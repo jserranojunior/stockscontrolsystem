@@ -1,0 +1,51 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "checkJs": false,
+    "useDefineForClassFields": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "strict": true,
+    "jsx": "preserve",
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "lib": ["esnext", "dom"],
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": false,
+    "allowJs": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "src/**/**/**/*.ts",
+    "src/**/**/**/*.test.ts",
+    "src/**/**/**/**/*.test.ts",
+    "src/**/**/*.test.ts",
+    "src/**/**/**/**/**/*.test.ts",
+    "src/**/*.test.ts",
+    "src/**/**/*.ts"
+  ],
+  "exclude": [
+    "**/*.spec.ts",
+    "**/**/*.test.ts",
+    "**/*.test.ts",
+    "*.test.ts",
+    "**/**/**/*.test.ts",
+    "**/**/**/**/*.test.ts",
+    "**/**/**/**/**/**/*.test.ts",
+    "**/**/**/**/**/**/**/*.test.ts",
+    "'/mnt/bufalo/dev/scs/front/src/mods/dashbord/calculadora/src/**/*.js'",
+    "'/mnt/bufalo/dev/scs/front/src/mods/dashbord/calculadora/src/mixins/**/*.js'",
+    "'/mnt/bufalo/dev/scs/front/src/mods/dashbord/calculadora/src/utils/**/*.js'",
+    "node_modules",
+
+    "./node_modules"
+  ],
+  "references": [{ "path": "./tsconfig.node.json" }],
+  "checkJs": false,
+  "vetur.validation.script": false
+}

@@ -1,0 +1,33 @@
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host=0.0.0.0",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@iconify/vue": "^5.0.0",
+    "alvitre-obelisk": "^1.2.5",
+    "axios": "^1.6.8",
+    "maska": "^3.1.1",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.10",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "autoprefixer": "^10.4.21",
+    "daisyui": "^5.0.43",
+    "postcss": "^8.5.5",
+    "tailwindcss": "^4.1.10",
+    "typescript": "^5.2.2",
+    "vite": "^6.3.5",
+    "vite-plugin-env-compatible": "^2.0.1",
+    "vitest": "^3.2.3",
+    "vue-tsc": "^2.0.6"
+  }
+}

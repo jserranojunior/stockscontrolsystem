@@ -1,0 +1,35 @@
+version: "3"
+
+networks:
+  stack_ponte:
+    external: true
+
+services:
+  frontend_scs:
+    container_name: "frontend_scs"
+    image: "webdevops/apache:latest"
+    networks:
+      - stack_ponte
+    volumes:
+      - "${PATHPESSOAL}/scs/front-scs/dist:/app"
+    ports:
+      - 4080:80
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.scs.rule=Host(`scs.${DOMAIN}`,`www.scs.${DOMAIN}`)"
+      - "traefik.http.services.scs.loadbalancer.server.port=80"
+
+  backend_scs:
+    container_name: "backend_scs"
+    image: golang:1.16.3
+    networks:
+      - stack_ponte
+    volumes:
+      - ${PATHPESSOAL}/scs/backgo:/app
+    ports:
+      - 4020:8000
+    command: "/bin/sh -c 'cd /app && ls && ./main'"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.apiscs.rule=Host(`apiscs.${DOMAIN}`)"
+      - "traefik.http.services.apiscs.loadbalancer.server.port=4020"

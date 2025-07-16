@@ -1,0 +1,17 @@
+database/mysql
+
+backend/node_modules
+backend/.env
+backgo/go_modules
+frontend/.env
+frontend/node_modules
+frontend/"
+front/.env
+.env
+/front/.env
+./front/env
+server/.env
+target/
+
+
+frontend/package-lock.json
