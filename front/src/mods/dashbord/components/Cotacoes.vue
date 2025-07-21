@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-wrap justify-center gap-4">
+  <div class="flex flex-wrap justify-center mx-2">
     <MoedaCotacao />
     <CriptCotacao />
     <MarketCotacao />

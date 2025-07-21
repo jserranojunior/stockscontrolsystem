@@ -38,9 +38,12 @@
     "**/**/**/**/*.test.ts",
     "**/**/**/**/**/**/*.test.ts",
     "**/**/**/**/**/**/**/*.test.ts",
-    "'/mnt/bufalo/dev/scs/front/src/mods/dashbord/calculadora/src/**/*.js'",
-    "'/mnt/bufalo/dev/scs/front/src/mods/dashbord/calculadora/src/mixins/**/*.js'",
-    "'/mnt/bufalo/dev/scs/front/src/mods/dashbord/calculadora/src/utils/**/*.js'",
+    "/mnt/bufalo/dev/scs/front/src/mods/dashbord/calculadora/src/**/*.js",
+    "/mnt/bufalo/dev/scs/front/src/mods/dashbord/calculadora/src/mixins/calculator.js",
+    "/mnt/bufalo/dev/scs/front/src/mods/dashbord/calculadora/src/mixins/converter.js",
+    "/mnt/bufalo/dev/scs/front/src/mods/dashbord/calculadora/src/mixins/vac.js",
+    "/mnt/bufalo/dev/scs/front/src/mods/dashbord/calculadora/src/utils/translations/br.js",
+    "/mnt/bufalo/dev/scs/front/src/mods/dashbord/calculadora/src/utils/translations/translator.js",
     "node_modules",
 
     "./node_modules"
