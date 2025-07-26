@@ -80,7 +80,7 @@
     </nav>
 
     <!-- Conteúdo -->
-    <div class="p-4">
+    <div class="p-2">
       <div class="flex justify-between items-center mb-4">
         <button
           class="text-white bg-gray-600 hover:bg-gray-700 p-2 rounded cursor-pointer"

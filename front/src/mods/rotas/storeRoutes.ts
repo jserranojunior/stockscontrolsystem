@@ -158,5 +158,18 @@ export const store = reactive({
       updated_at: "2020-03-29T17:24:11.000000Z",
       acl: { acl: 0 },
     },
+    {
+      id: 12,
+      meta: { id: 12 },
+      name: "calculadora",
+      path: "/calculadora",
+      component: () => import("../../pages/Calculadora.vue"),
+      rule: "Pública",
+      titulo: "Calculadora",
+      remember_token: null,
+      created_at: "2020-03-29T17:24:11.000000Z",
+      updated_at: "2020-03-29T17:24:11.000000Z",
+      acl: { acl: 0 },
+    },
   ],
 });

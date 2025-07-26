@@ -23,16 +23,20 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="card">
+  <div class="card w-96">
     <div class="card-body">
       <h2 class="card-title">Calculadora</h2>
       <!-- Passa as props para o componente Calculator -->
-      <Calculator
-        :title="props.title"
-        :description="props.description"
-        :defaultMode="props.defaultMode"
-        :locale="props.locale"
-      />
+      <div class="flex">
+        <div class="w-full">
+          <Calculator
+            :title="props.title"
+            :description="props.description"
+            :defaultMode="props.defaultMode"
+            :locale="props.locale"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>

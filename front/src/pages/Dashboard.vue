@@ -9,10 +9,6 @@
     <!-- Card de Horários -->
     <Hora></Hora>
     <!-- Calendário -->
-
-    <div class="items-center align-middle">
-      <Calculadora />
-    </div>
   </div>
 
   <div class="flex flex-wrap justify-center">
@@ -38,7 +34,6 @@ import { ref, onMounted, onUnmounted } from "vue";
 import EuroConversor from "../mods/dashbord/components/EuroConversor.vue";
 import DolarConversor from "../mods/dashbord/components/DolarConversor.vue";
 import Calendario from "../mods/dashbord/components/Calendario.vue";
-import Calculadora from "../mods/dashbord/calculadora/Calculadora.vue";
 import Cotacoes from "../mods/dashbord/components/Cotacoes.vue";
 import Hora from "../mods/dashbord/components/Hora.vue";
 import { useCotacoes } from "../mods/dashbord/composables/useCotacoes";
