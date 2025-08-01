@@ -33,14 +33,14 @@
   <div v-if="!openNewCompra" id="relatorio-diario">
     <RelatorioDiario />
   </div>
-  <div v-if="!openNewCompra" id="resultado-mensal">
-    <ResultadoMensal />
-  </div>
   <div v-if="!openNewCompra" id="resumo">
     <Resumo />
   </div>
   <div v-if="!openNewCompra" id="resumo-dolar">
     <ResumoDolar />
+  </div>
+  <div v-if="!openNewCompra" id="resultado-mensal">
+    <ResultadoMensal />
   </div>
 </template>
 <script setup lang="ts">

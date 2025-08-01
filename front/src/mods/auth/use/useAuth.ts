@@ -76,6 +76,7 @@ export const useAuth = () => {
         await getUserAcl().then(async () => {
           await generateRoutesEnableWithUserAcls().then(() => {
             setRoutesEnableAuth(nameRoutesEnable);
+            router.push({ name: "/" });
           });
         });
         store.btnLogin = true;

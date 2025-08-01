@@ -34,6 +34,13 @@
           v-if="nameRoutesEnable.includes('financeiro')"
           >Financeiro
         </router-link>
+
+        <router-link
+          class="btn-sm mx-1 btn btn-outline btn-secondary"
+          :to="'/calculadora'"
+          v-if="nameRoutesEnable.includes('calculadora')"
+          >Calculadora</router-link
+        >
         <!--   <router-link
           class="btn-sm mx-1 btn btn-outline btn-secondary"
           :to="'/contasapagar'"
@@ -65,12 +72,6 @@
           >Diário</router-link
         >
 
-        <router-link
-          class="btn-sm mx-1 btn btn-outline btn-secondary"
-          :to="'/calculadora'"
-          v-if="nameRoutesEnable.includes('calculadora')"
-          >Calculadora</router-link
-        >
         <router-link
           class="btn-sm mx-1 btn btn-outline btn-secondary"
           :to="'/contabilidade'"

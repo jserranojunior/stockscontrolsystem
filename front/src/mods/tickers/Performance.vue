@@ -27,6 +27,17 @@
                 class="table table-xs w-full min-w-[800px] text-sm bg-base-100"
               >
                 <thead class="text-black">
+                  <tr>
+                    <td colspan="5" class="text-center bg-yellow-100">
+                      INVESTIDO
+                    </td>
+                    <td class="text-center mx-auto">
+                      <div class="px-2 w-2">|</div>
+                    </td>
+                    <td colspan="6" class="text-center bg-blue-200">
+                      PERFORMANCE
+                    </td>
+                  </tr>
                   <tr class="text-xs uppercase tracking-wide">
                     <th></th>
                     <th class="text-center" title="Nome do ativo">ATIVOS</th>
@@ -43,9 +54,11 @@
                     <th class="text-right" title="Preço Médio (Valor Médio)">
                       PMC
                     </th>
-                    <th class="text-right"><div class="px-2"></div></th>
+                    <th class="text-center mx-auto">
+                      <div class="px-2 w-2">|</div>
+                    </th>
                     <th
-                      class="text-right"
+                      class="text-left"
                       title="Preço atual do ativo no final dia"
                     >
                       P. Atual
@@ -102,8 +115,10 @@
                     <td class="text-right">
                       {{ formatCurrency(ativo.precoMedio) }}
                     </td>
-                    <td></td>
-                    <td class="text-right">
+                    <th class="text-center mx-auto">
+                      <div class="px-2 w-2">|</div>
+                    </th>
+                    <td class="text-left">
                       {{ formatCurrency(ativo.precoAtual) }}
                     </td>
                     <td class="text-right">
@@ -127,7 +142,9 @@
 
                     <td></td>
                     <td></td>
-                    <td></td>
+                    <th class="text-center mx-auto">
+                      <div class="px-2 w-2">|</div>
+                    </th>
                     <td></td>
                     <td class="text-right">
                       {{ formatCurrency(corretora.totalDiario.valorComprado) }}
@@ -154,7 +171,9 @@
 
                     <td></td>
                     <td></td>
-                    <td></td>
+                    <th class="text-center mx-auto">
+                      <div class="px-2 w-2">|</div>
+                    </th>
                     <td></td>
 
                     <td class="text-right">

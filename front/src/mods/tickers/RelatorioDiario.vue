@@ -1,7 +1,7 @@
 <template>
   <div class="p-6 flex justify-center items-center">
     <h1 class="text-3xl font-bold mb-6 text-center w-full">
-      Relatório Diário de Investimentos
+      Relatório Semanal de Investimentos
     </h1>
   </div>
 

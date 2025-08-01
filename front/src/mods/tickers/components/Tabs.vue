@@ -15,10 +15,10 @@
         <a
           href="#resultado-mensal"
           class="btn btn-outline btn-sm whitespace-nowrap"
-          >Resultado Mensal</a
+          >Resultado Semanal</a
         >
         <a href="#resumo" class="btn btn-outline btn-sm whitespace-nowrap"
-          >Resumo</a
+          >Resumo Anual</a
         >
       </nav>
     </div>

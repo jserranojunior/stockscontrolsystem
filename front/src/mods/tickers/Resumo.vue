@@ -1,7 +1,7 @@
 <template>
   <div class="p-6 flex justify-center items-center">
     <div class="w-full">
-      <h1 class="text-3xl font-bold my-4 text-center">Resumo</h1>
+      <h1 class="text-3xl font-bold my-4 text-center">Resumo Mensal</h1>
     </div>
   </div>
   <div class="w-full max-w-6xl mx-auto card shadow-xl p-0 m-0 rounded-2xl">
