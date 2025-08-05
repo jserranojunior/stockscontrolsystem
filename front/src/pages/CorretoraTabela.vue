@@ -51,11 +51,11 @@
           <p class="text-sm font-semibold mb-1 text-gray-600">Ticks:</p>
           <div class="flex flex-wrap gap-2">
             <span
-              v-for="tick in corretora.ticks"
-              :key="tick"
+              v-for="tick in corretora.tickers"
+              :key="tick.id"
               class="badge badge-outline"
             >
-              {{ tick }}
+              {{ tick.tick }}
             </span>
           </div>
         </div>
@@ -65,10 +65,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onBeforeMount, ref } from "vue";
 import { store } from "../mods/tickers/composables/storeTicker";
+import { useTicker } from "../mods/tickers/composables/useTicker";
+const { getCorretoras } = useTicker();
 
 function formatarData(dataISO: string): string {
   return new Date(dataISO).toLocaleDateString("pt-BR");
 }
+
+onBeforeMount(async () => {
+  await getCorretoras().then(() => {
+    console.log("Corretoras carregadas:", store.corretoras);
+  });
+});
 </script>

@@ -48,4 +48,11 @@ func RegisterRoutes() {
 		financial.Get("/paidbills/:id", middlewares.CORSMiddleware, middlewares.VerifyJwt, handlers.EditPaidBills)
 	}
 
+	router.Get("/corretoras", middlewares.CORSMiddleware, handlers.GetCorretoras)
+	router.Get("/corretoras/:id", middlewares.CORSMiddleware, handlers.GetCorretoraPorID)
+	router.Post("/corretoras", middlewares.CORSMiddleware, handlers.CriarCorretora)
+	router.Put("/corretoras/:id", middlewares.CORSMiddleware, handlers.AtualizarCorretora)
+	router.Delete("/corretoras/:id", middlewares.CORSMiddleware, handlers.DeletarCorretora)
+	router.Get("/corretorascomoperacoes", middlewares.CORSMiddleware, handlers.GetCorretorasComOperacoes)
+
 }

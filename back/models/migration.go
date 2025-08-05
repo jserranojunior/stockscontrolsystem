@@ -6,7 +6,7 @@ package models
 
 import "github.com/gocondor/core/database"
 
-//MigrateDB the database
+// MigrateDB the database
 func MigrateDB() {
 	db := database.Resolve()
 	// add your models to be auto migrated here
@@ -18,8 +18,8 @@ func MigrateDB() {
 	db.AutoMigrate(&Acl{})
 	db.AutoMigrate(&UserAcl{})
 	db.AutoMigrate(&AclRoutes{})
-
-
-
+	db.AutoMigrate(&Corretoras{})
+	db.AutoMigrate(&Tickers{})
+	db.AutoMigrate(&Operacoes{})
 
 }

@@ -1,6 +1,60 @@
 import { computed } from "vue";
 import { store } from "./storeTicker";
+import { httpTickers } from "./httpTickers";
 export const useTicker = () => {
+  async function getCorretoras() {
+    await httpTickers()
+      .getCorretoras()
+      .then((res) => {
+        store.corretoras = res.data;
+      });
+  }
+
+  async function getCorretorasComOperacoes() {
+    await httpTickers()
+      .getCorretorasComOperacoes()
+      .then((res) => {
+        console.log(res.data);
+        store.ativos = calcularPosicao(res.data);
+      });
+  }
+
+  function calcularPosicao(dados: any) {
+    // Verifica se existe alguma corretora no objeto
+    for (const corretoraKey in dados) {
+      const corretora = dados[corretoraKey];
+
+      // Garante que existe array de tickers
+      if (!corretora.tickers || !Array.isArray(corretora.tickers)) continue;
+
+      // Itera sobre os tickers da corretora
+      corretora.tickers = corretora.tickers.map((ticker: any) => {
+        // Verifica se há operações
+        if (ticker.operacoes && ticker.operacoes.length > 0) {
+          const ultimaOp = ticker.operacoes[ticker.operacoes.length - 1];
+
+          // Calcula a posição
+          const precoAtual = ticker.precoAtual ?? 0;
+          const saldo = ultimaOp.saldoTickers ?? 0;
+          const posicao = parseFloat((saldo * precoAtual).toFixed(2));
+
+          return {
+            ...ticker,
+            posicao,
+          };
+        }
+
+        // Caso não haja operações
+        return {
+          ...ticker,
+          posicao: 0,
+        };
+      });
+    }
+
+    return dados;
+  }
+
   function adicionarOperacao() {
     const operacao = {
       data: store.novaOperacao.data,
@@ -109,5 +163,7 @@ export const useTicker = () => {
     formatarData,
     adicionarOperacao,
     removerOperacao,
+    getCorretoras,
+    getCorretorasComOperacoes,
   };
 };
