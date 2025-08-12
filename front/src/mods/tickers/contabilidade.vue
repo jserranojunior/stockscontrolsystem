@@ -2,11 +2,8 @@
   <div class="mx-auto p-6 space-y-10" v-if="store.ativos">
     <!-- Loop através de todos os ativos -->
     <div v-for="(corretora, index) in store.ativos" :key="index">
-      <div
-        v-for="(ticker, index) in corretora.tickers"
-        :key="index"
-        class="card bg-base-200 shadow-lg rounded-lg p-6 mb-10"
-      >
+      <div v-for="(ticker, index) in corretora.tickers" :key="index"
+        class="card bg-base-200 shadow-lg rounded-lg p-6 mb-10">
         <!-- Cabeçalho com nome do ativo -->
         <h1 class="text-3xl font-bold mb-6">
           {{ ticker.tick }}
@@ -17,9 +14,7 @@
 
         <!-- Tabela de operações -->
         <div class="overflow-x-auto mb-6">
-          <table
-            class="table table-sm w-full bg-white border border-gray-300 text-sm"
-          >
+          <table class="table table-sm w-full bg-white border border-gray-300 text-sm">
             <thead>
               <tr class="bg-gray-100 font-bold text-gray-800">
                 <th class="border border-gray-300 p-2">C/V</th>
@@ -37,12 +32,13 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(op, index) in ticker.operacoes" :key="index">
+              <tr v-for="(op, index) in ticker.operacoes" :key="index"
+                :class="{ 'bg-red-300': op.tipoOperacao === 'V' }">
                 <td class="border border-gray-300 p-2 text-center">
                   {{ op.tipoOperacao }}
                 </td>
                 <td class="border border-gray-300 p-2 text-center">
-                  {{ formatarData(op.data) }}
+                  {{ dateFormatPtbr(op.data) }}
                 </td>
                 <td class="border border-gray-300 p-2 text-right">
                   {{
@@ -117,24 +113,20 @@
                 <span class="font-semibold">Resultado:</span>
 
                 <!-- Percentual -->
-                <div
-                  :class="{
-                    'text-blue-600': resultadoPercentual(ticker) > 0,
-                    'text-red-600': resultadoPercentual(ticker) < 0,
-                    'text-gray-600': resultadoPercentual(ticker) === 0,
-                  }"
-                >
+                <div :class="{
+                  'text-blue-600': resultadoPercentual(ticker) > 0,
+                  'text-red-600': resultadoPercentual(ticker) < 0,
+                  'text-gray-600': resultadoPercentual(ticker) === 0,
+                }">
                   {{ resultadoPercentual(ticker).toFixed(2) }}%
                 </div>
 
                 <!-- Valor -->
-                <div
-                  :class="{
-                    'text-blue-600': resultadoValor(ticker) > 0,
-                    'text-red-600': resultadoValor(ticker) < 0,
-                    'text-gray-600': resultadoValor(ticker) === 0,
-                  }"
-                >
+                <div :class="{
+                  'text-blue-600': resultadoValor(ticker) > 0,
+                  'text-red-600': resultadoValor(ticker) < 0,
+                  'text-gray-600': resultadoValor(ticker) === 0,
+                }">
                   {{ formatarMoeda(resultadoValor(ticker)) }}
                 </div>
               </div>
@@ -182,10 +174,7 @@
               </div>
             </div>
 
-            <div
-              class="flex justify-between"
-              v-if="ticker.operacoes && ticker.operacoes.length > 0"
-            >
+            <div class="flex justify-between" v-if="ticker.operacoes && ticker.operacoes.length > 0">
               <div class="font-semibold">PMC:</div>
               <div>
                 {{
@@ -222,6 +211,7 @@
 import { onBeforeMount } from "vue";
 import { store } from "./composables/storeTicker";
 import { useTicker } from "./composables/useTicker";
+import { dateFormatPtbr } from "alvitre-obelisk";
 const { getCorretorasComOperacoes } = useTicker();
 
 onBeforeMount(async () => {

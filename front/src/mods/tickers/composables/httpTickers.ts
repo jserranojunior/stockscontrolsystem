@@ -24,5 +24,20 @@ export function httpTickers() {
       });
   }
 
-  return { getCorretoras, getCorretorasComOperacoes };
+  async function getCorretorasComOperacoesPerformance() {
+    const urlApi = "/corretorascomoperacoesperformance";
+    return await ApiConnect.getWithoutToken(urlApi)
+      .then((res: any) => {
+        return res;
+      })
+      .catch((res: any) => {
+        return res;
+      });
+  }
+
+  return {
+    getCorretoras,
+    getCorretorasComOperacoes,
+    getCorretorasComOperacoesPerformance,
+  };
 }

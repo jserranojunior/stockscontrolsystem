@@ -10,6 +10,25 @@ import (
 	"gorm.io/gorm"
 )
 
+type OperacaoDTO struct {
+	Tick         string    `json:"tick"`
+	TipoOperacao string    `json:"tipoOperacao"`
+	Data         time.Time `json:"data"`
+	Quantidade   float64   `json:"quantidade"`
+	ValorTotal   float64   `json:"valorTotal"`
+	ValorUnidade float64   `json:"valorUnidade"`
+	PrecoMedio   float64   `json:"precoMedio"`
+	Saldo        float64   `json:"saldo"`
+	Carteira     float64   `json:"carteira"`
+	PrecoAtual   float64   `json:"precoAtual"`
+}
+
+type CorretoraDTO struct {
+	Nome      string        `json:"nome"`
+	Cor       string        `json:"cor"`
+	Operacoes []OperacaoDTO `json:"operacoes"`
+}
+
 // Use a variável global DB (definida em outro lugar)
 
 func GetCorretoras(c *gin.Context) {
@@ -158,4 +177,46 @@ func GetCorretorasComOperacoes(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, corretoras)
+}
+
+func GetCorretorasComOperacoesPerfomance(c *gin.Context) {
+	var corretoras []models.Corretoras
+
+	// Carrega Tickers e suas Operações
+	err := DB.Preload("Tickers.Operacoes").Find(&corretoras).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Monta o DTO de resposta
+	var resposta []CorretoraDTO
+	for _, cor := range corretoras {
+		corDTO := CorretoraDTO{
+			Nome: cor.Nome,
+			Cor:  cor.Cor,
+		}
+
+		for _, ticker := range cor.Tickers {
+			for _, op := range ticker.Operacoes {
+				opDTO := OperacaoDTO{
+					Tick:         ticker.Tick,
+					TipoOperacao: op.TipoOperacao,
+					Data:         op.Data,
+					Quantidade:   op.Quantidade,
+					ValorTotal:   op.ValorTotal,
+					ValorUnidade: op.ValorUnidade,
+					PrecoMedio:   op.PrecoMedioCompra,
+					Saldo:        op.SaldoTickers,
+					Carteira:     op.Carteira,
+					PrecoAtual:   ticker.PrecoAtual,
+				}
+				corDTO.Operacoes = append(corDTO.Operacoes, opDTO)
+			}
+		}
+
+		resposta = append(resposta, corDTO)
+	}
+
+	c.JSON(http.StatusOK, resposta)
 }

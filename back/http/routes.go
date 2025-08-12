@@ -54,5 +54,6 @@ func RegisterRoutes() {
 	router.Put("/corretoras/:id", middlewares.CORSMiddleware, handlers.AtualizarCorretora)
 	router.Delete("/corretoras/:id", middlewares.CORSMiddleware, handlers.DeletarCorretora)
 	router.Get("/corretorascomoperacoes", middlewares.CORSMiddleware, handlers.GetCorretorasComOperacoes)
+	router.Get("/corretorascomoperacoesperformance", middlewares.CORSMiddleware, handlers.GetCorretorasComOperacoesPerfomance)
 
 }

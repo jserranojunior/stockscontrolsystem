@@ -19,6 +19,61 @@ export const useTicker = () => {
       });
   }
 
+  async function getCorretorasComOperacoesPerformance() {
+    await httpTickers()
+      .getCorretorasComOperacoesPerformance()
+      .then((res) => {
+        console.log(res.data);
+        store.ativos = calcularPosicaoOperacoesPerformance(res.data);
+      });
+  }
+
+  function calcularPosicaoPerfomance(op: any): number {
+    const precoAtual = op.precoAtual ?? 0;
+    const quantidade = op.quantidade ?? 0;
+    return parseFloat((quantidade * precoAtual).toFixed(2));
+  }
+
+  function calcularPerformance(
+    posicao: number,
+    valorInvestido: number
+  ): number {
+    return parseFloat((posicao - (valorInvestido ?? 0)).toFixed(2));
+  }
+
+  function calcularVariacaoPercentual(
+    precoAtual: number,
+    precoMedio: number
+  ): number {
+    if (!precoMedio || precoMedio === 0) return 0;
+    const variacao = ((precoAtual - precoMedio) / precoMedio) * 100;
+    return parseFloat(variacao.toFixed(2));
+  }
+
+  function calcularPosicaoOperacoesPerformance(dados: any) {
+    for (const corretora of dados) {
+      if (!corretora.operacoes || !Array.isArray(corretora.operacoes)) continue;
+
+      corretora.operacoes = corretora.operacoes.map((op: any) => {
+        const posicao = calcularPosicaoPerfomance(op);
+        const performance = calcularPerformance(posicao, op.valorTotal);
+        const variacaoPercentual = calcularVariacaoPercentual(
+          op.precoAtual,
+          op.precoMedio
+        );
+
+        return {
+          ...op,
+          posicao,
+          performance,
+          variacaoPercentual,
+        };
+      });
+    }
+
+    return dados;
+  }
+
   function calcularPosicao(dados: any) {
     // Verifica se existe alguma corretora no objeto
     for (const corretoraKey in dados) {
@@ -165,5 +220,6 @@ export const useTicker = () => {
     removerOperacao,
     getCorretoras,
     getCorretorasComOperacoes,
+    getCorretorasComOperacoesPerformance,
   };
 };
