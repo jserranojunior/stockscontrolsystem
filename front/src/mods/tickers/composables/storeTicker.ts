@@ -48,11 +48,15 @@ export const store = reactive({
   tipoOperacao: "compra",
   novaOperacao: {
     data: new Date().toISOString().split("T")[0],
-    tick: "TSLA34",
-    qtdCompra: null,
-    qtdVenda: null,
-    valorCompra: null,
-    valorVenda: null,
+    tickerId: null as any,
+    quantidade: null as any,
+    valorTotal: null as any,
+    precoMedioCompra: null as any,
+    tipoOperacao: "C",
+
+    valorUnidade: null as any,
+    saldoTickers: null as any,
+    carteira: null as any,
   },
 
   ativosParaCalcular: {
@@ -142,4 +146,8 @@ export const store = reactive({
   },
 
   ativos: {} as any,
+
+  corretoraTickers: [] as any,
+
+  corretoraSelecionada: null as any,
 });

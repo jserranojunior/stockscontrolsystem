@@ -171,5 +171,18 @@ export const store = reactive({
       updated_at: "2020-03-29T17:24:11.000000Z",
       acl: { acl: 0 },
     },
+    {
+      id: 13,
+      meta: { id: 13 },
+      name: "operacoes",
+      path: "/operacoes",
+      component: () => import("../../pages/Operacoes.vue"),
+      rule: "Pública",
+      titulo: "Operacoes",
+      remember_token: null,
+      created_at: "2020-03-29T17:24:11.000000Z",
+      updated_at: "2020-03-29T17:24:11.000000Z",
+      acl: { acl: 0 },
+    },
   ],
 });

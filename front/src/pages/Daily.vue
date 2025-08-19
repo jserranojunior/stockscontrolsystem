@@ -6,11 +6,6 @@
       <Calendario />
     </div>
 
-    <div class="w-auto mr-6">
-      <div class="text-right btn btn-sm btn-primary" v-if="!openNewCompra" @click="toggleNewCompra">
-        Registrar Compra
-      </div>
-    </div>
   </div>
   <div class="flex justify-end m-4">
     <div class="text-right btn btn-warning" v-if="openNewCompra" @click="toggleNewCompra">
@@ -18,9 +13,7 @@
     </div>
   </div>
 
-  <div v-if="openNewCompra">
-    <addNewDailyAction />
-  </div>
+
   <div v-if="!openNewCompra" id="performance">
     <Performance />
   </div>
@@ -39,17 +32,12 @@
 </template>
 <script setup lang="ts">
 import Tabs from "../mods/tickers/components/Tabs.vue";
-import addNewDailyAction from "../mods/tickers/addNewDailyAction.vue";
 import Performance from "../mods/tickers/Performance.vue";
 import RelatorioDiario from "../mods/tickers/RelatorioDiario.vue";
-import { ref } from "vue";
+
 import ResultadoMensal from "../mods/tickers/ResultadoMensal.vue";
 import Resumo from "../mods/tickers/Resumo.vue";
 import ResumoDolar from "../mods/tickers/ResumoDolar.vue";
 import Calendario from "../components/Calendario/Calendario.vue";
-const openNewCompra = ref(false);
 
-function toggleNewCompra() {
-  openNewCompra.value = !openNewCompra.value;
-}
 </script>

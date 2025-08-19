@@ -10,12 +10,97 @@ export const useTicker = () => {
       });
   }
 
+  function showMessage(message: string) {
+    // Implementar lógica para exibir mensagem de erro
+    alert(message);
+  }
+
+  function converterCampos() {
+    // Converter data
+    if (!store.novaOperacao.data) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      store.novaOperacao.data = today.toISOString();
+    } else {
+      if (!store.novaOperacao.data.includes("T")) {
+        const dateWithZeroTime = new Date(
+          store.novaOperacao.data + "T00:00:00"
+        );
+        store.novaOperacao.data = dateWithZeroTime.toISOString();
+      }
+    }
+
+    // Converter campos numéricos diretamente no store
+    store.novaOperacao.tickerId = Number(store.novaOperacao.tickerId);
+    store.novaOperacao.quantidade = Number(store.novaOperacao.quantidade);
+    store.novaOperacao.valorTotal = Number(store.novaOperacao.valorTotal);
+    store.novaOperacao.valorUnidade = Number(store.novaOperacao.valorUnidade);
+
+    store.novaOperacao.precoMedioCompra = store.novaOperacao.precoMedioCompra
+      ? Number(store.novaOperacao.precoMedioCompra)
+      : null;
+
+    store.novaOperacao.saldoTickers = Number(store.novaOperacao.saldoTickers);
+
+    store.novaOperacao.carteira = store.novaOperacao.carteira
+      ? Number(store.novaOperacao.carteira)
+      : null;
+  }
+
+  // No seu componente Vue/React
+  async function adicionarOperacao(): Promise<void> {
+    // Validação básica antes de enviar
+    if (!store.novaOperacao.tickerId || !store.novaOperacao.quantidade) {
+      showMessage("Preencha todos os campos obrigatórios");
+      return;
+    }
+
+    converterCampos();
+
+    try {
+      const result = await httpTickers().addOperacao(store.novaOperacao);
+
+      if (result.success) {
+        // Sucesso
+        showMessage(result.message || "Operação adicionada com sucesso!");
+
+        // Limpar formulário
+        store.corretoraSelecionada = null;
+        store.novaOperacao = {
+          tickerId: 0,
+          tipoOperacao: "C",
+          data: new Date().toISOString().split("T")[0],
+          quantidade: 0,
+          valorTotal: 0,
+          valorUnidade: 0,
+          precoMedioCompra: null,
+          saldoTickers: 0,
+          carteira: null,
+        };
+      } else {
+        // Erro
+        showMessage(result.error || "Erro ao adicionar operação");
+      }
+    } catch (error) {
+      if (error) {
+        console.log(error);
+      }
+    }
+  }
+
   async function getCorretorasComOperacoes() {
     await httpTickers()
       .getCorretorasComOperacoes()
       .then((res) => {
-        console.log(res.data);
         store.ativos = calcularPosicao(res.data);
+      });
+  }
+
+  async function getTickersCorretoraID(corretoraID: number) {
+    await httpTickers()
+      .getTickersCorretoraID(corretoraID)
+      .then((res) => {
+        store.corretoraTickers = res.data;
       });
   }
 
@@ -23,7 +108,6 @@ export const useTicker = () => {
     await httpTickers()
       .getCorretorasComOperacoesPerformance(data)
       .then((res) => {
-        console.log(res.data);
         store.ativos = calcularPosicaoOperacoesPerformance(res.data);
       });
   }
@@ -110,41 +194,6 @@ export const useTicker = () => {
     return dados;
   }
 
-  function adicionarOperacao() {
-    const operacao = {
-      data: store.novaOperacao.data,
-      tick: store.novaOperacao.tick.toUpperCase(),
-      qtdCompra:
-        store.tipoOperacao === "compra"
-          ? Number(store.novaOperacao.qtdCompra)
-          : null,
-      qtdVenda:
-        store.tipoOperacao === "venda"
-          ? Number(store.novaOperacao.qtdVenda)
-          : null,
-      valorCompra:
-        store.tipoOperacao === "compra"
-          ? Number(store.novaOperacao.valorCompra)
-          : null,
-      valorVenda:
-        store.tipoOperacao === "venda"
-          ? Number(store.novaOperacao.valorVenda)
-          : null,
-    };
-
-    store.operacoes.push(operacao);
-
-    // Reset form
-    store.novaOperacao = {
-      data: new Date().toISOString().split("T")[0],
-      tick: "",
-      qtdCompra: null,
-      qtdVenda: null,
-      valorCompra: null,
-      valorVenda: null,
-    };
-  }
-
   function removerOperacao(index: any) {
     store.operacoes.splice(index, 1);
   }
@@ -221,5 +270,6 @@ export const useTicker = () => {
     getCorretoras,
     getCorretorasComOperacoes,
     getCorretorasComOperacoesPerformance,
+    getTickersCorretoraID,
   };
 };

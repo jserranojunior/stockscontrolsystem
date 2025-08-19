@@ -56,4 +56,8 @@ func RegisterRoutes() {
 	router.Get("/corretorascomoperacoes", middlewares.CORSMiddleware, handlers.GetCorretorasComOperacoes)
 	router.Get("/corretorascomoperacoesperformance/:data", middlewares.CORSMiddleware, handlers.GetCorretorasComOperacoesPerfomance)
 
+	router.Get("/tickers/:corretoraID", middlewares.CORSMiddleware, handlers.GetTickersPorCorretoraID)
+
+	router.Post("/operacoes", middlewares.CORSMiddleware, handlers.CreateOperacao)
+
 }
