@@ -2,24 +2,18 @@
   <Tabs />
   <div class="flex justify-between mt-6">
     <div class="w-1/3"></div>
-    <div class="w-1/3"><Calendario /></div>
+    <div class="w-1/3">
+      <Calendario />
+    </div>
 
     <div class="w-auto mr-6">
-      <div
-        class="text-right btn btn-sm btn-primary"
-        v-if="!openNewCompra"
-        @click="toggleNewCompra"
-      >
+      <div class="text-right btn btn-sm btn-primary" v-if="!openNewCompra" @click="toggleNewCompra">
         Registrar Compra
       </div>
     </div>
   </div>
   <div class="flex justify-end m-4">
-    <div
-      class="text-right btn btn-warning"
-      v-if="openNewCompra"
-      @click="toggleNewCompra"
-    >
+    <div class="text-right btn btn-warning" v-if="openNewCompra" @click="toggleNewCompra">
       Fechar
     </div>
   </div>
@@ -52,7 +46,7 @@ import { ref } from "vue";
 import ResultadoMensal from "../mods/tickers/ResultadoMensal.vue";
 import Resumo from "../mods/tickers/Resumo.vue";
 import ResumoDolar from "../mods/tickers/ResumoDolar.vue";
-import Calendario from "../components/Calendario.vue";
+import Calendario from "../components/Calendario/Calendario.vue";
 const openNewCompra = ref(false);
 
 function toggleNewCompra() {

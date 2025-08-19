@@ -180,16 +180,35 @@ func GetCorretorasComOperacoes(c *gin.Context) {
 }
 
 func GetCorretorasComOperacoesPerfomance(c *gin.Context) {
+	// pega data da rota
+	dataParam := c.Param("data")
+	if dataParam == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Parâmetro 'data' é obrigatório no formato yyyy-mm-dd"})
+		return
+	}
+
+	// converte string para time.Time
+	data, err := time.Parse("2006-01-02", dataParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Formato de data inválido, use yyyy-mm-dd"})
+		return
+	}
+
+	// cria intervalo do dia (00:00 até 23:59)
+	inicio := data
+	fim := data.Add(24 * time.Hour)
+
 	var corretoras []models.Corretoras
 
-	// Carrega Tickers e suas Operações
-	err := DB.Preload("Tickers.Operacoes").Find(&corretoras).Error
+	// busca corretoras, tickers e operações apenas do dia informado
+	err = DB.Preload("Tickers.Operacoes", "data >= ? AND data < ?", inicio, fim).
+		Find(&corretoras).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Monta o DTO de resposta
+	// monta DTO de resposta
 	var resposta []CorretoraDTO
 	for _, cor := range corretoras {
 		corDTO := CorretoraDTO{
@@ -218,5 +237,6 @@ func GetCorretorasComOperacoesPerfomance(c *gin.Context) {
 		resposta = append(resposta, corDTO)
 	}
 
+	// retorna JSON
 	c.JSON(http.StatusOK, resposta)
 }

@@ -141,5 +141,5 @@ export const store = reactive({
     },
   },
 
-  ativos: [] as any,
+  ativos: {} as any,
 });

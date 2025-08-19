@@ -19,9 +19,9 @@ export const useTicker = () => {
       });
   }
 
-  async function getCorretorasComOperacoesPerformance() {
+  async function getCorretorasComOperacoesPerformance(data: string) {
     await httpTickers()
-      .getCorretorasComOperacoesPerformance()
+      .getCorretorasComOperacoesPerformance(data)
       .then((res) => {
         console.log(res.data);
         store.ativos = calcularPosicaoOperacoesPerformance(res.data);

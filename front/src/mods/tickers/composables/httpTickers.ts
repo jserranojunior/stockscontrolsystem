@@ -24,8 +24,8 @@ export function httpTickers() {
       });
   }
 
-  async function getCorretorasComOperacoesPerformance() {
-    const urlApi = "/corretorascomoperacoesperformance";
+  async function getCorretorasComOperacoesPerformance(data: string) {
+    const urlApi = "/corretorascomoperacoesperformance/" + data;
     return await ApiConnect.getWithoutToken(urlApi)
       .then((res: any) => {
         return res;

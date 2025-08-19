@@ -1,5 +1,8 @@
-Arrumar a data mal formatada
-Colocar venda em vermelho
+
 Colocar L/P 
 Colocar Marge (+/-)
-MEta colocar para calcular com o valor da unidade ao invez da posição
+
+Colocar data e hora da última atualização da preço atual
+
+
+posiÇão fica sendo O VALOR ATUAL * QUANTIDADE DE TICJ

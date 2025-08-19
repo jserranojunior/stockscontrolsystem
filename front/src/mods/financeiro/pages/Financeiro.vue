@@ -8,10 +8,7 @@
         </div>
       </div>
       <div class="w-full sm:w-1/3 md:w-1/3 lg:w-1/3 text-right p-1">
-        <button
-          class="btn btn-warning btn-sm cursor-pointer"
-          @click="openModalAddBillsToPay()"
-        >
+        <button class="btn btn-warning btn-sm cursor-pointer" @click="openModalAddBillsToPay()">
           Nova conta
         </button>
       </div>
@@ -27,7 +24,7 @@
 </template>
 
 <script lang="ts" setup>
-import Calendario from "../../../components/Calendario.vue";
+import Calendario from "../../../components/Calendario/Calendario.vue";
 import ContasAPagar from "../components/ContasAPagar.vue";
 import Financial from "../composables/Financial";
 
