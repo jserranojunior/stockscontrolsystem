@@ -14,7 +14,13 @@
     "lib": ["esnext", "dom"],
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": false,
-    "allowJs": true
+    "allowJs": true,
+    
+    // ADICIONE ESTAS LINHAS:
+    "outDir": "./dist",
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false
   },
   "include": [
     "src/**/*.ts",
@@ -45,8 +51,11 @@
     "/mnt/bufalo/dev/scs/front/src/mods/dashbord/calculadora/src/utils/translations/br.js",
     "/mnt/bufalo/dev/scs/front/src/mods/dashbord/calculadora/src/utils/translations/translator.js",
     "node_modules",
-
-    "./node_modules"
+    "./node_modules",
+    
+    // ADICIONE TAMBÉM:
+    "dist",
+    "**/dist/**"
   ],
   "references": [{ "path": "./tsconfig.node.json" }],
   "checkJs": false,
