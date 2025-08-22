@@ -1,34 +1,33 @@
 <template>
-  <Tabs />
-  <div class="flex justify-between mt-6">
-    <div class="w-1/3"></div>
-    <div class="w-1/3">
-      <Calendario />
+  <div>
+    <Tabs />
+    <div class="flex justify-between mt-6">
+      <div class="w-1/3"></div>
+      <div class="w-1/3">
+        <Calendario />
+      </div>
+
+    </div>
+
+
+    <div id="performance">
+      <Performance />
+    </div>
+    <div id="relatorio-diario">
+      <RelatorioDiario />
+    </div>
+    <div id="resumo">
+      <Resumo />
+    </div>
+    <div id="resumo-dolar">
+      <ResumoDolar />
+    </div>
+    <div id="resultado-mensal">
+      <ResultadoMensal />
     </div>
 
   </div>
-  <div class="flex justify-end m-4">
-    <div class="text-right btn btn-warning" v-if="openNewCompra" @click="toggleNewCompra">
-      Fechar
-    </div>
-  </div>
 
-
-  <div v-if="!openNewCompra" id="performance">
-    <Performance />
-  </div>
-  <div v-if="!openNewCompra" id="relatorio-diario">
-    <RelatorioDiario />
-  </div>
-  <div v-if="!openNewCompra" id="resumo">
-    <Resumo />
-  </div>
-  <div v-if="!openNewCompra" id="resumo-dolar">
-    <ResumoDolar />
-  </div>
-  <div v-if="!openNewCompra" id="resultado-mensal">
-    <ResultadoMensal />
-  </div>
 </template>
 <script setup lang="ts">
 import Tabs from "../mods/tickers/components/Tabs.vue";

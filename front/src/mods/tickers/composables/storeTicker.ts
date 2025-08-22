@@ -144,7 +144,7 @@ export const store = reactive({
       ],
     },
   },
-
+  operacoesSemanaMes: {} as any,
   ativos: {} as any,
 
   corretoraTickers: [] as any,

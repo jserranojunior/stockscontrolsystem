@@ -8,13 +8,13 @@ import (
 
 type Operacoes struct {
 	gorm.Model
-	TickerID     uint      `gorm:"not null" json:"tickerId"`            // relação com Tickers
+	TickerID     uint      `gorm:"not null" json:"tickerId"`            // Relação com Tickers
 	TipoOperacao string    `gorm:"size:1;not null" json:"tipoOperacao"` // "C" (compra) ou "V" (venda)
 	Data         time.Time `gorm:"not null" json:"data"`
 	Quantidade   float64   `gorm:"not null" json:"quantidade"`
-	ValorTotal   float64   `gorm:"not null" json:"valorTotal"`
+	ValorTotal   float64   `gorm:"column:valor_total;not null" json:"valorTotal"` // Define explicitamente a coluna
 	ValorUnidade float64   `gorm:"not null" json:"valorUnidade"`
-	// Campos adicionais para calculo
+	// Campos adicionais para cálculo
 	PrecoMedioCompra float64 `gorm:"default:0" json:"precoMedioCompra"`
 	SaldoTickers     float64 `gorm:"default:0" json:"saldoTickers"`
 	Carteira         float64 `gorm:"default:0" json:"carteira"`

@@ -6,7 +6,15 @@ export const useTicker = () => {
     await httpTickers()
       .getCorretoras()
       .then((res) => {
+        console.log("Corretoras", res);
         store.corretoras = res.data;
+      });
+  }
+  async function getOperacoesSemanaMes() {
+    await httpTickers()
+      .getOperacoesSemanaMes()
+      .then((res) => {
+        store.operacoesSemanaMes = res.data;
       });
   }
 
@@ -104,11 +112,35 @@ export const useTicker = () => {
       });
   }
 
+  function calcularTotalDiario(dados: any) {
+    for (const corretora of dados) {
+      let totalPerformanceDiaria = { quantidade: 0, valor: 0 };
+      corretora.totalPerformanceDiaria = totalPerformanceDiaria;
+      if (!corretora.operacoes || !Array.isArray(corretora.operacoes)) continue;
+
+      for (let op of corretora.operacoes) {
+        if (op.tipoOperacao == "C") {
+          totalPerformanceDiaria.quantidade += op.quantidade;
+          totalPerformanceDiaria.valor += op.valorTotal;
+        } else {
+          totalPerformanceDiaria.quantidade -= op.quantidade;
+          totalPerformanceDiaria.valor -= op.valorTotal;
+        }
+
+        console.log("op diaria", op);
+        console.log("total diaria", totalPerformanceDiaria);
+      }
+
+      corretora.totalPerformanceDiaria = totalPerformanceDiaria;
+    }
+  }
+
   async function getCorretorasComOperacoesPerformance(data: string) {
     await httpTickers()
       .getCorretorasComOperacoesPerformance(data)
       .then((res) => {
         store.ativos = calcularPosicaoOperacoesPerformance(res.data);
+        calcularTotalDiario(res.data);
       });
   }
 
@@ -271,5 +303,6 @@ export const useTicker = () => {
     getCorretorasComOperacoes,
     getCorretorasComOperacoesPerformance,
     getTickersCorretoraID,
+    getOperacoesSemanaMes,
   };
 };

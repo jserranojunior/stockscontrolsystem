@@ -1,6 +1,17 @@
 import ClassUseApiConnect from "../../../helpers/http/useApiConnect";
 const ApiConnect = new ClassUseApiConnect();
 
+async function getOperacoesSemanaMes() {
+  const urlApi = "/operacoessemanames";
+  return await ApiConnect.getWithoutToken(urlApi)
+    .then((res: any) => {
+      return res;
+    })
+    .catch((res: any) => {
+      return res;
+    });
+}
+
 export function httpTickers() {
   async function getCorretoras() {
     const urlApi = "/corretoras";
@@ -118,5 +129,6 @@ export function httpTickers() {
     getCorretorasComOperacoesPerformance,
     getTickersCorretoraID,
     addOperacao,
+    getOperacoesSemanaMes,
   };
 }
