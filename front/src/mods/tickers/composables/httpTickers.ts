@@ -57,6 +57,29 @@ export function httpTickers() {
       });
   }
 
+  async function getOperacoesID(ID: number) {
+    const urlApi = "/operacoes/" + ID;
+    return await ApiConnect.getWithoutToken(urlApi)
+      .then((res: any) => {
+        console.log(res);
+        return res;
+      })
+      .catch((res: any) => {
+        return res;
+      });
+  }
+
+  async function updateOperacoes(data: any) {
+    const urlApi = "/operacoes";
+    return await ApiConnect.putWithoutToken(urlApi, data)
+      .then((res: any) => {
+        return res;
+      })
+      .catch((res: any) => {
+        return res;
+      });
+  }
+
   interface OperacaoData {
     tickerId: number;
     tipoOperacao: string;
@@ -124,11 +147,13 @@ export function httpTickers() {
     }
   }
   return {
+    updateOperacoes,
     getCorretoras,
     getCorretorasComOperacoes,
     getCorretorasComOperacoesPerformance,
     getTickersCorretoraID,
     addOperacao,
     getOperacoesSemanaMes,
+    getOperacoesID,
   };
 }

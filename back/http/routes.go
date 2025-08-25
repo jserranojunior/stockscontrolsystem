@@ -62,4 +62,8 @@ func RegisterRoutes() {
 
 	router.Get("/operacoessemanames", middlewares.CORSMiddleware, handlers.GetOperacoesPorCorretoraParaTabela)
 
+	router.Get("/operacoes/:id", middlewares.CORSMiddleware, handlers.GetOperacaoByID)
+
+	router.Put("/operacoes", middlewares.CORSMiddleware, handlers.UpdateOperacao)
+
 }

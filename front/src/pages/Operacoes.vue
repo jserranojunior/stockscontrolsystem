@@ -1,10 +1,13 @@
 <template>
   <div>
-    <addNewDailyAction />
+    <addOperation />
+
+
   </div>
 </template>
 
 <script lang="ts" setup>
-import addNewDailyAction from "../mods/tickers/addNewDailyAction.vue";
+
+import addOperation from "../mods/tickers/operacoes/addOperation.vue";
 
 </script>

@@ -23,7 +23,7 @@
             <div class="overflow-x-auto mb-6">
               <table class="table full bg-white border border-gray-300 text-md">
                 <thead>
-                  <tr class="bg-gray-100 font-bold text-gray-800">
+                  <tr class="bg-gray-100 font-bold text-gray-800 cursor-pointer hover:bg-gray-200">
                     <th class="border border-gray-300 p-2">C/V</th>
                     <th class="border border-gray-300 p-2">Data</th>
                     <th class="border border-gray-300 p-2">C</th>
@@ -40,7 +40,9 @@
                 </thead>
                 <tbody>
                   <tr v-for="(op, index) in ticker.operacoes" :key="index"
-                    :class="{ 'bg-red-100': op.tipoOperacao === 'V' }" class="font-bold">
+                    :class="{ 'bg-red-100': op.tipoOperacao === 'V' }"
+                    class="font-bold cursor-pointer hover:bg-gray-200" @click="editarOperacao(op.ID)">
+
                     <td class="border border-gray-200 p-2 text-center">
                       {{ op.tipoOperacao }}
                     </td>
@@ -245,6 +247,8 @@ import { store } from "./composables/storeTicker";
 import { useTicker } from "./composables/useTicker";
 import { dateFormatPtbr } from "alvitre-obelisk";
 import { httpTickers } from './composables/httpTickers';
+import { useRouter } from "vue-router";
+const router = useRouter();
 const { getCorretorasComOperacoes } = useTicker();
 
 onBeforeMount(async () => {
@@ -255,7 +259,12 @@ const calcularMetaValor = (carteira: number): number => {
   return carteira * 1.25;
 };
 
+function editarOperacao(id: number) {
+  // Redireciona para a página de edição da operação com o ID fornecido
+  store.editarOperacao.ID = id;
+  router.push({ name: "editaroperacao", params: {} });
 
+}
 
 const calcularDiferencaMeta = (
   carteira: number,

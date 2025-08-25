@@ -2,6 +2,41 @@ import { computed } from "vue";
 import { store } from "./storeTicker";
 import { httpTickers } from "./httpTickers";
 export const useTicker = () => {
+  function calcularSaldo(
+    saldoTickers: number,
+    tipoOperacao: string,
+    quantidade: number
+  ) {
+    if (tipoOperacao === "C") {
+      saldoTickers = saldoTickers + quantidade;
+    } else if (tipoOperacao === "V") {
+      saldoTickers = saldoTickers - quantidade;
+    }
+    return saldoTickers;
+  }
+
+  function calcularCarteira(
+    carteira: number,
+    tipoOperacao: string,
+    valorTotal: number
+  ) {
+    let newValorCarteira = 0;
+    if (tipoOperacao === "C") {
+      newValorCarteira = carteira + valorTotal;
+    } else if (tipoOperacao === "V") {
+      newValorCarteira = carteira - valorTotal;
+    }
+    return newValorCarteira;
+  }
+
+  function calcularUnidade(valorTotal: number, quantidade: number) {
+    let valorUnidade;
+    if (valorTotal && quantidade) {
+      valorUnidade = (valorTotal / quantidade).toFixed(2);
+    }
+    return valorUnidade;
+  }
+
   async function getCorretoras() {
     await httpTickers()
       .getCorretoras()
@@ -23,36 +58,69 @@ export const useTicker = () => {
     alert(message);
   }
 
-  function converterCampos() {
-    // Converter data
-    if (!store.novaOperacao.data) {
+  function converterCampoData(data: string) {
+    let dataConvertida: any;
+    if (!data) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      store.novaOperacao.data = today.toISOString();
+      dataConvertida = today.toISOString();
     } else {
-      if (!store.novaOperacao.data.includes("T")) {
-        const dateWithZeroTime = new Date(
-          store.novaOperacao.data + "T00:00:00"
-        );
-        store.novaOperacao.data = dateWithZeroTime.toISOString();
+      if (!data.includes("T")) {
+        const dateWithZeroTime = new Date(data + "T00:00:00");
+        dataConvertida = dateWithZeroTime.toISOString();
       }
     }
+    return dataConvertida;
+  }
 
+  function converterCampos(data: any) {
     // Converter campos numéricos diretamente no store
-    store.novaOperacao.tickerId = Number(store.novaOperacao.tickerId);
-    store.novaOperacao.quantidade = Number(store.novaOperacao.quantidade);
-    store.novaOperacao.valorTotal = Number(store.novaOperacao.valorTotal);
-    store.novaOperacao.valorUnidade = Number(store.novaOperacao.valorUnidade);
-
-    store.novaOperacao.precoMedioCompra = store.novaOperacao.precoMedioCompra
-      ? Number(store.novaOperacao.precoMedioCompra)
+    data.tickerId = Number(data.tickerId);
+    data.quantidade = Number(data.quantidade);
+    data.valorTotal = Number(data.valorTotal);
+    data.valorUnidade = Number(data.valorUnidade);
+    data.carteira = Number(data.carteira);
+    data.precoMedioCompra = data.precoMedioCompra
+      ? Number(data.precoMedioCompra)
       : null;
 
-    store.novaOperacao.saldoTickers = Number(store.novaOperacao.saldoTickers);
+    data.saldoTickers = Number(data.saldoTickers);
 
-    store.novaOperacao.carteira = store.novaOperacao.carteira
-      ? Number(store.novaOperacao.carteira)
-      : null;
+    return data;
+  }
+
+  // No seu componente Vue/React
+  async function atualizarOperacao(data: any): Promise<void> {
+    // Validação básica antes de enviar
+    if (
+      !store.editarOperacao.ID ||
+      !store.editarOperacao.tickerId ||
+      !store.editarOperacao.quantidade
+    ) {
+      showMessage("Preencha todos os campos obrigatórios");
+      return;
+    }
+    store.editarOperacao.data = converterCampoData(store.editarOperacao.data);
+    store.editarOperacao = converterCampos(store.editarOperacao);
+
+    try {
+      console.log("Atualizando operação carteira", data.carteira);
+
+      const result = await httpTickers().updateOperacoes(data);
+
+      if (result.data.success) {
+        // Sucesso
+        console.log(result.data.message, "Operação atualizada com sucesso!");
+      } else {
+        // Erro
+        showMessage(result.data.error || "Erro ao atualizar operação");
+      }
+    } catch (error) {
+      if (error) {
+        console.error(error);
+        showMessage("Erro inesperado ao atualizar operação");
+      }
+    }
   }
 
   // No seu componente Vue/React
@@ -62,8 +130,9 @@ export const useTicker = () => {
       showMessage("Preencha todos os campos obrigatórios");
       return;
     }
+    store.novaOperacao.data = converterCampoData(store.novaOperacao.data);
 
-    converterCampos();
+    store.novaOperacao = converterCampos(store.novaOperacao);
 
     try {
       const result = await httpTickers().addOperacao(store.novaOperacao);
@@ -109,6 +178,16 @@ export const useTicker = () => {
       .getTickersCorretoraID(corretoraID)
       .then((res) => {
         store.corretoraTickers = res.data;
+      });
+  }
+
+  async function getOperacoesID(corretoraID: number) {
+    return await httpTickers()
+      .getOperacoesID(corretoraID)
+      .then((res) => {
+        console.log("Operação para editar", res.data.carteira);
+        store.editarOperacao = res.data;
+        return res.data;
       });
   }
 
@@ -304,5 +383,10 @@ export const useTicker = () => {
     getCorretorasComOperacoesPerformance,
     getTickersCorretoraID,
     getOperacoesSemanaMes,
+    calcularSaldo,
+    calcularCarteira,
+    calcularUnidade,
+    getOperacoesID,
+    atualizarOperacao,
   };
 };

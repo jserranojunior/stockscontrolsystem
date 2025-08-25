@@ -59,6 +59,20 @@ export const store = reactive({
     carteira: null as any,
   },
 
+  editarOperacao: {
+    ID: null as any,
+    data: new Date().toISOString().split("T")[0],
+    tickerId: null as any,
+    quantidade: null as any,
+    valorTotal: null as any,
+    precoMedioCompra: null as any,
+    tipoOperacao: "C",
+    ticker: null as any,
+    valorUnidade: null as any,
+    saldoTickers: null as any,
+    carteira: null as any,
+  },
+
   ativosParaCalcular: {
     ASML: {
       nome: "ASML Holding NV",

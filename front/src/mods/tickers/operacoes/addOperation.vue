@@ -8,7 +8,7 @@
         Nova Operação
       </h2>
 
-      <pre>{{ }}</pre>
+
 
       <div class="space-y-4">
         <div class="flex flex-wrap justify-between">
@@ -99,9 +99,9 @@
                 <span class="label-text font-medium">Valor Total</span>
               </label>
               <div class="relative">
-                <span class="absolute left-3 top-3">R$</span>
-                <input type="number" v-model="store.novaOperacao.valorTotal" class="input input-bordered w-full pl-10"
-                  step="0.01" min="0.01" placeholder="0,00" />
+
+                <input type="text" v-model="state.valorTotal" v-money="moneyMask"
+                  class="input input-bordered w-full pl-10" placeholder="0,00" />
               </div>
             </div>
           </div>
@@ -112,9 +112,9 @@
                 <span class="label-text font-medium">Preço Médio de Compra</span>
               </label>
               <div class="relative">
-                <span class="absolute left-3 top-3">R$</span>
-                <input type="number" v-model="store.novaOperacao.precoMedioCompra"
-                  class="input input-bordered w-full pl-10" step="0.01" min="0.01" placeholder="0,00" />
+
+                <input type="text" v-model="state.precoMedioCompra" v-money="moneyMask"
+                  class="input input-bordered w-full pl-10" placeholder="0,00" />
               </div>
 
             </div>
@@ -127,7 +127,7 @@
 
         <!-- Botão Submit -->
         <div class="pt-2 float-right">
-          <button class="btn btn-primary w-full md:w-auto gap-2" @click="adicionarOperacao()">
+          <button class="btn btn-primary w-full md:w-auto gap-2" @click="addOperacao()">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -145,61 +145,54 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, watch } from "vue";
-import { store } from "./composables/storeTicker";
-import { useTicker } from "./composables/useTicker";
+import { onBeforeMount, reactive, watch } from "vue";
+import { store } from "../composables/storeTicker";
+import { useTicker } from "../composables/useTicker";
+import { moneyMask } from "../../../helpers/mask/moneyMask";
+import moneyToFloat from "../../../helpers/filters/moneyToFloat";
+const { adicionarOperacao, getCorretoras, getTickersCorretoraID, calcularSaldo, calcularCarteira, calcularUnidade } = useTicker();
 
-const { adicionarOperacao, getCorretoras, getTickersCorretoraID } = useTicker();
+let state = reactive({
+  valorTotal: "",
+  precoMedioCompra: "",
 
-onBeforeMount(() => {
-  getCorretoras();
 });
 
-function calcularUnidade() {
-  if (store.novaOperacao.valorTotal && store.novaOperacao.quantidade) {
-    return (store.novaOperacao.valorTotal / store.novaOperacao.quantidade).toFixed(2);
-  }
-  return null;
+function addOperacao() {
+  adicionarOperacao();
 }
 
 
+function getOperacoes() {
+  store.novaOperacao.valorTotal = moneyToFloat(state.valorTotal);
+  store.novaOperacao.precoMedioCompra = moneyToFloat(state.precoMedioCompra);
 
-function getOperacao() {
   store.corretoraTickers.find((ticker: any) => {
+
     if (ticker.ID === store.novaOperacao.tickerId) {
+      console.log(ticker)
       if (ticker.operacoes && ticker.operacoes[0]) {
-        calcularSaldo(ticker.operacoes[0].saldoTickers);
-        calcularCarteira(ticker.operacoes[0].carteira);
+        store.novaOperacao.saldoTickers = calcularSaldo(ticker.operacoes[0].saldoTickers, store.novaOperacao.tipoOperacao, store.novaOperacao.quantidade);
+        store.novaOperacao.carteira = calcularCarteira(ticker.operacoes[0].carteira, store.novaOperacao.tipoOperacao, store.novaOperacao.valorTotal);
       } else {
-        calcularSaldo(0);
-        calcularCarteira(0);
+        store.novaOperacao.saldoTickers = calcularSaldo(0, 'C', 0);
+        store.novaOperacao.carteira = calcularCarteira(0, 'C', 0);
       }
 
       return true;
     }
     return false;
   });
-
 }
 
-function calcularSaldo(saldo: number) {
-  if (store.novaOperacao.tipoOperacao === "C") {
-    store.novaOperacao.saldoTickers = saldo + store.novaOperacao.quantidade;
-  } else if (store.novaOperacao.tipoOperacao === "V") {
-    store.novaOperacao.saldoTickers = saldo - store.novaOperacao.quantidade;
-  }
-}
 
-function calcularCarteira(carteira: number) {
-  if (store.novaOperacao.tipoOperacao === "C") {
-    store.novaOperacao.carteira = carteira + store.novaOperacao.valorTotal;
-  } else if (store.novaOperacao.tipoOperacao === "V") {
-    store.novaOperacao.carteira = carteira - store.novaOperacao.valorTotal;
-  }
-}
+onBeforeMount(async () => {
+  await getCorretoras()
+});
+
 
 watch(() => store.novaOperacao.tipoOperacao, () => {
-  getOperacao();
+  getOperacoes();
 });
 
 watch(
@@ -213,31 +206,38 @@ watch(
 watch(
   () => store.novaOperacao.valorTotal,
   (newValue) => {
-    store.novaOperacao.valorUnidade = calcularUnidade();
+    store.novaOperacao.valorUnidade = calcularUnidade(store.novaOperacao.valorTotal, store.novaOperacao.quantidade);
   }
 );
 
 watch(() => store.novaOperacao.valorTotal, (newValue) => {
-  getOperacao();
+  getOperacoes();
 });
 
 watch(
   () => store.novaOperacao.tickerId,
   (newValue) => {
-    getOperacao();
+    getOperacoes();
+
   }
 );
 
 watch(
   () => store.novaOperacao.quantidade,
   (newValue) => {
-    store.novaOperacao.valorUnidade = calcularUnidade();
+    store.novaOperacao.valorUnidade = calcularUnidade(store.novaOperacao.valorTotal, store.novaOperacao.quantidade);
   }
 );
 
 watch(() => store.novaOperacao.quantidade, (newValue) => {
-  getOperacao();
+  getOperacoes();
 });
 
+watch(() => state.valorTotal, (newValue) => {
+  store.novaOperacao.valorTotal = moneyToFloat(newValue);
+});
+watch(() => state.precoMedioCompra, (newValue) => {
+  store.novaOperacao.precoMedioCompra = moneyToFloat(newValue);
+});
 
 </script>

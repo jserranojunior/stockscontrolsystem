@@ -7,6 +7,7 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/gocondor/core"
 	"github.com/joho/godotenv"
@@ -20,6 +21,17 @@ import (
 
 func main() {
 	// New initializes new App variable
+
+	// Carregar o fuso horário desejado
+	location, err := time.LoadLocation("America/Sao_Paulo")
+	if err != nil {
+		log.Fatal("Error loading location: ", err)
+	}
+
+	// Exemplo de uso da variável location para mostrar o horário atual
+	currentTime := time.Now().In(location)
+	log.Printf("Current time in Sao Paulo: %s\n", currentTime.Format("2006-01-02 15:04:05"))
+
 	app := core.New()
 
 	// set env

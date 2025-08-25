@@ -13,6 +13,51 @@ import (
 	"gorm.io/gorm"
 )
 
+func UpdateOperacao(c *gin.Context) {
+	var input models.Operacoes
+
+	// Bind do JSON recebido
+	if err := c.ShouldBindJSON(&input); err != nil {
+		fmt.Println("Erro ao bind JSON:", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Verifica se ID foi enviado
+	if input.ID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID da operação é obrigatório"})
+		return
+	}
+
+	var operacao models.Operacoes
+	if err := DB.First(&operacao, input.ID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Operação não encontrada"})
+		return
+	}
+
+	// Atualiza os campos
+	operacao.TickerID = input.TickerID
+	operacao.TipoOperacao = input.TipoOperacao
+	operacao.Data = input.Data
+	operacao.Quantidade = input.Quantidade
+	operacao.ValorTotal = input.ValorTotal
+	operacao.ValorUnidade = input.ValorUnidade
+	operacao.PrecoMedioCompra = input.PrecoMedioCompra
+	operacao.SaldoTickers = input.SaldoTickers
+	operacao.Carteira = input.Carteira
+
+	if err := DB.Save(&operacao).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao atualizar operação"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Operação atualizada com sucesso!",
+		"data":    operacao,
+	})
+}
+
 // CreateOperacao cria uma nova operação
 func CreateOperacao(c *gin.Context) {
 	var operacao models.Operacoes
@@ -59,6 +104,18 @@ func CreateOperacao(c *gin.Context) {
 		"message":  "Operação criada com sucesso",
 		"operacao": operacao,
 	})
+}
+
+func GetOperacaoByID(c *gin.Context) {
+	id := c.Param("id")
+	var operacao models.Operacoes
+
+	if err := DB.Preload("Ticker").First(&operacao, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Operação não encontrada"})
+		return
+	}
+
+	c.JSON(http.StatusOK, operacao)
 }
 
 /* GetOperacoesPorSemanaEMes
