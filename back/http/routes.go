@@ -66,4 +66,6 @@ func RegisterRoutes() {
 
 	router.Put("/operacoes", middlewares.CORSMiddleware, handlers.UpdateOperacao)
 
+	router.Post("/ticker", middlewares.CORSMiddleware, handlers.AddTicker)
+
 }

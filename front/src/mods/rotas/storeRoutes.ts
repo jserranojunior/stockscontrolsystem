@@ -54,7 +54,7 @@ export const store = reactive({
       updated_at: "2020-03-29T17:24:11.000000Z",
       acl: { acl: 0 },
     },
-    {
+    /*     {
       id: 4,
       meta: { id: 4 },
       name: "financeiro",
@@ -66,8 +66,8 @@ export const store = reactive({
       created_at: "2020-03-29T17:24:11.000000Z",
       updated_at: "2020-03-29T17:24:11.000000Z",
       acl: { acl: 0 },
-    },
-    {
+    }, */
+    /*     {
       id: 5,
       meta: { id: 5 },
       name: "financeiroaddconta",
@@ -79,7 +79,7 @@ export const store = reactive({
       created_at: "2020-03-29T17:24:11.000000Z",
       updated_at: "2020-03-29T17:24:11.000000Z",
       acl: { acl: 0 },
-    },
+    }, */
     {
       id: 6,
       meta: { id: 6 },
@@ -93,7 +93,7 @@ export const store = reactive({
       updated_at: "2020-03-29T17:24:11.000000Z",
       acl: { acl: 0 },
     },
-    {
+    /*     {
       id: 7,
       meta: { id: 7 },
       name: "contasapagar",
@@ -105,7 +105,7 @@ export const store = reactive({
       created_at: "2020-03-29T17:24:11.000000Z",
       updated_at: "2020-03-29T17:24:11.000000Z",
       acl: { acl: 0 },
-    },
+    }, */
     {
       id: 8,
       meta: { id: 8 },

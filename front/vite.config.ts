@@ -1,36 +1,37 @@
 import vue from "@vitejs/plugin-vue";
-import envCompatible from "vite-plugin-env-compatible";
 
-export default ({ command }: any) => {
+const commonConfig = {
+  plugins: [vue()],
+  resolve: {
+    alias: [{ find: "@", replacement: "/src" }],
+  },
+  test: {
+    globals: true,
+    environment: "jsdom",
+  },
+};
+
+export default ({ command }: { command: string }) => {
   if (command === "serve") {
     return {
-      plugins: [vue(), envCompatible()],
-      resolve: {
-        alias: [{ find: "@", replacement: "/src" }],
-      },
-      server: {
-        host: true, // aceita conexões externas
-        port: 3000,
-        hmr: {
-          host: "scs.alvitre.com.br", // domínio para o HMR websocket
-          port: 443, // porta do websocket (443 para HTTPS)
-          protocol: "wss", // websocket seguro (HTTPS)
-        },
-      },
-    };
-  } else if (command === "testbuild") {
-    return {
-      plugins: [vue(), envCompatible()],
-      resolve: {
-        alias: [{ find: "@", replacement: "/src" }],
-      },
+      ...commonConfig,
       server: {
         host: "0.0.0.0",
-        port: 5000,
+        port: 8082,
+        https: false,
+      },
+    };
+  } else if (command === "build") {
+    return {
+      ...commonConfig,
+      server: {
+        host: "0.0.0.0",
+        port: 88,
         https: true,
-        hmr: { host: "192.168.15.4:8081", port: 8081 },
+        hmr: { host: "https://scs.alvitre.com.br", port: 443 },
       },
       build: {
+        target: "esnext",
         chunkSizeWarningLimit: 2000,
       },
     };

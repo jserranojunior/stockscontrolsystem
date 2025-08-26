@@ -146,7 +146,56 @@ export function httpTickers() {
       };
     }
   }
+
+  async function addTicker(data: any): Promise<ApiResponse> {
+    const urlApi = "/ticker";
+
+    try {
+      const response = await ApiConnect.postWithoutToken(
+        urlApi,
+        data as unknown as Record<string, unknown>
+      );
+
+      if (
+        response &&
+        typeof response === "object" &&
+        "status" in response &&
+        response.status >= 200 &&
+        response.status < 300
+      ) {
+        return {
+          success: true,
+          data: response.data,
+          message: "Ticker adicionado com sucesso",
+        };
+      } else if (
+        response &&
+        typeof response === "object" &&
+        "status" in response
+      ) {
+        return {
+          success: false,
+          error: response.data?.error || "Erro ao adicionar ticker",
+          status: response.status,
+        };
+      } else {
+        return {
+          success: false,
+          error: "Resposta inválida do servidor",
+        };
+      }
+    } catch (error: any) {
+      return {
+        success: false,
+        error:
+          error.response?.data?.error || error.message || "Erro de conexão",
+        status: error.response?.status,
+      };
+    }
+  }
+
   return {
+    addTicker,
     updateOperacoes,
     getCorretoras,
     getCorretorasComOperacoes,

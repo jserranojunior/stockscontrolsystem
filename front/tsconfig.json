@@ -15,12 +15,14 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": false,
     "allowJs": true,
-    
+    "types": ["node"],
     // ADICIONE ESTAS LINHAS:
     "outDir": "./dist",
     "noEmit": true,
     "declaration": false,
-    "declarationMap": false
+    "declarationMap": false,
+        "typeRoots": ["./node_modules/@types", "./src/types"]
+
   },
   "include": [
     "src/**/*.ts",

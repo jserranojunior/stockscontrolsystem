@@ -106,3 +106,42 @@ func GetTickersPorCorretoraID(c *gin.Context) {
 
 	c.JSON(http.StatusOK, tickers)
 }
+
+type AddTickerInput struct {
+	CorretoraID uint    `json:"corretora" binding:"required"`
+	Tick        string  `json:"tick" binding:"required"`
+	Name        string  `json:"name"`
+	DataCompra  string  `json:"datacompra" binding:"required"`
+	PrecoAtual  float64 `json:"precoAtual"`
+}
+
+func AddTicker(c *gin.Context) {
+	var input AddTickerInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Converte DataCompra
+	dataCompra, err := time.Parse("2006-01-02", input.DataCompra)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "DataCompra inválida"})
+		return
+	}
+
+	// Converte Name para sql.NullString
+	ticker := models.Tickers{
+		CorretoraID: input.CorretoraID,
+		Tick:        input.Tick,
+		Name:        sql.NullString{String: input.Name, Valid: input.Name != ""},
+		DataCompra:  dataCompra,
+		PrecoAtual:  input.PrecoAtual,
+	}
+
+	if err := DB.Create(&ticker).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao salvar ticker"})
+		return
+	}
+
+	c.JSON(http.StatusOK, ticker)
+}

@@ -164,4 +164,13 @@ export const store = reactive({
   corretoraTickers: [] as any,
 
   corretoraSelecionada: null as any,
+
+  novoTicker: {
+    corretora: 0,
+    tick: "",
+    name: "",
+    datacompra: new Date().toISOString().split("T")[0],
+    datavenda: null as any,
+    precoAtual: 0 as number,
+  },
 });
