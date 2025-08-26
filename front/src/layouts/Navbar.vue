@@ -1,5 +1,6 @@
 <template>
-  <div class="text-neutral rounded-xl w-full z-10 px-2 flex flex-wrap justify-between my-1 items-center mx-2">
+  <div
+    class="text-neutral rounded-xl w-full z-10 px-2 flex flex-wrap justify-between my-1 items-center mx-2 fixed top-0 bg-gray-100">
     <div class="flex-1">
       <label for="my-drawer" class="btn btn-sm drawer-button cursor-pointer">
         <Icon icon="ic:sharp-menu" width="24" height="24"></Icon>
@@ -46,7 +47,7 @@
           v-if="nameRoutesEnable.includes('contabilidade')">Contabilidade</router-link>
         <router-link class="btn-sm mx-1 btn  btn-secondary" :to="'/operacoes'"
           v-if="nameRoutesEnable.includes('operacoes')">Nova Operação</router-link>
-        <div class="btn-sm mx-1 btn btn-primary" @click="Logout()" v-if="nameRoutesEnable.includes('financeiro')">
+        <div class="btn-sm mx-1 btn btn-primary" @click="Logout()" v-if="nameRoutesEnable.includes('contabilidade')">
           Sair
         </div>
       </nav>
