@@ -3,10 +3,11 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "scripts": {
-    "dev": "vite --host=0.0.0.0",
-    "build": "vue-tsc && vite build",
-    "preview": "vite preview",
+ "scripts": {
+    "dev": "vite",
+    "build": "vite build --mode production",
+    "testbuild": "vite build --mode development",
+    "serve": "vite preview",
     "test": "vitest"
   },
   "dependencies": {
