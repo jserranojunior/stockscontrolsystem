@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jserranojunior/scs/backgo/models"
+	"github.com/jserranojunior/scs/back/models"
 	"gorm.io/gorm"
 )
 

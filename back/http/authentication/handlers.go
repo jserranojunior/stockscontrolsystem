@@ -8,7 +8,7 @@ import (
 	"github.com/gocondor/core/auth"
 	"github.com/gocondor/core/database"
 	"github.com/gocondor/core/jwt"
-	"github.com/jserranojunior/scs/backgo/models"
+	"github.com/jserranojunior/scs/back/models"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )

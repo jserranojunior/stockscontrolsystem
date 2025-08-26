@@ -7,7 +7,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jserranojunior/scs/backgo/models"
+	"github.com/jserranojunior/scs/back/models"
 )
 
 func GetUser(c *gin.Context) {

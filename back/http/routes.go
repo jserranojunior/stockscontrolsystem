@@ -6,8 +6,8 @@ package http
 
 import (
 	"github.com/gocondor/core/routing"
-	"github.com/jserranojunior/scs/backgo/http/handlers"
-	"github.com/jserranojunior/scs/backgo/http/middlewares"
+	"github.com/jserranojunior/scs/back/http/handlers"
+	"github.com/jserranojunior/scs/back/http/middlewares"
 )
 
 // RegisterRoutes to register your routes

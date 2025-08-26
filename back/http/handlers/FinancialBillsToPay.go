@@ -6,8 +6,8 @@ import (
 
 	// "alvitre.com.br/scs/api/financial/valuesbillstopay"
 	"github.com/gin-gonic/gin"
-	"github.com/jserranojunior/scs/backgo/helpers"
-	"github.com/jserranojunior/scs/backgo/models"
+	"github.com/jserranojunior/scs/back/helpers"
+	"github.com/jserranojunior/scs/back/models"
 	"gorm.io/gorm"
 
 	"errors"

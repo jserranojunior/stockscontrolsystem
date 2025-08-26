@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/jserranojunior/scs/backgo/models"
+	"github.com/jserranojunior/scs/back/models"
 )
 
 /* SUBSTRING(data_pagamento,1,7) = ? AND data_pagamento > '' OR SUBSTRING(data_pagamento,1,7) < ? AND data_pagamento > ''

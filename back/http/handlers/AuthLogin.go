@@ -9,8 +9,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
-	"github.com/jserranojunior/scs/backgo/http/middlewares"
-	"github.com/jserranojunior/scs/backgo/models"
+	"github.com/jserranojunior/scs/back/http/middlewares"
+	"github.com/jserranojunior/scs/back/models"
 )
 
 // ----------------------------------------------------------------------------

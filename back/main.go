@@ -11,12 +11,12 @@ import (
 
 	"github.com/gocondor/core"
 	"github.com/joho/godotenv"
-	"github.com/jserranojunior/scs/backgo/config"
-	"github.com/jserranojunior/scs/backgo/http"
-	"github.com/jserranojunior/scs/backgo/http/authentication"
-	"github.com/jserranojunior/scs/backgo/http/handlers"
-	"github.com/jserranojunior/scs/backgo/http/middlewares"
-	"github.com/jserranojunior/scs/backgo/models"
+	"github.com/jserranojunior/scs/back/config"
+	"github.com/jserranojunior/scs/back/http"
+	"github.com/jserranojunior/scs/back/http/authentication"
+	"github.com/jserranojunior/scs/back/http/handlers"
+	"github.com/jserranojunior/scs/back/http/middlewares"
+	"github.com/jserranojunior/scs/back/models"
 )
 
 func main() {
