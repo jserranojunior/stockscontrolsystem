@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"sort"
 	"strconv"
 	"time"
 
@@ -11,16 +12,18 @@ import (
 )
 
 type OperacaoDTO struct {
-	Tick         string    `json:"tick"`
-	TipoOperacao string    `json:"tipoOperacao"`
-	Data         time.Time `json:"data"`
-	Quantidade   float64   `json:"quantidade"`
-	ValorTotal   float64   `json:"valorTotal"`
-	ValorUnidade float64   `json:"valorUnidade"`
-	PrecoMedio   float64   `json:"precoMedio"`
-	Saldo        float64   `json:"saldo"`
-	Carteira     float64   `json:"carteira"`
-	PrecoAtual   float64   `json:"precoAtual"`
+	ID                        uint      `json:"id"`
+	Tick                      string    `json:"tick"`
+	TipoOperacao              string    `json:"tipoOperacao"`
+	Data                      time.Time `json:"data"`
+	Quantidade                float64   `json:"quantidade"`
+	ValorTotal                float64   `json:"valorTotal"`
+	ValorUnidade              float64   `json:"valorUnidade"`
+	PrecoMedio                float64   `json:"precoMedio"`
+	Saldo                     float64   `json:"saldo"`
+	Carteira                  float64   `json:"carteira"`
+	PrecoAtual                float64   `json:"precoAtual"`
+	DataAtualizacaoPrecoAtual time.Time `json:"dataAtualizacaoPrecoAtual"`
 }
 
 type CorretoraDTO struct {
@@ -219,19 +222,78 @@ func GetCorretorasComOperacoesPerfomance(c *gin.Context) {
 		for _, ticker := range cor.Tickers {
 			for _, op := range ticker.Operacoes {
 				opDTO := OperacaoDTO{
-					Tick:         ticker.Tick,
-					TipoOperacao: op.TipoOperacao,
-					Data:         op.Data,
-					Quantidade:   op.Quantidade,
-					ValorTotal:   op.ValorTotal,
-					ValorUnidade: op.ValorUnidade,
-					PrecoMedio:   op.PrecoMedioCompra,
-					Saldo:        op.SaldoTickers,
-					Carteira:     op.Carteira,
-					PrecoAtual:   ticker.PrecoAtual,
+
+					Tick:                      ticker.Tick,
+					TipoOperacao:              op.TipoOperacao,
+					Data:                      op.Data,
+					Quantidade:                op.Quantidade,
+					ValorTotal:                op.ValorTotal,
+					ValorUnidade:              op.ValorUnidade,
+					PrecoMedio:                op.PrecoMedioCompra,
+					Saldo:                     op.SaldoTickers,
+					Carteira:                  op.Carteira,
+					PrecoAtual:                ticker.PrecoAtual,
+					DataAtualizacaoPrecoAtual: ticker.DataAtualizacaoPrecoAtual,
 				}
 				corDTO.Operacoes = append(corDTO.Operacoes, opDTO)
 			}
+		}
+
+		resposta = append(resposta, corDTO)
+	}
+
+	// retorna JSON
+	c.JSON(http.StatusOK, resposta)
+}
+
+func GetCorretorasUltimaOperacao(c *gin.Context) {
+	var corretoras []models.Corretoras
+
+	// busca corretoras + tickers + todas operações
+	err := DB.Preload("Tickers.Operacoes").
+		Find(&corretoras).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// monta DTO de resposta
+	var resposta []CorretoraDTO
+	for _, cor := range corretoras {
+		corDTO := CorretoraDTO{
+			Nome: cor.Nome,
+			Cor:  cor.Cor,
+		}
+
+		for _, ticker := range cor.Tickers {
+			if len(ticker.Operacoes) == 0 {
+				continue
+			}
+
+			// ordena operações do ticker (mais recente primeiro)
+			sort.Slice(ticker.Operacoes, func(i, j int) bool {
+				return ticker.Operacoes[i].Data.After(ticker.Operacoes[j].Data)
+			})
+
+			// pega a última (mais recente)
+			ultimaOp := ticker.Operacoes[0]
+
+			opDTO := OperacaoDTO{
+				ID:                        ticker.ID,
+				Tick:                      ticker.Tick,
+				TipoOperacao:              ultimaOp.TipoOperacao,
+				Data:                      ultimaOp.Data,
+				Quantidade:                ultimaOp.Quantidade,
+				ValorTotal:                ultimaOp.ValorTotal,
+				ValorUnidade:              ultimaOp.ValorUnidade,
+				PrecoMedio:                ultimaOp.PrecoMedioCompra,
+				Saldo:                     ultimaOp.SaldoTickers,
+				Carteira:                  ultimaOp.Carteira,
+				PrecoAtual:                ticker.PrecoAtual,
+				DataAtualizacaoPrecoAtual: ticker.DataAtualizacaoPrecoAtual,
+			}
+
+			corDTO.Operacoes = append(corDTO.Operacoes, opDTO)
 		}
 
 		resposta = append(resposta, corDTO)

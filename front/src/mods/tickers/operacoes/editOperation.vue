@@ -106,7 +106,7 @@
           <div class="w-full md:w-1/2 lg:w-1/4">
             <div class="form-control mx-2">
               <label class="label">
-                <span class="label-text font-medium">Preço Médio de Compra</span>
+                <span class="label-text font-medium">Preço Médio</span>
               </label>
               <div class="relative">
 

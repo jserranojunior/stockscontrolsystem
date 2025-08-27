@@ -1,5 +1,27 @@
 <template>
   <div>
+
+
+    <Modal :nome="'atualizartick'" v-if="store.ativoSelecionado">
+      <template #header>
+        <h3 class="text-lg font-bold">Atualizar Valor Atual</h3>
+        <p class="py-4">{{ store.ativoSelecionado.tick }}</p>
+      </template>
+      <template #body>
+        <input type="text" placeholder="0,00" class="input input-bordered w-full"
+          v-model="store.ativoSelecionado.valorSemFormatar" v-money="moneyMask" />
+
+      </template>
+      <template #footer>
+        <button class="btn btn-success mt-4 float-right mx-1" @click="atualizarValorTick()">Atualizar</button>
+
+        <button class="btn btn-warning mt-4 float-right mx-1"
+          @click="togleShowModalFixed({ nome: 'atualizartick', show: false })">Fechar</button>
+      </template>
+    </Modal>
+
+
+
     <div class="p-6 flex justify-center items-center">
       <div class="w-full">
         <h1 class="text-3xl font-bold my-4 text-center">
@@ -11,6 +33,8 @@
       <div class="w-full max-w-6xl mx-auto">
         <div class="flex flex-wrap justify-center">
           <!-- Loop através das corretoras -->
+
+
 
           <div v-for="corretora in store.ativos" :key="corretora.ID"
             class="w-full card shadow-xl m-0 rounded-2xl mb-10 p-2">
@@ -24,19 +48,19 @@
                 <table class="table  w-full min-w-[800px] text-md bg-base-100">
                   <thead class="text-black">
                     <tr>
-                      <td colspan="5" class="text-center bg-yellow-100">
+                      <td colspan="4" class="text-center bg-yellow-100">
                         INVESTIDO
                       </td>
                       <td class="text-center mx-auto">
                         <div class="px-2 w-2">|</div>
                       </td>
-                      <td colspan="6" class="text-center bg-blue-200">
+                      <td colspan="5" class="text-center bg-blue-200">
                         PERFORMANCE
                       </td>
                     </tr>
-                    <tr class="text-xs uppercase tracking-wide">
-                      <th></th>
-                      <th class="text-center" title="Operação">OP</th>
+                    <tr class="text-xs uppercase tracking-wide bg-gray-100">
+
+
                       <th class="text-center" title="Nome do ativo">ATIVOS</th>
 
 
@@ -68,6 +92,9 @@
                       <th class="text-right" title="Variação percentual entre preço médio e valor atual">
                         Var %
                       </th>
+                      <th class="text-right" title="Data da atualização do preço atual">
+                        Atualizado
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -83,21 +110,18 @@
 
                     <!-- Ativos -->
 
-                    <tr v-for="operacoes in corretora.operacoes" :key="operacoes.codigo" class="bg-gray-300 transition">
-                      <td></td>
-                      <td class="text-center font-bold"
-                        :class="operacoes.tipoOperacao === 'V' ? 'text-red-600' : operacoes.tipoOperacao === 'C' ? 'text-green-600' : ''">
-                        {{ operacoes.tipoOperacao }}
-                      </td>
+                    <tr v-for="operacoes in corretora.operacoes" :key="operacoes.codigo"
+                      @click="abrirModalEditarTick(operacoes)" class="hover:bg-gray-300 transition cursor-pointer">
+
+
                       <td class="text-center font-bold">{{ operacoes.tick }}</td>
 
                       <td class="text-right font-medium">
-                        {{ operacoes.tipoOperacao === 'V' ? formatarNumero(-operacoes.valorTotal) :
-                          formatarNumero(operacoes.valorTotal) }}
+                        {{ formatarNumero(operacoes.carteira) }}
                       </td>
 
                       <td class="text-right font-medium">
-                        {{ operacoes.tipoOperacao === 'V' ? -operacoes.quantidade : operacoes.quantidade }}
+                        {{ operacoes.saldo }}
                       </td>
                       <td class="text-right">
                         {{ formatarNumero(operacoes.precoMedio) }}
@@ -106,49 +130,61 @@
                         <div class="px-2 w-2">|</div>
                       </th>
                       <td class="text-left">
-                        {{ formatarNumero(operacoes.precoAtual) }}
+                        {{ formatarMoeda(operacoes.precoAtual) }}
                       </td>
                       <td class="text-right">
                         {{ formatarNumero(operacoes.posicao) }}
                       </td>
 
-                      <td class="text-right">
+                      <td class="text-right font-bold" :class="{
+                        'text-green-600': operacoes.performance > 0,
+                        'text-red-600': operacoes.performance < 0
+                      }">
                         {{ formatarNumero(operacoes.performance) }}
                       </td>
 
-                      <td class="text-right">
+                      <td class="text-right font-bold" :class="{
+                        'text-green-600': operacoes.variacaoPercentual > 0,
+                        'text-red-600': operacoes.variacaoPercentual < 0
+                      }">
                         {{ operacoes.variacaoPercentual }}%
+                      </td>
+
+
+
+                      <td> {{ formatarData(operacoes.dataAtualizacaoPrecoAtual) }}
                       </td>
                     </tr>
 
                     <!-- Total Diário -->
-                    <tr class="bg-gray-200 font-semibold"
-                      v-if="corretora && corretora.totalPerformanceDiaria && corretora.totalPerformanceDiaria.valor">
+                    <tr class="bg-gray-100 font-semibold"
+                      v-if="corretora && corretora.totalPerformanceDiaria && corretora.totalPerformanceDiaria.carteira">
                       <td title="Movimentação diaria">Total Diário</td>
-                      <td></td>
-                      <td></td>
+
+
                       <td class="text-right">
-                        {{ formatarNumero(corretora.totalPerformanceDiaria.valor) }}
+                        {{ formatarNumero(corretora.totalPerformanceDiaria.carteira) }}
                       </td>
 
-                      <td class="text-right"> {{ corretora.totalPerformanceDiaria.quantidade }}
+                      <td class="text-right"> {{ corretora.totalPerformanceDiaria.saldo }}
                       </td>
                       <td></td>
                       <th class="text-center mx-auto">
                         <div class="px-2 w-2">|</div>
                       </th>
                       <td></td>
-                      <td class="text-right">
-                        <!--  {{ formatCurrency(corretora.totalDiario.valorComprado) }} -->
+
+                      <td class="text-right"> {{ formatarNumero(corretora.totalPerformanceDiaria.posicao) }}
                       </td>
 
-                      <td class="text-right">
-                        <!-- {{ formatCurrency(corretora.totalDiario.performance) }} -->
+                      <td class="text-right"> {{ formatarNumero(corretora.totalPerformanceDiaria.performance) }}
+
                       </td>
 
                       <td class="text-right">
                         <!-- {{ corretora.totalDiario.variacaoPercentual }}% -->
                       </td>
+                      <td></td>
                     </tr>
 
                     <!-- Total Corretora -->
@@ -156,18 +192,18 @@
                       <td title="Total Dia Anterior - Final do dia">
                         Total {{ corretora.nome.split(" ")[0] }}
                       </td>
-                      <td></td>
-                      <td></td>
-                      <td class="text-right">
-                        <!-- {{ formatCurrency(corretora.totalCorretora.valorDiario) }} -->
+
+                      <td colspan="3" class="text-center text-lg text-green-700">
+                        {{ formatarNumero(corretora.totalPerformanceDiaria.performance) }}
                       </td>
 
                       <td></td>
-                      <td></td>
                       <th class="text-center mx-auto">
-                        <div class="px-2 w-2">|</div>
+
                       </th>
-                      <td></td>
+
+
+
 
                       <td class="text-right">
                         <!--  {{
@@ -182,6 +218,7 @@
                       <td class="text-right">
                         <!--  {{ corretora.totalCorretora.variacaoPercentual }}% -->
                       </td>
+                      <td></td>
                     </tr>
                   </tbody>
                 </table>
@@ -196,22 +233,80 @@
 
 <script setup lang="ts">
 import { onBeforeMount, ref, watch } from "vue";
+import Modal from "../../components/modals/Modal.vue";
+import { useModal } from "../../components/modals/use/useModal";
+const { togleShowModalFixed } = useModal();
 import { useTicker } from "./composables/useTicker";
-const { getCorretorasComOperacoesPerformance } = useTicker();
-import { store } from "./composables/storeTicker";
-import { storeCalendario } from "../../components/Calendario/storeCalendario";
+const { getCorretorasComOperacoesPerformance, atualizarTicker } = useTicker();
+import { store } from "./composables/storeTicker"
+import { moneyMask, formatarMoeda } from "../../helpers/mask/moneyMask";
+import moneyToFloat from "../../helpers/filters/moneyToFloat";
 onBeforeMount(async () => {
-  await getCorretorasComOperacoesPerformance(storeCalendario.dataSelecionadaFormatada);
+  await getCorretorasComOperacoesPerformance();
 });
 
-watch(
-  () => storeCalendario.dataSelecionadaFormatada,
-  async (newValue) => {
-    if (!newValue) return;
-    await getCorretorasComOperacoesPerformance(newValue);
-  },
-  { immediate: true }
-);
+async function abrirModalEditarTick(ativoSelecionado: any) {
+  store.ativoSelecionado = ativoSelecionado;
+  togleShowModalFixed({ nome: "atualizartick", show: true });
+}
+
+function dataHoraAtual() {
+  const data = new Date(); // pega a hora local (GMT-3 se navegador estiver correto)
+
+  // formata YYYY-MM-DDTHH:mm:ss
+  const pad = (n: number) => n.toString().padStart(2, "0");
+
+  const ano = data.getFullYear();
+  const mes = pad(data.getMonth() + 1);
+  const dia = pad(data.getDate());
+  const hora = pad(data.getHours());
+  const min = pad(data.getMinutes());
+  const seg = pad(data.getSeconds());
+
+  return `${ano}-${mes}-${dia}T${hora}:${min}:${seg}`; // sem Z
+}
+
+async function atualizarValorTick() {
+
+
+
+  if (store.ativoSelecionado) {
+    store.ativoSelecionado.dataAtualizacaoPrecoAtual = dataHoraAtual()
+    store.ativoSelecionado.precoAtual = moneyToFloat(store.ativoSelecionado.valorSemFormatar)
+  }
+  await atualizarTicker(store.ativoSelecionado).then(async () => {
+    store.ativoSelecionado.precoAtual = String(store.ativoSelecionado.precoAtual)
+
+    await getCorretorasComOperacoesPerformance().then(() => {
+      togleShowModalFixed({ nome: "atualizartick", show: false });
+
+    })
+
+  }
+  )
+
+
+  /*  unh 265,86 */
+}
+
+function formatarData(valor: any) {
+  if (!valor) return "";
+
+  const data = new Date(valor);
+
+  // Checa explicitamente se o ano é 1 (zero value do Go)
+  if (data.getFullYear() <= 1) {
+    return ""; // ou "Sem data"
+  }
+
+  return data.toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 
 // dentro do <script setup>
 const getBgClass = (cor: string) => {
@@ -240,4 +335,8 @@ function formatCurrency(value: any) {
     currency: "BRL",
   });
 }
+
+
+
+
 </script>

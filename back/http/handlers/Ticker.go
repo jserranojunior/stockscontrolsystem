@@ -12,17 +12,18 @@ import (
 )
 
 type TickerResponse struct {
-	ID          uint               `json:"ID"`
-	CreatedAt   time.Time          `json:"CreatedAt"`
-	UpdatedAt   time.Time          `json:"UpdatedAt"`
-	DeletedAt   gorm.DeletedAt     `json:"DeletedAt"` // ← Alterado para gorm.DeletedAt
-	CorretoraID uint               `json:"corretora"`
-	Tick        string             `json:"tick"`
-	Name        sql.NullString     `json:"name"`
-	DataCompra  time.Time          `json:"datacompra"`
-	DataVenda   sql.NullTime       `json:"datavenda"`
-	PrecoAtual  float64            `json:"precoAtual"`
-	Operacoes   []OperacaoResponse `json:"operacoes,omitempty"`
+	ID                        uint               `json:"ID"`
+	CreatedAt                 time.Time          `json:"CreatedAt"`
+	UpdatedAt                 time.Time          `json:"UpdatedAt"`
+	DeletedAt                 gorm.DeletedAt     `json:"DeletedAt"` // ← Alterado para gorm.DeletedAt
+	CorretoraID               uint               `json:"corretora"`
+	Tick                      string             `json:"tick"`
+	Name                      sql.NullString     `json:"name"`
+	DataCompra                time.Time          `json:"datacompra"`
+	DataVenda                 sql.NullTime       `json:"datavenda"`
+	PrecoAtual                float64            `json:"precoAtual"`
+	Operacoes                 []OperacaoResponse `json:"operacoes,omitempty"`
+	DataAtualizacaoPrecoAtual time.Time          `json:"dataAtualizacaoPrecoAtual"`
 }
 
 type OperacaoResponse struct {
@@ -90,17 +91,18 @@ func GetTickersPorCorretoraID(c *gin.Context) {
 		}
 
 		tickers = append(tickers, TickerResponse{
-			ID:          tickerDB.ID,
-			CreatedAt:   tickerDB.CreatedAt,
-			UpdatedAt:   tickerDB.UpdatedAt,
-			DeletedAt:   tickerDB.DeletedAt,
-			CorretoraID: tickerDB.CorretoraID,
-			Tick:        tickerDB.Tick,
-			Name:        tickerDB.Name,
-			DataCompra:  tickerDB.DataCompra,
-			DataVenda:   tickerDB.DataVenda,
-			PrecoAtual:  tickerDB.PrecoAtual,
-			Operacoes:   operacoes,
+			ID:                        tickerDB.ID,
+			CreatedAt:                 tickerDB.CreatedAt,
+			UpdatedAt:                 tickerDB.UpdatedAt,
+			DeletedAt:                 tickerDB.DeletedAt,
+			CorretoraID:               tickerDB.CorretoraID,
+			Tick:                      tickerDB.Tick,
+			Name:                      tickerDB.Name,
+			DataCompra:                tickerDB.DataCompra,
+			DataVenda:                 tickerDB.DataVenda,
+			PrecoAtual:                tickerDB.PrecoAtual,
+			Operacoes:                 operacoes,
+			DataAtualizacaoPrecoAtual: tickerDB.DataAtualizacaoPrecoAtual,
 		})
 	}
 
@@ -108,11 +110,12 @@ func GetTickersPorCorretoraID(c *gin.Context) {
 }
 
 type AddTickerInput struct {
-	CorretoraID uint    `json:"corretora" binding:"required"`
-	Tick        string  `json:"tick" binding:"required"`
-	Name        string  `json:"name"`
-	DataCompra  string  `json:"datacompra" binding:"required"`
-	PrecoAtual  float64 `json:"precoAtual"`
+	CorretoraID               uint    `json:"corretora" binding:"required"`
+	Tick                      string  `json:"tick" binding:"required"`
+	Name                      string  `json:"name"`
+	DataCompra                string  `json:"datacompra" binding:"required"`
+	PrecoAtual                float64 `json:"precoAtual"`
+	DataAtualizacaoPrecoAtual string  `json:"dataAtualizacaoPrecoAtual"`
 }
 
 func AddTicker(c *gin.Context) {
@@ -131,15 +134,79 @@ func AddTicker(c *gin.Context) {
 
 	// Converte Name para sql.NullString
 	ticker := models.Tickers{
-		CorretoraID: input.CorretoraID,
-		Tick:        input.Tick,
-		Name:        sql.NullString{String: input.Name, Valid: input.Name != ""},
-		DataCompra:  dataCompra,
-		PrecoAtual:  input.PrecoAtual,
+		CorretoraID:               input.CorretoraID,
+		Tick:                      input.Tick,
+		Name:                      sql.NullString{String: input.Name, Valid: input.Name != ""},
+		DataCompra:                dataCompra,
+		PrecoAtual:                input.PrecoAtual,
+		DataAtualizacaoPrecoAtual: time.Now(),
 	}
 
 	if err := DB.Create(&ticker).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao salvar ticker"})
+		return
+	}
+
+	c.JSON(http.StatusOK, ticker)
+}
+
+type UpdateTickerInput struct {
+	Tick       *string  `json:"tick,omitempty"`
+	Name       *string  `json:"name,omitempty"`
+	DataCompra *string  `json:"datacompra,omitempty"`
+	DataVenda  *string  `json:"datavenda,omitempty"`
+	PrecoAtual *float64 `json:"precoAtual,omitempty"`
+}
+
+func UpdateTicker(c *gin.Context) {
+	// pega ID do ticker da rota
+	tickerID := c.Param("id")
+	if tickerID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Parâmetro 'id' é obrigatório"})
+		return
+	}
+
+	// bind JSON
+	var input UpdateTickerInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// busca ticker
+	var ticker models.Tickers
+	if err := DB.First(&ticker, tickerID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Ticker não encontrado"})
+		return
+	}
+
+	// atualiza campos apenas se vierem no JSON
+	if input.Tick != nil {
+		ticker.Tick = *input.Tick
+	}
+	if input.Name != nil {
+		ticker.Name = sql.NullString{String: *input.Name, Valid: true}
+	}
+	if input.DataCompra != nil {
+		if dc, err := time.Parse("2006-01-02", *input.DataCompra); err == nil {
+			ticker.DataCompra = dc
+		}
+	}
+	if input.DataVenda != nil {
+		if dv, err := time.Parse("2006-01-02", *input.DataVenda); err == nil {
+			ticker.DataVenda = sql.NullTime{Time: dv, Valid: true}
+		}
+	}
+	if input.PrecoAtual != nil {
+		ticker.PrecoAtual = *input.PrecoAtual
+	}
+
+	// sempre atualiza a data de atualização
+	ticker.DataAtualizacaoPrecoAtual = time.Now()
+
+	// salva alterações
+	if err := DB.Save(&ticker).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao atualizar ticker"})
 		return
 	}
 

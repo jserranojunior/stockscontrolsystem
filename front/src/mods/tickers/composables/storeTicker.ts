@@ -46,6 +46,7 @@ export const store = reactive({
     },
   ] as any,
   tipoOperacao: "compra",
+  ativoSelecionado: null as any,
   novaOperacao: {
     data: new Date().toISOString().split("T")[0],
     tickerId: null as any,

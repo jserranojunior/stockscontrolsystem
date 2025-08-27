@@ -19,6 +19,7 @@ export default ({ command }: { command: string }) => {
         host: "0.0.0.0",
         port: 8082,
         https: false,
+        allowedHosts: ["devscs.alvitre.com.br"],
       },
     };
   } else if (command === "build") {

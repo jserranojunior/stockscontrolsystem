@@ -152,7 +152,7 @@
                 </div>
 
                 <div class="flex justify-between font-bold">
-                  <div class="tooltip" data-tip="Preço Médio de Compra * 1.25">
+                  <div class="tooltip" data-tip="Preço Médio * 1.25">
                     <div class="font-semibold">1.25:</div>
                   </div>
                   <div v-if="ticker.posicao">

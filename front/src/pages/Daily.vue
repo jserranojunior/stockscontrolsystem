@@ -3,9 +3,7 @@
     <Tabs />
     <div class="flex justify-between mt-6">
       <div class="w-1/3"></div>
-      <div class="w-1/3">
-        <Calendario />
-      </div>
+
 
     </div>
 
@@ -37,6 +35,5 @@ import RelatorioDiario from "../mods/tickers/RelatorioDiario.vue";
 import ResultadoMensal from "../mods/tickers/ResultadoMensal.vue";
 import Resumo from "../mods/tickers/Resumo.vue";
 import ResumoDolar from "../mods/tickers/ResumoDolar.vue";
-import Calendario from "../components/Calendario/Calendario.vue";
 
 </script>

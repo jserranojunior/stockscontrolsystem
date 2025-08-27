@@ -35,8 +35,8 @@ export function httpTickers() {
       });
   }
 
-  async function getCorretorasComOperacoesPerformance(data: string) {
-    const urlApi = "/corretorascomoperacoesperformance/" + data;
+  async function getCorretorasComOperacoesPerformance() {
+    const urlApi = "/corretorasultimaoperacao";
     return await ApiConnect.getWithoutToken(urlApi)
       .then((res: any) => {
         return res;
@@ -76,6 +76,18 @@ export function httpTickers() {
         return res;
       })
       .catch((res: any) => {
+        return res;
+      });
+  }
+
+  async function updateTicker(data: any) {
+    const urlApi = "/ticker/" + data.id;
+    return await ApiConnect.putWithoutToken(urlApi, data)
+      .then((res: any) => {
+        return res;
+      })
+      .catch((res: any) => {
+        console.error(res);
         return res;
       });
   }
@@ -195,6 +207,7 @@ export function httpTickers() {
   }
 
   return {
+    updateTicker,
     addTicker,
     updateOperacoes,
     getCorretoras,

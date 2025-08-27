@@ -123,6 +123,19 @@ export const useTicker = () => {
     }
   }
 
+  // No seu componente Vue/React
+  async function atualizarTicker(data: any) {
+    return await httpTickers()
+      .updateTicker(data)
+      .then((res: any) => {
+        return res;
+      })
+      .catch((res: any) => {
+        console.error(res);
+        return res;
+      });
+  }
+
   async function adicionarTicker(): Promise<void> {
     // Validação básica antes de enviar
     if (
@@ -251,41 +264,57 @@ export const useTicker = () => {
       });
   }
 
-  function calcularTotalDiario(dados: any) {
+  function calcularTotalInvestidoPerformance(dados: any) {
     for (const corretora of dados) {
-      let totalPerformanceDiaria = { quantidade: 0, valor: 0 };
+      let totalPerformanceDiaria = {
+        saldo: 0,
+        carteira: 0,
+        posicao: 0,
+        performance: 0,
+      };
       corretora.totalPerformanceDiaria = totalPerformanceDiaria;
       if (!corretora.operacoes || !Array.isArray(corretora.operacoes)) continue;
 
       for (let op of corretora.operacoes) {
-        if (op.tipoOperacao == "C") {
-          totalPerformanceDiaria.quantidade += op.quantidade;
-          totalPerformanceDiaria.valor += op.valorTotal;
-        } else {
-          totalPerformanceDiaria.quantidade -= op.quantidade;
-          totalPerformanceDiaria.valor -= op.valorTotal;
-        }
-
-        console.log("op diaria", op);
-        console.log("total diaria", totalPerformanceDiaria);
+        totalPerformanceDiaria.saldo += op.saldo;
+        totalPerformanceDiaria.carteira += op.carteira;
+        totalPerformanceDiaria.posicao += op.posicao;
+        totalPerformanceDiaria.performance += op.performance;
       }
 
       corretora.totalPerformanceDiaria = totalPerformanceDiaria;
     }
+    return dados;
   }
 
-  async function getCorretorasComOperacoesPerformance(data: string) {
+  function zerarPrecoMedioSemSaldo(dados: any) {
+    for (const corretora of dados) {
+      if (corretora.operacoes && corretora.operacoes[0]) {
+        for (let op of corretora.operacoes) {
+          if (!op.saldo) {
+            console.log("Corretora", corretora.nome);
+            op.precoMedio = 0;
+          }
+        }
+      }
+    }
+    return dados;
+  }
+
+  async function getCorretorasComOperacoesPerformance() {
     await httpTickers()
-      .getCorretorasComOperacoesPerformance(data)
+      .getCorretorasComOperacoesPerformance()
       .then((res) => {
-        store.ativos = calcularPosicaoOperacoesPerformance(res.data);
-        calcularTotalDiario(res.data);
+        console.log("Ativos com performance", res.data[2].operacoes[0]);
+        let checkDados = zerarPrecoMedioSemSaldo(res.data);
+        store.ativos = calcularPosicaoOperacoesPerformance(checkDados);
+        calcularTotalInvestidoPerformance(store.ativos);
       });
   }
 
   function calcularPosicaoPerfomance(op: any): number {
     const precoAtual = op.precoAtual ?? 0;
-    const quantidade = op.quantidade ?? 0;
+    const quantidade = op.saldo ?? 0;
     return parseFloat((quantidade * precoAtual).toFixed(2));
   }
 
@@ -311,7 +340,8 @@ export const useTicker = () => {
 
       corretora.operacoes = corretora.operacoes.map((op: any) => {
         const posicao = calcularPosicaoPerfomance(op);
-        const performance = calcularPerformance(posicao, op.valorTotal);
+
+        const performance = calcularPerformance(posicao, op.carteira);
         const variacaoPercentual = calcularVariacaoPercentual(
           op.precoAtual,
           op.precoMedio
@@ -433,6 +463,7 @@ export const useTicker = () => {
   });
 
   return {
+    atualizarTicker,
     adicionarTicker,
     relatorioCalculado,
     formatarMoeda,
