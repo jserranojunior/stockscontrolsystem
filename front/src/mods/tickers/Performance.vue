@@ -194,7 +194,7 @@
                       </td>
 
                       <td colspan="3" class="text-center text-lg text-green-700">
-                        {{ formatarNumero(corretora.totalPerformanceDiaria.performance) }}
+                        {{ formatarNumero(corretora.totalPerformanceDiaria.posicao) }}
                       </td>
 
                       <td></td>
