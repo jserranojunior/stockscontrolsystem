@@ -6,3 +6,16 @@ Colocar data e hora da última atualização da preço atual
 
 
 posiÇão fica sendo O VALOR ATUAL * QUANTIDADE DE TICJ
+
+
+
+
+
+novas atualizações
+
+
+
+Arrumar que esta com 1 dia a menos PERGUNTAR
+
+Nova operação valor da carteira
+Adicionar % no total da nomade

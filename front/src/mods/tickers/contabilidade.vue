@@ -1,5 +1,7 @@
 <template>
+  <!--   <pre>{{ store.ativos }}</pre> -->
   <div class="mx-auto p-6 space-y-10" v-if="store.ativos">
+
     <!-- Loop através de todos os ativos -->
     <div v-for="(corretora, index) in store.ativos" :key="index">
 
@@ -41,9 +43,10 @@
                 <tbody>
                   <tr v-for="(op, index) in ticker.operacoes" :key="index"
                     :class="{ 'bg-red-100': op.tipoOperacao === 'V' }"
-                    class="font-bold cursor-pointer hover:bg-gray-200" @click="editarOperacao(op.ID)">
+                    class="font-bold cursor-pointer hover:bg-gray-200" @click="editarOperacao(op)">
 
                     <td class="border border-gray-200 p-2 text-center">
+
                       {{ op.tipoOperacao }}
                     </td>
                     <td class="border border-gray-300 p-2 text-center">
@@ -248,6 +251,7 @@ import { useTicker } from "./composables/useTicker";
 import { dateFormatPtbr } from "alvitre-obelisk";
 import { httpTickers } from './composables/httpTickers';
 import { useRouter } from "vue-router";
+
 const router = useRouter();
 const { getCorretorasComOperacoes } = useTicker();
 
@@ -259,10 +263,9 @@ const calcularMetaValor = (carteira: number): number => {
   return carteira * 1.25;
 };
 
-function editarOperacao(id: number) {
+function editarOperacao(op: any) {
   // Redireciona para a página de edição da operação com o ID fornecido
-  store.editarOperacao.ID = id;
-  router.push({ name: "editaroperacao", params: {} });
+  store.editarOperacao = op;
 
 }
 

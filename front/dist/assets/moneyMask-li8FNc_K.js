@@ -1,1 +1,0 @@
-const o={decimal:",",thousands:".",prefix:" ",suffix:"",precision:2,masked:!0};function a(e){return(Number(e)||0).toFixed(o.precision).replace(".",o.decimal).replace(/\B(?=(\d{3})+(?!\d))/g,o.thousands)}function n(e){if(!e)return 0;let s=e.replace(/\./g,"").replace(",",".");return parseFloat(s)||0}export{a as f,o as m,n as p};

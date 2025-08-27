@@ -1,17 +1,20 @@
 <template>
-  <div class="p-2 space-y-10 mx-6">
-    <div class="card bg-base-200 rounded-2xl p-4">
+  <Modal :nome="'editOperacao'">
+    <template #header>
       <h2 class="text-md font-bold mb-6 text-primary flex items-center gap-2">
 
         Editar Operação
       </h2>
 
+    </template>
+    <template #body>
+      <div class=" space-y-10 mb-2" v-if="store.editarOperacao.ID">
+        <div class="card bg-gra-100 rounded-2xl p-2">
 
-      <div class="space-y-4">
-        <div class="flex flex-wrap justify-between">
+
           <!-- Data -->
-          <div class="w-full md:w-1/2 lg:w-1/4">
-            <div class="form-control mx-2">
+          <div class="w-full mt-2">
+            <div class=" form-control mx-2">
               <label class="label">
                 <span class="label-text font-medium">Data da Operação</span>
               </label>
@@ -26,10 +29,10 @@
                   </svg>
                 </span>
               </div>
+
             </div>
           </div>
-
-          <div class="w-full md:w-1/2 lg:w-1/4">
+          <div class="w-full mt-2">
             <div class="form-control mx-2">
               <label class="label">
                 <span class="label-text font-medium">Corretora</span>
@@ -46,7 +49,7 @@
 
           </div>
           <!-- Ativo -->
-          <div class="w-full md:w-1/2 lg:w-1/4">
+          <div class="w-full mt-2">
             <div class="form-control mx-2">
               <label class="label">
                 <span class="label-text font-medium">Tick</span>
@@ -61,7 +64,7 @@
               </div>
             </div>
           </div>
-          <div class="w-full md:w-1/2 lg:w-1/4">
+          <div class="w-full mt-2">
             <div class="form-control mx-2">
               <label class="label">
                 <span class="label-text font-medium">Tipo de Operação</span>
@@ -72,12 +75,8 @@
               </select>
             </div>
           </div>
-        </div>
 
-        <!-- Campos dinâmicos -->
-        <div class="flex flex-wrap">
-
-          <div class="w-full md:w-1/2 lg:w-1/4">
+          <div class="w-full mt-2">
             <div class="form-control mx-2">
               <label class="label">
                 <span class="label-text font-medium">Quantidade</span>
@@ -90,7 +89,7 @@
             </div>
           </div>
 
-          <div class="w-full md:w-1/2 lg:w-1/4">
+          <div class="w-full mt-2">
             <div class="form-control mx-2">
               <label class="label">
                 <span class="label-text font-medium">Valor Total</span>
@@ -103,7 +102,7 @@
             </div>
           </div>
 
-          <div class="w-full md:w-1/2 lg:w-1/4">
+          <div class="w-full mt-2">
             <div class="form-control mx-2">
               <label class="label">
                 <span class="label-text font-medium">Preço Médio</span>
@@ -117,7 +116,7 @@
             </div>
           </div>
 
-          <div class="w-full md:w-1/2 lg:w-1/4">
+          <div class="w-full mt-2">
             <div class="form-control mx-2">
               <label class="label">
                 <span class="label-text font-medium">Carteira depois da compra</span>
@@ -131,7 +130,7 @@
             </div>
           </div>
 
-          <div class="w-full md:w-1/2 lg:w-1/4 mt-2">
+          <div class="w-full mt-2">
             <div class="form-control mx-2">
               <label class="label">
                 <span class="label-text font-medium">Saldo depois da compra</span>
@@ -145,46 +144,50 @@
             </div>
           </div>
 
+
+
         </div>
 
 
+      </div>
+    </template>
+    <template #footer>
+      <div class="flex float-right">
+        <div class="pt-2 float-right mx-2">
+          <button class="btn btn-warning w-full md:w-auto gap-2" @click="voltar()">
 
+            Voltar
+          </button>
+        </div>
 
-        <!-- Botão Submit -->
+        <div class="pt-2 float-right">
+          <button class="btn btn-success w-full md:w-auto gap-2" @click="updateOperacoes()">
 
-        <div class="flex float-right">
-          <div class="pt-2 float-right mx-2">
-            <button class="btn btn-warning w-full md:w-auto gap-2" @click="router.push({ name: 'contabilidade' })">
-
-              Voltar
-            </button>
-          </div>
-
-          <div class="pt-2 float-right">
-            <button class="btn btn-success w-full md:w-auto gap-2" @click="updateOperacoes()">
-
-              Atualizar Operação
-            </button>
-          </div>
+            Atualizar Operação
+          </button>
         </div>
       </div>
-    </div>
+    </template>
+  </Modal>
 
-
-  </div>
 
 
 </template>
 
 <script setup lang="ts">
+import Modal from "../../../components/modals/Modal.vue";
 import { onBeforeMount, reactive, watch } from "vue";
 import { store } from "../composables/storeTicker";
 import { useTicker } from "../composables/useTicker";
 import { moneyMask } from "../../../helpers/mask/moneyMask";
 import moneyToFloat from "../../../helpers/filters/moneyToFloat";
+import { useModal } from "../../../components/modals/use/useModal";
+
+const { togleShowModalFixed } = useModal()
+
 import { useRouter } from "vue-router";
 const router = useRouter();
-const { atualizarOperacao, getCorretoras, getTickersCorretoraID, calcularUnidade, getOperacoesID } = useTicker();
+const { atualizarOperacao, getCorretoras, getTickersCorretoraID, calcularUnidade, getOperacoesID, getCorretorasComOperacoes } = useTicker();
 
 let state = reactive({
   valorTotal: "",
@@ -193,34 +196,54 @@ let state = reactive({
 });
 
 
+function voltar() {
+  if (store.editarOperacao.ID) {
+    store.editarOperacao.ID = null
+  }
+
+  togleShowModalFixed({
+    nome: 'editOperacao',
+    show: false
+  })
+}
+
 
 async function updateOperacoes() {
 
-  await atualizarOperacao(store.editarOperacao).then(() => {
+  await atualizarOperacao(store.editarOperacao).then(async () => {
     // Limpar formulário após adicionar a operação
-    store.editarOperacao = {
-      ID: 0,
-      data: "",
-      tipoOperacao: "C",
-      quantidade: 0,
-      valorUnidade: 0,
-      valorTotal: 0,
-      precoMedioCompra: 0,
-      saldoTickers: 0,
-      carteira: 0,
-      tickerId: 0,
-      ticker: null
-    };
-    state.valorTotal = "";
-    state.precoMedioCompra = "";
-
-    store.corretoraSelecionada = null;
-    store.corretoraTickers = [];
 
 
-    router.push({ name: "contabilidade", params: {} });
+
+
+    await getCorretorasComOperacoes().then(() => {
+
+      store.editarOperacao = {
+        ID: 0,
+        data: "",
+        tipoOperacao: "C",
+        quantidade: 0,
+        valorUnidade: 0,
+        valorTotal: 0,
+        precoMedioCompra: 0,
+        saldoTickers: 0,
+        carteira: 0,
+        tickerId: 0,
+        ticker: null
+      };
+      state.valorTotal = "";
+      state.precoMedioCompra = "";
+
+
+
+
+
+      voltar()
+    })
 
   });
+
+
 }
 
 
@@ -229,7 +252,22 @@ async function updateOperacoes() {
 
 
 onBeforeMount(async () => {
-  await getCorretoras().then(async () => {
+  await getCorretoras().then(async () => { })
+
+});
+
+
+/* watch(() => store.editarOperacao.tipoOperacao, () => {
+  calcularOperacao();
+});
+ */
+
+watch(() => store.editarOperacao.ID, async () => {
+  console.log("Mudano o ID")
+  if (store.editarOperacao && store.editarOperacao.ID) {
+    console.log("Não deve rodar")
+
+    console.log("Ta entrando aqui")
     await getOperacoesID(store.editarOperacao.ID).then((res: any) => {
 
       store.editarOperacao.data = store.editarOperacao.data.split('T')[0];
@@ -245,16 +283,14 @@ onBeforeMount(async () => {
         store.editarOperacao.tickerId = store.editarOperacao.ticker.ID
       }
 
+      togleShowModalFixed({ nome: "editOperacao", show: true })
+
 
     })
-  })
-});
 
+  }
+})
 
-/* watch(() => store.editarOperacao.tipoOperacao, () => {
-  calcularOperacao();
-});
- */
 watch(
   () => store.corretoraSelecionada,
   (newValue) => {
@@ -272,28 +308,12 @@ watch(
 
 
 
-
-/* watch(() => store.editarOperacao.valorTotal, (newValue) => {
-  calcularOperacao();
-}); */
-
-/* watch(
-  () => store.editarOperacao.tickerId,
-  (newValue) => {
-    calcularOperacao();
-  }
-); */
-
 watch(
   () => store.editarOperacao.quantidade,
   (newValue) => {
     store.editarOperacao.valorUnidade = calcularUnidade(store.editarOperacao.valorTotal, store.editarOperacao.quantidade);
   }
 );
-
-/* watch(() => store.editarOperacao.quantidade, (newValue) => {
-  calcularOperacao();
-}); */
 
 watch(() => state.valorTotal, (newValue) => {
   store.editarOperacao.valorTotal = moneyToFloat(newValue);

@@ -90,37 +90,21 @@ export const useTicker = () => {
   }
 
   // No seu componente Vue/React
-  async function atualizarOperacao(data: any): Promise<void> {
-    // Validação básica antes de enviar
-    if (
-      !store.editarOperacao.ID ||
-      !store.editarOperacao.tickerId ||
-      !store.editarOperacao.quantidade
-    ) {
-      showMessage("Preencha todos os campos obrigatórios");
-      return;
-    }
+  async function atualizarOperacao(data: any) {
     store.editarOperacao.data = converterCampoData(store.editarOperacao.data);
     store.editarOperacao = converterCampos(store.editarOperacao);
 
-    try {
-      console.log("Atualizando operação carteira", data.carteira);
-
-      const result = await httpTickers().updateOperacoes(data);
-
-      if (result.data.success) {
-        // Sucesso
-        console.log(result.data.message, "Operação atualizada com sucesso!");
-      } else {
-        // Erro
-        showMessage(result.data.error || "Erro ao atualizar operação");
-      }
-    } catch (error) {
-      if (error) {
-        console.error(error);
-        showMessage("Erro inesperado ao atualizar operação");
-      }
-    }
+    return await httpTickers()
+      .updateOperacoes(data)
+      .then(() => {
+        console.log(data, "Operação atualizada com sucesso!");
+      })
+      .catch((error) => {
+        if (error) {
+          console.error(error);
+          showMessage("Erro inesperado ao atualizar operação");
+        }
+      });
   }
 
   // No seu componente Vue/React
@@ -203,6 +187,7 @@ export const useTicker = () => {
       showMessage("Preencha todos os campos obrigatórios");
       return;
     }
+
     store.novaOperacao.data = converterCampoData(store.novaOperacao.data);
 
     store.novaOperacao = converterCampos(store.novaOperacao);
@@ -258,7 +243,6 @@ export const useTicker = () => {
     return await httpTickers()
       .getOperacoesID(corretoraID)
       .then((res) => {
-        console.log("Operação para editar", res.data.carteira);
         store.editarOperacao = res.data;
         return res.data;
       });
@@ -305,7 +289,6 @@ export const useTicker = () => {
     await httpTickers()
       .getCorretorasComOperacoesPerformance()
       .then((res) => {
-        console.log("Ativos com performance", res.data[2].operacoes[0]);
         let checkDados = zerarPrecoMedioSemSaldo(res.data);
         store.ativos = calcularPosicaoOperacoesPerformance(checkDados);
         calcularTotalInvestidoPerformance(store.ativos);

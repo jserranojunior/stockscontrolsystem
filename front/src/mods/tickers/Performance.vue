@@ -172,7 +172,7 @@
                       <th class="text-center mx-auto">
                         <div class="px-2 w-2">|</div>
                       </th>
-                      <td></td>
+                      <td><!-- ADICIONAR ISSO AQUI DEPOIS {{ corretora.totalPerformanceDiaria.precoAtual }} --></td>
 
                       <td class="text-right"> {{ formatarNumero(corretora.totalPerformanceDiaria.posicao) }}
                       </td>
@@ -193,7 +193,8 @@
                         Total {{ corretora.nome.split(" ")[0] }}
                       </td>
 
-                      <td colspan="3" class="text-center text-lg text-green-700">
+                      <td colspan="3" class="text-center text-lg text-green-700"
+                        v-if="corretora.totalPerformanceDiaria && corretora.totalPerformanceDiaria.posicao">
                         {{ formatarNumero(corretora.totalPerformanceDiaria.posicao) }}
                       </td>
 

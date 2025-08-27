@@ -159,6 +159,7 @@ let state = reactive({
 });
 
 function addOperacao() {
+
   adicionarOperacao();
 }
 

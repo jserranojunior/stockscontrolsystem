@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"sort"
 	"strconv"
@@ -174,11 +175,17 @@ func DeletarCorretora(c *gin.Context) {
 
 func GetCorretorasComOperacoes(c *gin.Context) {
 	var corretoras []models.Corretoras
-	err := DB.Preload("Tickers.Operacoes").Find(&corretoras).Error
+
+	err := DB.Preload("Tickers.Operacoes", func(db *gorm.DB) *gorm.DB {
+		return db.Order("operacoes.data ASC")
+	}).Find(&corretoras).Error // aqui estava faltando
+
 	if err != nil {
+		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	c.JSON(http.StatusOK, corretoras)
 }
 
@@ -245,7 +252,6 @@ func GetCorretorasComOperacoesPerfomance(c *gin.Context) {
 	// retorna JSON
 	c.JSON(http.StatusOK, resposta)
 }
-
 func GetCorretorasUltimaOperacao(c *gin.Context) {
 	var corretoras []models.Corretoras
 
@@ -278,6 +284,11 @@ func GetCorretorasUltimaOperacao(c *gin.Context) {
 			// pega a última (mais recente)
 			ultimaOp := ticker.Operacoes[0]
 
+			// se saldo for zero, apenas ignora esse ticker
+			if ultimaOp.SaldoTickers == 0 {
+				continue
+			}
+
 			opDTO := OperacaoDTO{
 				ID:                        ticker.ID,
 				Tick:                      ticker.Tick,
@@ -296,6 +307,7 @@ func GetCorretorasUltimaOperacao(c *gin.Context) {
 			corDTO.Operacoes = append(corDTO.Operacoes, opDTO)
 		}
 
+		// retorna a corretora mesmo que tenha zero ou mais operações válidas
 		resposta = append(resposta, corDTO)
 	}
 
