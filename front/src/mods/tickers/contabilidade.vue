@@ -1,248 +1,276 @@
 <template>
   <!--   <pre>{{ store.ativos }}</pre> -->
-  <div class="mx-auto p-6 space-y-10" v-if="store.ativos">
+
+  <div class=" w-full text-center mt-18 " v-if="store.ativos">
+    <div class="menu menu-vertical lg:menu-horizontal rounded-box mx-auto bg-white"
+      v-for="(corretora, index) in store.ativos" :key="index">
+      <div v-for="(ticker, index) in corretora.tickers" :key="index">
+        <ul v-if="ticker.operacoes && ticker.operacoes.length > 0">
+          <li>
+            <a :href="`#${ticker.tick}`">
+              <div class="btn btn-sm mr-1"> {{ ticker.tick }}</div>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div class="mx-auto p-6 space-y-10 z-0 " v-if="store.ativos">
+
+
 
     <!-- Loop através de todos os ativos -->
     <div v-for="(corretora, index) in store.ativos" :key="index">
 
 
       <div v-for="(ticker, index) in corretora.tickers" :key="index">
-        <div class="card bg-base-100 shadow-lg rounded-lg p-6 mb-10"
-          v-if="ticker.operacoes && ticker.operacoes.length > 0">
-          <div class="card bg-base-200 shadow-lg rounded-lg p-6 mb-10">
+        <section :id="ticker.tick">
+          <div class="card bg-base-100 shadow-lg rounded-lg p-6 mb-10"
+            v-if="ticker.operacoes && ticker.operacoes.length > 0">
+            <div class="card bg-base-200 shadow-lg rounded-lg p-6 mb-10">
 
 
 
-            <!-- Cabeçalho com nome do ativo -->
-            <h1 class="text-3xl font-bold mb-6">
-              {{ ticker.tick }}
-              <span v-if="ticker.name.String" class="text-xl font-normal">
-                - {{ ticker.name.String }}
-              </span>
-            </h1>
+              <!-- Cabeçalho com nome do ativo -->
+              <h1 class="text-3xl font-bold mb-6">
+                {{ ticker.tick }}
+                <span v-if="ticker.name.String" class="text-xl font-normal">
+                  - {{ ticker.name.String }}
+                </span>
+              </h1>
 
-            <!-- Tabela de operações -->
-            <div class="overflow-x-auto mb-6">
-              <table class="table full bg-white border border-gray-300 text-md">
-                <thead>
-                  <tr class="bg-gray-100 font-bold text-gray-800 cursor-pointer hover:bg-gray-200">
-                    <th class="border border-gray-300 p-2">C/V</th>
-                    <th class="border border-gray-300 p-2">Data</th>
-                    <th class="border border-gray-300 p-2">C</th>
-                    <th class="border border-gray-300 p-2">V</th>
-                    <th class="border border-gray-300 p-2">Saldo</th>
-                    <th class="border border-gray-300 p-2">Valor Uni.</th>
-                    <th class="border border-gray-300 p-2">Compra</th>
-                    <th class="border border-gray-300 p-2">Venda</th>
-                    <th class="border border-gray-300 p-2">Carteira</th>
-                    <th class="border border-gray-300 p-2">PM</th>
-                    <th class="border border-gray-300 p-2">L/P</th>
-                    <th class="border border-gray-300 p-2">Div</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(op, index) in ticker.operacoes" :key="index"
-                    :class="{ 'bg-red-100': op.tipoOperacao === 'V' }"
-                    class="font-bold cursor-pointer hover:bg-gray-200" @click="editarOperacao(op)">
+              <!-- Tabela de operações -->
+              <div class="overflow-x-auto mb-6">
+                <table class="table full bg-white border border-gray-300 text-md">
+                  <thead>
+                    <tr class="bg-gray-100 font-bold text-gray-800 cursor-pointer hover:bg-gray-200">
+                      <th class="border border-gray-300 p-2">C/V</th>
+                      <th class="border border-gray-300 p-2">Data</th>
+                      <th class="border border-gray-300 p-2">C</th>
+                      <th class="border border-gray-300 p-2">V</th>
+                      <th class="border border-gray-300 p-2">Saldo</th>
+                      <th class="border border-gray-300 p-2">Valor Uni.</th>
+                      <th class="border border-gray-300 p-2">Compra</th>
+                      <th class="border border-gray-300 p-2">Venda</th>
+                      <th class="border border-gray-300 p-2">Carteira</th>
+                      <th class="border border-gray-300 p-2">PM</th>
+                      <th class="border border-gray-300 p-2">L/P</th>
+                      <th class="border border-gray-300 p-2">Div</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(op, index) in ticker.operacoes" :key="index"
+                      :class="{ 'bg-red-100': op.tipoOperacao === 'V' }"
+                      class="font-bold cursor-pointer hover:bg-gray-200" @click="editarOperacao(op)">
 
-                    <td class="border border-gray-200 p-2 text-center">
+                      <td class="border border-gray-200 p-2 text-center">
 
-                      {{ op.tipoOperacao }}
-                    </td>
-                    <td class="border border-gray-300 p-2 text-center">
-                      {{ dateFormatPtbr(op.data) }}
-                    </td>
-                    <td class="border border-gray-300 p-2 text-right">
+                        {{ op.tipoOperacao }}
+                      </td>
+                      <td class="border border-gray-300 p-2 text-center">
+                        {{ dateFormatPtbr(op.data) }}
+                      </td>
+                      <td class="border border-gray-300 p-2 text-right">
+                        {{
+                          op.tipoOperacao === "C"
+                            ? formatarNumero(op.quantidade)
+                            : "-"
+                        }}
+                      </td>
+                      <td class="border border-gray-300 p-2 text-right">
+                        {{
+                          op.tipoOperacao === "V"
+                            ? formatarNumero(op.quantidade)
+                            : "-"
+                        }}
+                      </td>
+                      <td class="border border-gray-300 p-2 text-right">
+                        {{ formatarNumero(op.saldoTickers) }}
+                      </td>
+                      <td class="border border-gray-300 p-2 text-right">
+                        {{ formatarMoeda(op.valorUnidade) }}
+                      </td>
+                      <td class="border border-gray-300 p-2 text-right">
+                        {{
+                          op.tipoOperacao === "C" ? formatarMoeda(op.valorTotal) : "-"
+                        }}
+                      </td>
+                      <td class="border border-gray-300 p-2 text-right">
+                        {{
+                          op.tipoOperacao === "V" ? formatarMoeda(op.valorTotal) : "-"
+                        }}
+                      </td>
+                      <td class="border border-gray-300 p-2 text-right">
+                        {{ formatarMoeda(op.carteira) }}
+                      </td>
+                      <td class="border border-gray-300 p-2 text-right">
+                        {{ formatarMoeda(op.precoMedioCompra) }}
+                      </td>
+                      <td class="border border-gray-300 p-2 text-right">
+                        {{ "-" }}
+                      </td>
+                      <td class="border border-gray-300 p-2 text-right">
+                        {{ "-" }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Resumo da posição -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                <div class="bg-base-100 p-4 rounded-lg">
+                  <div class="flex justify-between">
+                    <div class="font-semibold">Posição:</div>
+
+                    <div v-if="ticker.posicao">
+                      {{ formatarNumero(ticker.posicao) }}
+                    </div>
+
+                    <template v-else>
+                      <div>Sem operações</div>
+                    </template>
+                  </div>
+
+                  <div class="flex justify-between">
+                    <div class="font-semibold">P. Atual:</div>
+                    <div v-if="ticker.precoAtual">
+                      {{ formatarMoeda(ticker.precoAtual) }}
+                    </div>
+                  </div>
+                  <template v-if="ticker.operacoes">
+                    <div class="flex justify-between font-bold">
+                      <span class="font-semibold">Resultado:</span>
+
+                      <!-- Percentual -->
+                      <div :class="{
+                        'text-green-700': resultadoPercentual(ticker) > 0,
+                        'text-red-600': resultadoPercentual(ticker) < 0,
+                        'text-gray-600': resultadoPercentual(ticker) === 0,
+                      }">
+                        {{ resultadoPercentual(ticker).toFixed(2) }}%
+                      </div>
+
+                      <!-- Valor -->
+                      <div :class="{
+                        'text-green-700': resultadoValor(ticker) > 0,
+                        'text-red-600': resultadoValor(ticker) < 0,
+                        'text-gray-600': resultadoValor(ticker) === 0,
+                      }">
+                        {{ formatarMoeda(resultadoValor(ticker)) }}
+                      </div>
+                    </div>
+                  </template>
+                </div>
+                <!-- META -->
+                <div class="bg-base-100 p-4 rounded-lg">
+                  <div class="flex justify-between">
+                    <div class="tooltip" data-tip="Meta a ser atingida">
+                      <div class="font-semibold" alt="Meta a ser atingida">Meta:</div>
+                    </div>
+                    <div>+25%</div>
+
+                  </div>
+
+                  <div class="flex justify-between font-bold">
+                    <div class="tooltip" data-tip="Preço Médio * 1.25">
+                      <div class="font-semibold">1.25:</div>
+                    </div>
+                    <div v-if="ticker.posicao">
+                      {{ formatarMoeda(calcularMetaValor(ticker.operacoes[ticker.operacoes.length -
+                        1]
+                        .precoMedioCompra)) }}
+                    </div>
+                  </div>
+                  <!-- DIF -->
+                  <div class="flex justify-between font-bold">
+                    <div class="tooltip" data-tip="Diferença entre o preço atual e a meta">
+                      <div class="font-semibold">Dif.:</div>
+                    </div>
+                    <div v-if="ticker.operacoes && ticker.operacoes.length" :class="{
+                      'text-green-700': calcularDiferencaMeta(
+                        ticker.operacoes[ticker.operacoes.length - 1].precoMedioCompra,
+                        ticker.precoAtual,
+                        ticker.operacoes[ticker.operacoes.length - 1].saldoTickers
+                      ) > 0,
+                      'text-red-500': calcularDiferencaMeta(
+                        ticker.operacoes[ticker.operacoes.length - 1].precoMedioCompra,
+                        ticker.precoAtual,
+                        ticker.operacoes[ticker.operacoes.length - 1].saldoTickers
+                      ) < 0
+                    }">
                       {{
-                        op.tipoOperacao === "C"
-                          ? formatarNumero(op.quantidade)
-                          : "-"
+                        formatarMoeda(
+                          calcularDiferencaMeta(
+                            ticker.operacoes[ticker.operacoes.length -
+                              1]
+                              .precoMedioCompra,
+                            ticker.precoAtual,
+                            ticker.operacoes[ticker.operacoes.length - 1].saldoTickers
+                          )
+                        )
                       }}
-                    </td>
-                    <td class="border border-gray-300 p-2 text-right">
+                    </div>
+                  </div>
+                </div>
+                <!-- INVESTIDO -->
+                <div class="bg-base-100 p-4 rounded-lg font-bold">
+                  <div class="flex justify-between" v-if="ticker.operacoes">
+                    <div class="font-semibold">Nomad Investido:</div>
+                    <div>
                       {{
-                        op.tipoOperacao === "V"
-                          ? formatarNumero(op.quantidade)
-                          : "-"
+                        formatarMoeda(
+                          ticker.operacoes[ticker.operacoes.length - 1].carteira
+                        )
                       }}
-                    </td>
-                    <td class="border border-gray-300 p-2 text-right">
-                      {{ formatarNumero(op.saldoTickers) }}
-                    </td>
-                    <td class="border border-gray-300 p-2 text-right">
-                      {{ formatarMoeda(op.valorUnidade) }}
-                    </td>
-                    <td class="border border-gray-300 p-2 text-right">
-                      {{
-                        op.tipoOperacao === "C" ? formatarMoeda(op.valorTotal) : "-"
-                      }}
-                    </td>
-                    <td class="border border-gray-300 p-2 text-right">
-                      {{
-                        op.tipoOperacao === "V" ? formatarMoeda(op.valorTotal) : "-"
-                      }}
-                    </td>
-                    <td class="border border-gray-300 p-2 text-right">
-                      {{ formatarMoeda(op.carteira) }}
-                    </td>
-                    <td class="border border-gray-300 p-2 text-right">
-                      {{ formatarMoeda(op.precoMedioCompra) }}
-                    </td>
-                    <td class="border border-gray-300 p-2 text-right">
-                      {{ "-" }}
-                    </td>
-                    <td class="border border-gray-300 p-2 text-right">
-                      {{ "-" }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+                    </div>
+                  </div>
 
-            <!-- Resumo da posição -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-              <div class="bg-base-100 p-4 rounded-lg">
-                <div class="flex justify-between">
-                  <div class="font-semibold">Posição:</div>
+                  <div class="flex justify-between" v-if="ticker.operacoes && ticker.operacoes.length > 0">
+                    <div class="font-semibold">PMC:</div>
+                    <div>
+                      {{
+                        formatarMoeda(
+                          ticker.operacoes[ticker.operacoes.length - 1]
+                            .precoMedioCompra
+                        )
+                      }}
+                    </div>
+                  </div>
 
-                  <div v-if="ticker.posicao">
-                    {{ formatarNumero(ticker.posicao) }}
+                  <div class="flex justify-between" v-if="ticker.operacoes">
+                    <div class="font-semibold">Stocks:</div>
+                    <div>
+                      {{
+                        formatarNumero(
+                          ticker.operacoes[ticker.operacoes.length - 1].saldoTickers
+                        )
+                      }}
+                    </div>
                   </div>
 
                   <template v-else>
                     <div>Sem operações</div>
                   </template>
                 </div>
-
-                <div class="flex justify-between">
-                  <div class="font-semibold">P. Atual:</div>
-                  <div v-if="ticker.precoAtual">
-                    {{ formatarMoeda(ticker.precoAtual) }}
-                  </div>
-                </div>
-                <template v-if="ticker.operacoes">
-                  <div class="flex justify-between font-bold">
-                    <span class="font-semibold">Resultado:</span>
-
-                    <!-- Percentual -->
-                    <div :class="{
-                      'text-green-700': resultadoPercentual(ticker) > 0,
-                      'text-red-600': resultadoPercentual(ticker) < 0,
-                      'text-gray-600': resultadoPercentual(ticker) === 0,
-                    }">
-                      {{ resultadoPercentual(ticker).toFixed(2) }}%
-                    </div>
-
-                    <!-- Valor -->
-                    <div :class="{
-                      'text-green-700': resultadoValor(ticker) > 0,
-                      'text-red-600': resultadoValor(ticker) < 0,
-                      'text-gray-600': resultadoValor(ticker) === 0,
-                    }">
-                      {{ formatarMoeda(resultadoValor(ticker)) }}
-                    </div>
-                  </div>
-                </template>
-              </div>
-              <!-- META -->
-              <div class="bg-base-100 p-4 rounded-lg">
-                <div class="flex justify-between">
-                  <div class="tooltip" data-tip="Meta a ser atingida">
-                    <div class="font-semibold" alt="Meta a ser atingida">Meta:</div>
-                  </div>
-                  <div>+25%</div>
-
-                </div>
-
-                <div class="flex justify-between font-bold">
-                  <div class="tooltip" data-tip="Preço Médio * 1.25">
-                    <div class="font-semibold">1.25:</div>
-                  </div>
-                  <div v-if="ticker.posicao">
-                    {{ formatarMoeda(calcularMetaValor(ticker.operacoes[ticker.operacoes.length -
-                      1]
-                      .precoMedioCompra)) }}
-                  </div>
-                </div>
-                <!-- DIF -->
-                <div class="flex justify-between font-bold">
-                  <div class="tooltip" data-tip="Diferença entre o preço atual e a meta">
-                    <div class="font-semibold">Dif.:</div>
-                  </div>
-                  <div v-if="ticker.operacoes && ticker.operacoes.length" :class="{
-                    'text-green-700': calcularDiferencaMeta(
-                      ticker.operacoes[ticker.operacoes.length - 1].precoMedioCompra,
-                      ticker.precoAtual,
-                      ticker.operacoes[ticker.operacoes.length - 1].saldoTickers
-                    ) > 0,
-                    'text-red-500': calcularDiferencaMeta(
-                      ticker.operacoes[ticker.operacoes.length - 1].precoMedioCompra,
-                      ticker.precoAtual,
-                      ticker.operacoes[ticker.operacoes.length - 1].saldoTickers
-                    ) < 0
-                  }">
-                    {{
-                      formatarMoeda(
-                        calcularDiferencaMeta(
-                          ticker.operacoes[ticker.operacoes.length -
-                            1]
-                            .precoMedioCompra,
-                          ticker.precoAtual,
-                          ticker.operacoes[ticker.operacoes.length - 1].saldoTickers
-                        )
-                      )
-                    }}
-                  </div>
-                </div>
-              </div>
-              <!-- INVESTIDO -->
-              <div class="bg-base-100 p-4 rounded-lg font-bold">
-                <div class="flex justify-between" v-if="ticker.operacoes">
-                  <div class="font-semibold">Nomad Investido:</div>
-                  <div>
-                    {{
-                      formatarMoeda(
-                        ticker.operacoes[ticker.operacoes.length - 1].carteira
-                      )
-                    }}
-                  </div>
-                </div>
-
-                <div class="flex justify-between" v-if="ticker.operacoes && ticker.operacoes.length > 0">
-                  <div class="font-semibold">PMC:</div>
-                  <div>
-                    {{
-                      formatarMoeda(
-                        ticker.operacoes[ticker.operacoes.length - 1]
-                          .precoMedioCompra
-                      )
-                    }}
-                  </div>
-                </div>
-
-                <div class="flex justify-between" v-if="ticker.operacoes">
-                  <div class="font-semibold">Stocks:</div>
-                  <div>
-                    {{
-                      formatarNumero(
-                        ticker.operacoes[ticker.operacoes.length - 1].saldoTickers
-                      )
-                    }}
-                  </div>
-                </div>
-
-                <template v-else>
-                  <div>Sem operações</div>
-                </template>
               </div>
             </div>
           </div>
-        </div>
 
+        </section>
       </div>
+
     </div>
   </div>
 </template>
+<style>
+html {
+  scroll-behavior: smooth;
+}
+</style>
 
 <script setup lang="ts">
 import { onBeforeMount } from "vue";
