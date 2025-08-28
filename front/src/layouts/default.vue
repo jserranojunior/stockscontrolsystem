@@ -1,7 +1,7 @@
 <template>
   <BtnToTop></BtnToTop>
   <div class="bg-base-100">
-    <nav class="navbar border-b border-base-200 bg-white fixed top-0 z-10">
+    <nav class="navbar border-b border-base-200 bg-white ">
       <slot name="header"></slot>
     </nav>
     <div class="drawer min-h-screen">

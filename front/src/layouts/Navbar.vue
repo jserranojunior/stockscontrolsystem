@@ -1,5 +1,6 @@
 <template>
-  <div class="text-neutral rounded-xl w-full  px-2 flex flex-wrap justify-between my-1 items-center mx-2  bg-gray-100">
+  <div
+    class="text-neutral rounded-xl w-full  px-2 flex flex-wrap justify-between my-1 items-center mx-2 fixed top-0 z-10 bg-gray-100">
     <div class="flex-1">
       <label for="my-drawer" class="btn btn-sm drawer-button cursor-pointer">
         <Icon icon="ic:sharp-menu" width="24" height="24"></Icon>

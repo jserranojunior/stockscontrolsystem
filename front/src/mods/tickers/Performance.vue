@@ -82,10 +82,14 @@
 
               </tr>
             </thead>
-            <tbody>
+            <tbody v-if="store.ativos">
 
-              <tr class="bg-gray-100 font-semibold" v-for="corretora in store.ativos" :key="corretora.ID">
+              <tr class="bg-gray-100 font-semibold"
+                v-for="corretora in (Array.isArray(store.ativos) ? store.ativos.filter(c => c.totalPerformanceDiaria) : [])"
+                :key="corretora.ID">
+
                 <td title="Movimentação diaria">{{ corretora.nome }}</td>
+
 
 
                 <td class="text-right">
@@ -111,6 +115,7 @@
 
                   {{ formatarNumero(corretora.totalPerformanceDiaria.variacaoPercentual) }}
                 </td>
+
 
               </tr>
             </tbody>
