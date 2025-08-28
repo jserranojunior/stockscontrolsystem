@@ -21,6 +21,104 @@
     </Modal>
 
 
+    <div class="p-6 flex justify-center items-center">
+      <div class="w-full">
+        <h1 class="text-3xl font-bold my-4 text-center">
+          Resumo de Performance
+        </h1>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap justify-center p-1">
+      <div class="w-full max-w-6xl mx-auto">
+        <div class="flex flex-wrap justify-center">
+          <table class="table  w-full min-w-[800px] text-md bg-base-100">
+            <thead class="text-black">
+              <tr>
+                <td colspan="4" class="text-center bg-yellow-100">
+                  INVESTIDO
+                </td>
+                <td class="text-center mx-auto">
+                  <div class="px-2 w-2">|</div>
+                </td>
+                <td colspan="5" class="text-center bg-blue-200">
+                  PERFORMANCE
+                </td>
+              </tr>
+              <tr class="text-xs uppercase tracking-wide bg-gray-100">
+
+
+                <th class="text-center" title="Nome do ativo">CORRRETORA</th>
+
+
+                <th class="text-right" title="Valor investido">
+                  Investido
+                </th>
+
+                <th class="text-right" title="Quantidade de ativos em carteira">
+                  STOCKS
+                </th>
+                <th class="text-right" title="Preço Médio (Valor Médio)">
+                  PM
+                </th>
+                <th class="text-center mx-auto">
+                  <div class="px-2 w-2">|</div>
+                </th>
+                <th class="text-left" title="Preço atual do ativo no final dia">
+                  P. Atual
+                </th>
+                <th class="text-right" title="Valor total do ativo no final do dia">
+                  Posição
+                </th>
+
+                <th class="text-right"
+                  title="Lucro ou prejuízo acumulado + Variação percentual entre preço médio e valor atual">
+                  Performance
+                </th>
+
+                <th class="text-right" title="Variação percentual entre preço médio e valor atual">
+                  Var %
+                </th>
+
+              </tr>
+            </thead>
+            <tbody>
+
+              <tr class="bg-gray-100 font-semibold" v-for="corretora in store.ativos" :key="corretora.ID">
+                <td title="Movimentação diaria">{{ corretora.nome }}</td>
+
+
+                <td class="text-right">
+                  {{ formatarNumero(corretora.totalPerformanceDiaria.carteira) }}
+                </td>
+
+                <td class="text-right"> {{ corretora.totalPerformanceDiaria.saldo }}
+                </td>
+                <td class="text-right">{{ formatarNumero(corretora.totalPerformanceDiaria.precoMedio) }}</td>
+                <th class="text-center mx-auto">
+                  <div class="px-2 w-2">|</div>
+                </th>
+                <td class="text-right">{{ formatarNumero(corretora.totalPerformanceDiaria.precoAtual) }}</td>
+
+                <td class="text-right"> {{ formatarNumero(corretora.totalPerformanceDiaria.posicao) }}
+                </td>
+
+                <td class="text-right"> {{ formatarNumero(corretora.totalPerformanceDiaria.performance) }}
+
+                </td>
+
+                <td class="text-right">
+
+                  {{ formatarNumero(corretora.totalPerformanceDiaria.variacaoPercentual) }}
+                </td>
+
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
 
     <div class="p-6 flex justify-center items-center">
       <div class="w-full">
@@ -29,6 +127,9 @@
         </h1>
       </div>
     </div>
+
+
+
     <div class="flex flex-wrap justify-center p-1">
       <div class="w-full max-w-6xl mx-auto">
         <div class="flex flex-wrap justify-center">
@@ -168,11 +269,11 @@
 
                       <td class="text-right"> {{ corretora.totalPerformanceDiaria.saldo }}
                       </td>
-                      <td></td>
+                      <td>{{ formatarNumero(corretora.totalPerformanceDiaria.precoMedio) }}</td>
                       <th class="text-center mx-auto">
                         <div class="px-2 w-2">|</div>
                       </th>
-                      <td><!-- ADICIONAR ISSO AQUI DEPOIS {{ corretora.totalPerformanceDiaria.precoAtual }} --></td>
+                      <td>{{ formatarNumero(corretora.totalPerformanceDiaria.precoAtual) }}</td>
 
                       <td class="text-right"> {{ formatarNumero(corretora.totalPerformanceDiaria.posicao) }}
                       </td>
@@ -182,7 +283,8 @@
                       </td>
 
                       <td class="text-right">
-                        <!-- {{ corretora.totalDiario.variacaoPercentual }}% -->
+
+                        {{ formatarNumero(corretora.totalPerformanceDiaria.variacaoPercentual) }}
                       </td>
                       <td></td>
                     </tr>
@@ -192,18 +294,24 @@
                       <td title="Total Dia Anterior - Final do dia">
                         Total {{ corretora.nome.split(" ")[0] }}
                       </td>
-
-                      <td colspan="3" class="text-center text-lg text-green-700"
+                      <td class="text-right text-lg text-green-700"
                         v-if="corretora.totalPerformanceDiaria && corretora.totalPerformanceDiaria.posicao">
                         {{ formatarNumero(corretora.totalPerformanceDiaria.posicao) }}
                       </td>
-
-                      <td></td>
-                      <th class="text-center mx-auto">
-
-                      </th>
+                      <td>
+                      </td>
 
 
+
+                      <td>
+                      </td>
+                      <td>
+
+                      </td>
+
+                      <td>
+
+                      </td>
 
 
                       <td class="text-right">

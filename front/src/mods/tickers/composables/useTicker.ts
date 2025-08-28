@@ -255,6 +255,9 @@ export const useTicker = () => {
         carteira: 0,
         posicao: 0,
         performance: 0,
+        precoMedio: 0,
+        precoAtual: 0,
+        variacaoPercentual: 0,
       };
       corretora.totalPerformanceDiaria = totalPerformanceDiaria;
       if (!corretora.operacoes || !Array.isArray(corretora.operacoes)) continue;
@@ -264,9 +267,15 @@ export const useTicker = () => {
         totalPerformanceDiaria.carteira += op.carteira;
         totalPerformanceDiaria.posicao += op.posicao;
         totalPerformanceDiaria.performance += op.performance;
+        totalPerformanceDiaria.precoMedio += op.precoMedio;
+        totalPerformanceDiaria.precoAtual += op.precoAtual;
       }
 
       corretora.totalPerformanceDiaria = totalPerformanceDiaria;
+      totalPerformanceDiaria.variacaoPercentual = calcularVariacaoPercentual(
+        totalPerformanceDiaria.precoAtual,
+        totalPerformanceDiaria.precoMedio
+      );
     }
     return dados;
   }
@@ -291,7 +300,7 @@ export const useTicker = () => {
       .then((res) => {
         let checkDados = zerarPrecoMedioSemSaldo(res.data);
         store.ativos = calcularPosicaoOperacoesPerformance(checkDados);
-        calcularTotalInvestidoPerformance(store.ativos);
+        store.ativos = calcularTotalInvestidoPerformance(store.ativos);
       });
   }
 
