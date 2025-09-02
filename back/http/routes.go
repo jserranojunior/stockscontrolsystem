@@ -53,7 +53,7 @@ func RegisterRoutes() {
 	router.Post("/corretoras", middlewares.CORSMiddleware, handlers.CriarCorretora)
 	router.Put("/corretoras/:id", middlewares.CORSMiddleware, handlers.AtualizarCorretora)
 	router.Delete("/corretoras/:id", middlewares.CORSMiddleware, handlers.DeletarCorretora)
-	router.Get("/corretorascomoperacoes", middlewares.CORSMiddleware, handlers.GetCorretorasComOperacoes)
+	router.Get("/corretorascomoperacoes/:tipocontabilidade", middlewares.CORSMiddleware, handlers.GetCorretorasComOperacoes)
 	router.Get("/corretorascomoperacoesperformance/:data", middlewares.CORSMiddleware, handlers.GetCorretorasComOperacoesPerfomance)
 
 	router.Get("/corretorasultimaoperacao", middlewares.CORSMiddleware, handlers.GetCorretorasUltimaOperacao) //
@@ -67,6 +67,8 @@ func RegisterRoutes() {
 	router.Get("/operacoes/:id", middlewares.CORSMiddleware, handlers.GetOperacaoByID)
 
 	router.Put("/operacoes", middlewares.CORSMiddleware, handlers.UpdateOperacao)
+
+	router.Delete("/operacoes/:id", middlewares.CORSMiddleware, handlers.DeleteOperacao)
 
 	router.Post("/ticker", middlewares.CORSMiddleware, handlers.AddTicker)
 

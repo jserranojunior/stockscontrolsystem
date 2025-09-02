@@ -1,20 +1,27 @@
 <template>
+  <ModalConfirmacao :nomeModalConfirmacao="'confirmarDeleteOperacao'" :functionConfirmarModal="deletarOperacao"
+    :functionCancelarModal="voltar">
+    <template #header>
+      <span>Confirmar</span>
+    </template>
+    <template #body>
+      <span>Confirmar a exclusão da operação?</span>
+    </template>
+  </ModalConfirmacao>
+
+
   <Modal :nome="'editOperacao'">
     <template #header>
       <h2 class="text-md font-bold mb-6 text-primary flex items-center gap-2">
-
         Editar Operação
       </h2>
-
     </template>
     <template #body>
-      <div class=" space-y-10 mb-2" v-if="store.editarOperacao.ID">
+      <div class="space-y-10 mb-2" v-if="store.editarOperacao.ID">
         <div class="card bg-gra-100 rounded-2xl p-2">
-
-
           <!-- Data -->
           <div class="w-full mt-2">
-            <div class=" form-control mx-2">
+            <div class="form-control mx-2">
               <label class="label">
                 <span class="label-text font-medium">Data da Operação</span>
               </label>
@@ -29,7 +36,6 @@
                   </svg>
                 </span>
               </div>
-
             </div>
           </div>
           <div class="w-full mt-2">
@@ -46,7 +52,6 @@
                 </select>
               </div>
             </div>
-
           </div>
           <!-- Ativo -->
           <div class="w-full mt-2">
@@ -84,7 +89,6 @@
               <div class="relative">
                 <input type="number" v-model="store.editarOperacao.quantidade" class="input input-bordered w-full"
                   min="1" placeholder="Nº de ações" />
-
               </div>
             </div>
           </div>
@@ -95,7 +99,6 @@
                 <span class="label-text font-medium">Valor Total</span>
               </label>
               <div class="relative">
-
                 <input type="text" v-model="state.valorTotal" v-money="moneyMask"
                   class="input input-bordered w-full pl-10" placeholder="0,00" />
               </div>
@@ -108,11 +111,9 @@
                 <span class="label-text font-medium">Preço Médio</span>
               </label>
               <div class="relative">
-
                 <input type="text" v-model="state.precoMedioCompra" v-money="moneyMask"
                   class="input input-bordered w-full pl-10" placeholder="0,00" />
               </div>
-
             </div>
           </div>
 
@@ -122,11 +123,9 @@
                 <span class="label-text font-medium">Carteira depois da compra</span>
               </label>
               <div class="relative">
-
                 <input type="text" v-model="state.carteira" v-money="moneyMask"
                   class="input input-bordered w-full pl-10" placeholder="0,00" />
               </div>
-
             </div>
           </div>
 
@@ -136,42 +135,36 @@
                 <span class="label-text font-medium">Saldo depois da compra</span>
               </label>
               <div class="relative">
-
                 <input type="text" v-model="store.editarOperacao.saldoTickers" class="input input-bordered w-full pl-10"
                   placeholder="0" />
               </div>
-
             </div>
           </div>
-
-
-
         </div>
-
-
       </div>
     </template>
     <template #footer>
       <div class="flex float-right">
         <div class="pt-2 float-right mx-2">
           <button class="btn btn-warning w-full md:w-auto gap-2" @click="voltar()">
-
             Voltar
+          </button>
+        </div>
+
+        <div class="pt-2 float-right mx-2">
+          <button class="btn btn-error w-full md:w-auto gap-2" @click="openConfirmar()">
+            Deletar
           </button>
         </div>
 
         <div class="pt-2 float-right">
           <button class="btn btn-success w-full md:w-auto gap-2" @click="updateOperacoes()">
-
             Atualizar Operação
           </button>
         </div>
       </div>
     </template>
   </Modal>
-
-
-
 </template>
 
 <script setup lang="ts">
@@ -182,42 +175,65 @@ import { useTicker } from "../composables/useTicker";
 import { moneyMask } from "../../../helpers/mask/moneyMask";
 import moneyToFloat from "../../../helpers/filters/moneyToFloat";
 import { useModal } from "../../../components/modals/use/useModal";
+import ModalConfirmacao from "../../../components/modals/ModalConfirmacao.vue";
 
-const { togleShowModalFixed } = useModal()
+const { togleShowModalFixed } = useModal();
 
 import { useRouter } from "vue-router";
 const router = useRouter();
-const { atualizarOperacao, getCorretoras, getTickersCorretoraID, calcularUnidade, getOperacoesID, getCorretorasComOperacoes } = useTicker();
+const {
+  atualizarOperacao,
+  getCorretoras,
+  getTickersCorretoraID,
+  calcularUnidade,
+  getOperacoesID,
+  getCorretorasComOperacoes,
+  deleteOperacaoID,
+} = useTicker();
 
 let state = reactive({
   valorTotal: "",
   precoMedioCompra: "",
-  carteira: ""
+  carteira: "",
 });
+
+async function deletarOperacao() {
+  return await deleteOperacaoID(store.editarOperacao.ID).then(async () => {
+    await updateOperacoes()
+  })
+
+
+}
+
+function openConfirmar() {
+  togleShowModalFixed({
+    nome: "editOperacao",
+    show: false,
+  });
+  togleShowModalFixed({ nome: "confirmarDeleteOperacao", show: true });
+
+}
 
 
 function voltar() {
   if (store.editarOperacao.ID) {
-    store.editarOperacao.ID = null
+    store.editarOperacao.ID = null;
   }
 
+  togleShowModalFixed({ nome: "confirmarDeleteOperacao", show: false });
+
+
   togleShowModalFixed({
-    nome: 'editOperacao',
-    show: false
-  })
+    nome: "editOperacao",
+    show: false,
+  });
 }
 
-
 async function updateOperacoes() {
-
   await atualizarOperacao(store.editarOperacao).then(async () => {
     // Limpar formulário após adicionar a operação
 
-
-
-
     await getCorretorasComOperacoes().then(() => {
-
       store.editarOperacao = {
         ID: 0,
         data: "",
@@ -229,103 +245,99 @@ async function updateOperacoes() {
         saldoTickers: 0,
         carteira: 0,
         tickerId: 0,
-        ticker: null
+        ticker: null,
       };
       state.valorTotal = "";
       state.precoMedioCompra = "";
 
-
-
-
-
-      voltar()
-    })
-
+      voltar();
+    });
   });
-
-
 }
 
-
-
-
-
-
 onBeforeMount(async () => {
-  await getCorretoras().then(async () => { })
-
+  await getCorretoras().then(async () => { });
 });
-
 
 /* watch(() => store.editarOperacao.tipoOperacao, () => {
   calcularOperacao();
 });
  */
 
-watch(() => store.editarOperacao.ID, async () => {
-  console.log("Mudano o ID")
-  if (store.editarOperacao && store.editarOperacao.ID) {
-    console.log("Não deve rodar")
+watch(
+  () => store.editarOperacao.ID,
+  async () => {
+    console.log("Mudano o ID");
+    if (store.editarOperacao && store.editarOperacao.ID) {
+      console.log("Não deve rodar");
 
-    console.log("Ta entrando aqui")
-    await getOperacoesID(store.editarOperacao.ID).then((res: any) => {
+      console.log("Ta entrando aqui");
+      await getOperacoesID(store.editarOperacao.ID).then((res: any) => {
+        store.editarOperacao.data = store.editarOperacao.data.split("T")[0];
+        state.valorTotal = String(store.editarOperacao.valorTotal);
+        state.precoMedioCompra = String(store.editarOperacao.precoMedioCompra);
 
-      store.editarOperacao.data = store.editarOperacao.data.split('T')[0];
-      state.valorTotal = String(store.editarOperacao.valorTotal)
-      state.precoMedioCompra = String(store.editarOperacao.precoMedioCompra)
+        state.carteira = String(store.editarOperacao.carteira);
+        store.editarOperacao.valorUnidade = calcularUnidade(
+          store.editarOperacao.valorTotal,
+          store.editarOperacao.quantidade
+        );
 
-      state.carteira = String(store.editarOperacao.carteira)
-      store.editarOperacao.valorUnidade = calcularUnidade(store.editarOperacao.valorTotal, store.editarOperacao.quantidade);
+        if (store.editarOperacao.ticker.corretora) {
+          store.corretoraSelecionada = store.editarOperacao.ticker.corretora;
+          store.editarOperacao.tickerId = store.editarOperacao.ticker.ID;
+        }
 
-
-      if (store.editarOperacao.ticker.corretora) {
-        store.corretoraSelecionada = store.editarOperacao.ticker.corretora
-        store.editarOperacao.tickerId = store.editarOperacao.ticker.ID
-      }
-
-      togleShowModalFixed({ nome: "editOperacao", show: true })
-
-
-    })
-
+        togleShowModalFixed({ nome: "editOperacao", show: true });
+      });
+    }
   }
-})
+);
 
 watch(
   () => store.corretoraSelecionada,
   (newValue) => {
     getTickersCorretoraID(newValue);
-
   }
 );
 
 watch(
   () => store.editarOperacao.valorTotal,
   (newValue) => {
-    store.editarOperacao.valorUnidade = calcularUnidade(store.editarOperacao.valorTotal, store.editarOperacao.quantidade);
+    store.editarOperacao.valorUnidade = calcularUnidade(
+      store.editarOperacao.valorTotal,
+      store.editarOperacao.quantidade
+    );
   }
 );
-
-
 
 watch(
   () => store.editarOperacao.quantidade,
   (newValue) => {
-    store.editarOperacao.valorUnidade = calcularUnidade(store.editarOperacao.valorTotal, store.editarOperacao.quantidade);
+    store.editarOperacao.valorUnidade = calcularUnidade(
+      store.editarOperacao.valorTotal,
+      store.editarOperacao.quantidade
+    );
   }
 );
 
-watch(() => state.valorTotal, (newValue) => {
-  store.editarOperacao.valorTotal = moneyToFloat(newValue);
-});
-watch(() => state.carteira, (newValue) => {
-  store.editarOperacao.carteira = moneyToFloat(newValue);
-});
+watch(
+  () => state.valorTotal,
+  (newValue) => {
+    store.editarOperacao.valorTotal = moneyToFloat(newValue);
+  }
+);
+watch(
+  () => state.carteira,
+  (newValue) => {
+    store.editarOperacao.carteira = moneyToFloat(newValue);
+  }
+);
 
-
-
-watch(() => state.precoMedioCompra, (newValue) => {
-  store.editarOperacao.precoMedioCompra = moneyToFloat(newValue);
-});
-
+watch(
+  () => state.precoMedioCompra,
+  (newValue) => {
+    store.editarOperacao.precoMedioCompra = moneyToFloat(newValue);
+  }
+);
 </script>

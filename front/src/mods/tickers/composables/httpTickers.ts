@@ -24,8 +24,8 @@ export function httpTickers() {
       });
   }
 
-  async function getCorretorasComOperacoes() {
-    const urlApi = "/corretorascomoperacoes";
+  async function getCorretorasComOperacoes(tipoContabilidade: string) {
+    const urlApi = "/corretorascomoperacoes/" + tipoContabilidade;
     return await ApiConnect.getWithoutToken(urlApi)
       .then((res: any) => {
         return res;
@@ -57,11 +57,21 @@ export function httpTickers() {
       });
   }
 
+  async function deleteOperacao(ID: number) {
+    const urlApi = "/operacoes/" + ID;
+    return await ApiConnect.delet(urlApi)
+      .then((res: any) => {
+        return res;
+      })
+      .catch((res: any) => {
+        return res;
+      });
+  }
+
   async function getOperacoesID(ID: number) {
     const urlApi = "/operacoes/" + ID;
     return await ApiConnect.getWithoutToken(urlApi)
       .then((res: any) => {
-        console.log(res);
         return res;
       })
       .catch((res: any) => {
@@ -207,6 +217,7 @@ export function httpTickers() {
   }
 
   return {
+    deleteOperacao,
     updateTicker,
     addTicker,
     updateOperacoes,

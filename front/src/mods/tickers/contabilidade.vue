@@ -1,7 +1,12 @@
 <template>
-  <!--   <pre>{{ store.ativos }}</pre> -->
 
-  <div class=" w-full text-center mt-18 " v-if="store.ativos">
+  <div class="flex flex-warp justify-center mt-4">
+    <div class="btn btn-primary mx-1" @click="store.tipoContabilidade = 'ativo'">Ativos</div>
+
+    <div class="btn btn-warning mx-1" @click="store.tipoContabilidade = 'encerrado'">Encerrados</div>
+  </div>
+
+  <div class=" w-full text-center mt-10 " v-if="store.ativos">
     <div class="menu menu-vertical lg:menu-horizontal rounded-box mx-auto bg-white"
       v-for="(corretora, index) in store.ativos" :key="index">
       <div v-for="(ticker, index) in corretora.tickers" :key="index">
@@ -273,19 +278,25 @@ html {
 </style>
 
 <script setup lang="ts">
-import { onBeforeMount } from "vue";
+import { onBeforeMount, watch } from "vue";
 import { store } from "./composables/storeTicker";
 import { useTicker } from "./composables/useTicker";
 import { dateFormatPtbr } from "alvitre-obelisk";
-import { httpTickers } from './composables/httpTickers';
+
 import { useRouter } from "vue-router";
+
 
 const router = useRouter();
 const { getCorretorasComOperacoes } = useTicker();
 
 onBeforeMount(async () => {
+  store.tipoContabilidade = "ativo"
   await getCorretorasComOperacoes();
 });
+
+watch(() => store.tipoContabilidade, async () => {
+  await getCorretorasComOperacoes();
+})
 
 const calcularMetaValor = (carteira: number): number => {
   return carteira * 1.25;

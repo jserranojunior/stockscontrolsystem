@@ -174,19 +174,52 @@ func DeletarCorretora(c *gin.Context) {
 }
 
 func GetCorretorasComOperacoes(c *gin.Context) {
+	tipocontabilidade := c.Param("tipocontabilidade")
+	fmt.Println("tipocontabilidade =", tipocontabilidade)
+
 	var corretoras []models.Corretoras
 
+	// carrega tudo com operações ordenadas
 	err := DB.Preload("Tickers.Operacoes", func(db *gorm.DB) *gorm.DB {
 		return db.Order("operacoes.data ASC")
-	}).Find(&corretoras).Error // aqui estava faltando
-
+	}).Find(&corretoras).Error
 	if err != nil {
-		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, corretoras)
+	var corretorasFiltradas []models.Corretoras
+
+	for _, corretora := range corretoras {
+		var tickersFiltrados []models.Tickers
+
+		for _, ticker := range corretora.Tickers {
+			if len(ticker.Operacoes) == 0 {
+				continue
+			}
+
+			ultima := ticker.Operacoes[len(ticker.Operacoes)-1]
+
+			switch tipocontabilidade {
+			case "ativo":
+				if ultima.SaldoTickers != 0 {
+					tickersFiltrados = append(tickersFiltrados, ticker)
+				}
+			case "encerrado":
+				if ultima.SaldoTickers == 0 {
+					tickersFiltrados = append(tickersFiltrados, ticker)
+				}
+			}
+		}
+
+		// só adiciona corretora se tiver pelo menos 1 ticker válido
+		if len(tickersFiltrados) > 0 {
+			corretora.Tickers = tickersFiltrados
+			corretorasFiltradas = append(corretorasFiltradas, corretora)
+		}
+	}
+
+	c.JSON(http.StatusOK, corretorasFiltradas)
 }
 
 func GetCorretorasComOperacoesPerfomance(c *gin.Context) {

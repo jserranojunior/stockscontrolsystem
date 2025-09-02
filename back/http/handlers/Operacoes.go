@@ -320,3 +320,22 @@ func agruparPorSemana(operacoes []struct {
 
 	return semanas
 }
+
+func DeleteOperacao(c *gin.Context) {
+	id := c.Param("id")
+	var operacao models.Operacoes
+
+	// verifica se existe
+	if err := DB.First(&operacao, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Operação não encontrada"})
+		return
+	}
+
+	// deleta
+	if err := DB.Delete(&operacao).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao deletar operação"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Operação deletada com sucesso"})
+}

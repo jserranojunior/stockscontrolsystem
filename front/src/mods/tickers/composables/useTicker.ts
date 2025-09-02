@@ -41,7 +41,6 @@ export const useTicker = () => {
     await httpTickers()
       .getCorretoras()
       .then((res) => {
-        console.log("Corretoras", res);
         store.corretoras = res.data;
       });
   }
@@ -225,7 +224,7 @@ export const useTicker = () => {
 
   async function getCorretorasComOperacoes() {
     await httpTickers()
-      .getCorretorasComOperacoes()
+      .getCorretorasComOperacoes(store.tipoContabilidade)
       .then((res) => {
         store.ativos = calcularPosicao(res.data);
       });
@@ -236,6 +235,14 @@ export const useTicker = () => {
       .getTickersCorretoraID(corretoraID)
       .then((res) => {
         store.corretoraTickers = res.data;
+      });
+  }
+
+  async function deleteOperacaoID(corretoraID: number) {
+    await httpTickers()
+      .deleteOperacao(corretoraID)
+      .then((res) => {
+        console.log(res.data);
       });
   }
 
@@ -455,6 +462,7 @@ export const useTicker = () => {
   });
 
   return {
+    deleteOperacaoID,
     atualizarTicker,
     adicionarTicker,
     relatorioCalculado,
