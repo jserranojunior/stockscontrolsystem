@@ -2,20 +2,11 @@
 Colocar L/P 
 Colocar Marge (+/-)
 
-Colocar data e hora da última atualização da preço atual
-
-
-posiÇão fica sendo O VALOR ATUAL * QUANTIDADE DE TICJ
 
 
 
+PM em INVESTIDO no DIARIO é o Preço medio ou o preço da unidade?
 
 
-novas atualizações
-
-
-
-Arrumar que esta com 1 dia a menos PERGUNTAR
-
-Nova operação valor da carteira
-Adicionar % no total da nomade
+NO Inseriro tem um valorMedio que tem que ser automatico, valor dividido da ação pelo valor total - não confundir com preço médio
+Adicionar calculadora na edição da operação

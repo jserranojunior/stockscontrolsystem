@@ -46,9 +46,11 @@ func GetTickersPorCorretoraID(c *gin.Context) {
 		return
 	}
 
-	// 1. Primeiro buscar os tickers
+	// Buscar tickers já com a última operação
 	var tickersDB []models.Tickers
-	if err := DB.Where("corretora_id = ?", corretoraID).Find(&tickersDB).Error; err != nil {
+	if err := DB.Preload("Operacoes", func(db *gorm.DB) *gorm.DB {
+		return db.Order("data DESC").Order("created_at DESC").Limit(1)
+	}).Where("corretora_id = ?", corretoraID).Find(&tickersDB).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -58,22 +60,9 @@ func GetTickersPorCorretoraID(c *gin.Context) {
 		return
 	}
 
-	// 2. Para cada ticker, buscar a última operação individualmente
-	for i := range tickersDB {
-		if err := DB.
-			Where("ticker_id = ?", tickersDB[i].ID).
-			Order("data DESC").
-			Limit(1).
-			Find(&tickersDB[i].Operacoes).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-	}
-
-	// 3. Converter para a struct de response
+	// Converter para a struct de response
 	var tickers []TickerResponse
 	for _, tickerDB := range tickersDB {
-		// Converter operações
 		var operacoes []OperacaoResponse
 		for _, op := range tickerDB.Operacoes {
 			operacoes = append(operacoes, OperacaoResponse{

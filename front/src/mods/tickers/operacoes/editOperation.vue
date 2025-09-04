@@ -93,14 +93,14 @@
             </div>
           </div>
 
-          <div class="w-full mt-2">
+          <div class="w-full mt-2 text-left">
             <div class="form-control mx-2">
               <label class="label">
                 <span class="label-text font-medium">Valor Total</span>
               </label>
               <div class="relative">
-                <input type="text" v-model="state.valorTotal" v-money="moneyMask"
-                  class="input input-bordered w-full pl-10" placeholder="0,00" />
+                <input type="text" v-model="state.valorTotal" v-money="moneyMask" class="input input-bordered w-full"
+                  placeholder="0,00" />
               </div>
             </div>
           </div>
@@ -112,7 +112,7 @@
               </label>
               <div class="relative">
                 <input type="text" v-model="state.precoMedioCompra" v-money="moneyMask"
-                  class="input input-bordered w-full pl-10" placeholder="0,00" />
+                  class="input input-bordered w-full " placeholder="0,00" />
               </div>
             </div>
           </div>
@@ -120,11 +120,11 @@
           <div class="w-full mt-2">
             <div class="form-control mx-2">
               <label class="label">
-                <span class="label-text font-medium">Carteira depois da compra</span>
+                <span class="label-text font-medium">Carteira depois da operação</span>
               </label>
               <div class="relative">
-                <input type="text" v-model="state.carteira" v-money="moneyMask"
-                  class="input input-bordered w-full pl-10" placeholder="0,00" />
+                <input type="text" v-model="state.carteira" v-money="moneyMask" class="input input-bordered w-full "
+                  placeholder="0,00" />
               </div>
             </div>
           </div>
@@ -135,7 +135,7 @@
                 <span class="label-text font-medium">Saldo depois da compra</span>
               </label>
               <div class="relative">
-                <input type="text" v-model="store.editarOperacao.saldoTickers" class="input input-bordered w-full pl-10"
+                <input type="text" v-model="store.editarOperacao.saldoTickers" class="input input-bordered w-full "
                   placeholder="0" />
               </div>
             </div>

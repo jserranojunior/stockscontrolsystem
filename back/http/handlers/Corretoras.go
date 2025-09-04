@@ -181,7 +181,7 @@ func GetCorretorasComOperacoes(c *gin.Context) {
 
 	// carrega tudo com operações ordenadas
 	err := DB.Preload("Tickers.Operacoes", func(db *gorm.DB) *gorm.DB {
-		return db.Order("operacoes.data ASC")
+		return db.Order("operacoes.data ASC").Order("operacoes.created_at ASC")
 	}).Find(&corretoras).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

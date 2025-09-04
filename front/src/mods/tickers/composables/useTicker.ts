@@ -8,24 +8,31 @@ export const useTicker = () => {
     quantidade: number
   ) {
     if (tipoOperacao === "C") {
-      saldoTickers = saldoTickers + quantidade;
+      saldoTickers += quantidade;
     } else if (tipoOperacao === "V") {
-      saldoTickers = saldoTickers - quantidade;
+      saldoTickers -= quantidade;
     }
     return saldoTickers;
   }
 
   function calcularCarteira(
+    saldo: number,
     carteira: number,
     tipoOperacao: string,
     valorTotal: number
   ) {
     let newValorCarteira = 0;
-    if (tipoOperacao === "C") {
-      newValorCarteira = carteira + valorTotal;
-    } else if (tipoOperacao === "V") {
-      newValorCarteira = carteira - valorTotal;
+
+    if (saldo == 0) {
+      newValorCarteira = 0;
+    } else {
+      if (tipoOperacao === "C") {
+        newValorCarteira = carteira + valorTotal;
+      } else if (tipoOperacao === "V") {
+        newValorCarteira = carteira - valorTotal;
+      }
     }
+
     return newValorCarteira;
   }
 
@@ -182,7 +189,7 @@ export const useTicker = () => {
   // No seu componente Vue/React
   async function adicionarOperacao(): Promise<void> {
     // Validação básica antes de enviar
-    if (!store.novaOperacao.tickerId || !store.novaOperacao.quantidade) {
+    if (!store.novaOperacao.tickerId) {
       showMessage("Preencha todos os campos obrigatórios");
       return;
     }

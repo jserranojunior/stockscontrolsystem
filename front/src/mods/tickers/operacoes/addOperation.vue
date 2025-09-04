@@ -10,6 +10,7 @@
 
 
 
+
       <div class="space-y-4">
         <div class="flex flex-wrap justify-between">
           <!-- Data -->
@@ -120,6 +121,18 @@
             </div>
           </div>
 
+          <div class="w-full md:w-1/2 lg:w-1/4">
+            <div class="form-control mx-2">
+              <label class="label">
+                <span class="label-text font-medium">Carteira depois da operação</span>
+              </label>
+              <div class="relative">
+                <input type="text" v-model="state.carteira" v-money="moneyMask"
+                  class="input input-bordered w-full pl-10" placeholder="0,00" />
+              </div>
+            </div>
+          </div>
+
         </div>
 
 
@@ -155,7 +168,7 @@ const { adicionarOperacao, getCorretoras, getTickersCorretoraID, calcularSaldo, 
 let state = reactive({
   valorTotal: "",
   precoMedioCompra: "",
-
+  carteira: "",
 });
 
 function addOperacao() {
@@ -169,22 +182,29 @@ function getOperacoes() {
   store.novaOperacao.precoMedioCompra = moneyToFloat(state.precoMedioCompra);
 
   store.corretoraTickers.find((ticker: any) => {
-
+    console.log(ticker)
     if (ticker.ID === store.novaOperacao.tickerId) {
-      console.log(ticker)
-      if (ticker.operacoes && ticker.operacoes[0]) {
-        store.novaOperacao.saldoTickers = calcularSaldo(ticker.operacoes[0].saldoTickers, store.novaOperacao.tipoOperacao, store.novaOperacao.quantidade);
-        store.novaOperacao.carteira = calcularCarteira(ticker.operacoes[0].carteira, store.novaOperacao.tipoOperacao, store.novaOperacao.valorTotal);
+
+      if (ticker.operacoes && ticker.operacoes[ticker.operacoes.length - 1]) {
+
+
+        store.novaOperacao.saldoTickers = calcularSaldo(ticker.operacoes[ticker.operacoes.length - 1].saldoTickers, store.novaOperacao.tipoOperacao, store.novaOperacao.quantidade);
+
+        store.novaOperacao.carteira = calcularCarteira(store.novaOperacao.saldoTickers, ticker.operacoes[ticker.operacoes.length - 1].carteira, store.novaOperacao.tipoOperacao, store.novaOperacao.valorTotal);
       } else {
         store.novaOperacao.saldoTickers = calcularSaldo(0, 'C', 0);
-        store.novaOperacao.carteira = calcularCarteira(0, 'C', 0);
+        store.novaOperacao.carteira = calcularCarteira(0, 0, 'C', 0);
       }
+
+      state.carteira = String(ticker.operacoes[ticker.operacoes.length - 1].carteira);
+
 
       return true;
     }
     return false;
   });
 }
+
 
 
 onBeforeMount(async () => {
@@ -205,6 +225,13 @@ watch(
 );
 
 watch(
+  () => state.carteira,
+  (newValue) => {
+    store.editarOperacao.carteira = moneyToFloat(newValue);
+  }
+);
+
+watch(
   () => store.novaOperacao.valorTotal,
   (newValue) => {
     store.novaOperacao.valorUnidade = calcularUnidade(store.novaOperacao.valorTotal, store.novaOperacao.quantidade);
@@ -218,14 +245,21 @@ watch(() => store.novaOperacao.valorTotal, (newValue) => {
 watch(
   () => store.novaOperacao.tickerId,
   (newValue) => {
+
     getOperacoes();
 
   }
 );
 
+
+
+
 watch(
   () => store.novaOperacao.quantidade,
   (newValue) => {
+    if (newValue == 0) {
+      store.novaOperacao.carteira = 0
+    }
     store.novaOperacao.valorUnidade = calcularUnidade(store.novaOperacao.valorTotal, store.novaOperacao.quantidade);
   }
 );
