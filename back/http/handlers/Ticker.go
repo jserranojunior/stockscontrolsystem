@@ -49,7 +49,7 @@ func GetTickersPorCorretoraID(c *gin.Context) {
 	// Buscar tickers já com a última operação
 	var tickersDB []models.Tickers
 	if err := DB.Preload("Operacoes", func(db *gorm.DB) *gorm.DB {
-		return db.Order("data DESC").Order("created_at DESC").Limit(1)
+		return db.Order("operacoes.data ASC").Order("operacoes.created_at ASC")
 	}).Where("corretora_id = ?", corretoraID).Find(&tickersDB).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

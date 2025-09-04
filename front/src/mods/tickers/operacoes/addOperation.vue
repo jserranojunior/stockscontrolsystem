@@ -10,7 +10,6 @@
 
 
 
-
       <div class="space-y-4">
         <div class="flex flex-wrap justify-between">
           <!-- Data -->
@@ -182,7 +181,7 @@ function getOperacoes() {
   store.novaOperacao.precoMedioCompra = moneyToFloat(state.precoMedioCompra);
 
   store.corretoraTickers.find((ticker: any) => {
-    console.log(ticker)
+    console.log(store.corretoraTickers)
     if (ticker.ID === store.novaOperacao.tickerId) {
 
       if (ticker.operacoes && ticker.operacoes[ticker.operacoes.length - 1]) {
@@ -196,7 +195,7 @@ function getOperacoes() {
         store.novaOperacao.carteira = calcularCarteira(0, 0, 'C', 0);
       }
 
-      state.carteira = String(ticker.operacoes[ticker.operacoes.length - 1].carteira);
+      state.carteira = String(store.novaOperacao.carteira);
 
 
       return true;
