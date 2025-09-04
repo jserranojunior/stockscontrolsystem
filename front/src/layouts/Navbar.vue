@@ -1,4 +1,9 @@
 <template>
+  <div class="flex justify-center items-center flex-wrap my-4">
+    <div class="w-full">
+      <Calculadora></Calculadora>
+    </div>
+  </div>
   <div
     class="text-neutral rounded-xl w-full  px-2 flex flex-wrap justify-between my-1 items-center mx-2 fixed top-0 z-10 bg-gray-100">
     <div class="flex-1">
@@ -21,8 +26,8 @@
           v-if="nameRoutesEnable.includes('financeiro')">Financeiro
         </router-link>
 
-        <router-link class="btn-sm mx-1 btn btn-outline btn-secondary" :to="'/calculadora'"
-          v-if="nameRoutesEnable.includes('calculadora')">Calculadora</router-link>
+        <div class="btn-sm mx-1 btn btn-outline btn-secondary"
+          @click="togleShowModalFixed({ nome: 'modalCalculadora', show: true })">Calculadora</div>
         <!--   <router-link
           class="btn-sm mx-1 btn btn-outline btn-secondary"
           :to="'/contasapagar'"
@@ -57,6 +62,10 @@
 
 <script lang="ts" setup>
 import { onBeforeMount } from "vue";
+import Calculadora from "../components/calculadora/Calculadora.vue";
+
+import { useModal } from "../components/modals/use/useModal";
+const { togleShowModalFixed } = useModal();
 
 import { useAuth } from "../mods/auth/use/useAuth";
 let { Logout, userLogged } = useAuth();

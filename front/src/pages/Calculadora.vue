@@ -1,9 +1,8 @@
 <template>
-  <div class="flex justify-center items-center flex-wrap my-4">
-    <div class="w-full">
-      <Calculadora></Calculadora>
-    </div>
-  </div>
+
+  <Calculadora></Calculadora>
+
+
 </template>
 
 <script setup lang="ts">

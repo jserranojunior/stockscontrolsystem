@@ -10,11 +10,21 @@
   </ModalConfirmacao>
 
 
-  <Modal :nome="'editOperacao'">
+  <Modal :nome="'editOperacao'" class="z-99">
     <template #header>
-      <h2 class="text-md font-bold mb-6 text-primary flex items-center gap-2">
-        Editar Operação
-      </h2>
+      <div class="flex justify-between">
+        <div>
+          <h2 class="text-md font-bold mb-6 text-primary flex items-center gap-2">
+            Editar Operação
+          </h2>
+        </div>
+
+        <div class="btn-sm btn mx text-white bg-gray-600 hover:bg-gray-700 p-2 rounded cursor-pointer"
+          @click="togleShowModalFixed({ nome: 'modalCalculadora', show: true })">
+          <Icon icon="arcticons:opencalc" width="25" height="25"></Icon>
+
+        </div>
+      </div>
     </template>
     <template #body>
       <div class="space-y-10 mb-2" v-if="store.editarOperacao.ID">
