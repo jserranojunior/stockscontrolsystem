@@ -12,7 +12,7 @@
       <Performance />
     </div>
     <div id="relatorio-diario">
-      <RelatorioDiario />
+      <RelatorioSemanal />
     </div>
     <div id="resumo">
       <Resumo />
@@ -30,7 +30,7 @@
 <script setup lang="ts">
 import Tabs from "../mods/tickers/components/Tabs.vue";
 import Performance from "../mods/tickers/Performance.vue";
-import RelatorioDiario from "../mods/tickers/RelatorioDiario.vue";
+import RelatorioSemanal from "../mods/tickers/RelatorioSemanal.vue";
 
 import ResultadoMensal from "../mods/tickers/ResultadoMensal.vue";
 import Resumo from "../mods/tickers/Resumo.vue";

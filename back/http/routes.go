@@ -62,7 +62,7 @@ func RegisterRoutes() {
 
 	router.Post("/operacoes", middlewares.CORSMiddleware, handlers.CreateOperacao)
 
-	router.Get("/operacoessemanames", middlewares.CORSMiddleware, handlers.GetOperacoesPorCorretoraParaTabela)
+	router.Get("/operacoessemanames", middlewares.CORSMiddleware, handlers.GetOperacoesMesAtual)
 
 	router.Get("/operacoes/:id", middlewares.CORSMiddleware, handlers.GetOperacaoByID)
 

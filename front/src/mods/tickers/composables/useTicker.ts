@@ -55,6 +55,7 @@ export const useTicker = () => {
     await httpTickers()
       .getOperacoesSemanaMes()
       .then((res) => {
+        console.log(res.data);
         store.operacoesSemanaMes = res.data;
       });
   }

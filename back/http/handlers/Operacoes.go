@@ -2,10 +2,8 @@ package handlers
 
 import (
 	"fmt"
-	"math"
 	"net/http"
 	"sort"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -121,206 +119,6 @@ func GetOperacaoByID(c *gin.Context) {
 /* GetOperacoesPorSemanaEMes
  */
 
-// GetOperacoesPorSemanaDoMes retorna as operações agrupadas por semana dentro de um mês específico
-// GetOperacoesPorCorretoraEMes retorna as operações agrupadas por corretora dentro de um mês específico
-// GetOperacoesPorCorretoraEMes retorna as operações agrupadas por corretora dentro de um mês específico
-// GetOperacoesPorCorretoraEMes retorna as operações agrupadas por corretora dentro de um mês específico
-// GetOperacoesPorCorretoraParaTabela retorna dados organizados para a tabela HTML
-// GetOperacoesPorCorretoraParaTabela retorna dados organizados para a tabela HTML
-func GetOperacoesPorCorretoraParaTabela(c *gin.Context) {
-	ano := c.DefaultQuery("ano", "2025")
-	mes := c.DefaultQuery("mes", "08")
-
-	// Buscar TODAS as corretoras (mesmo as sem operações)
-	var corretoras []models.Corretoras
-	if err := DB.Find(&corretoras).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao buscar corretoras: " + err.Error()})
-		return
-	}
-
-	// Calcular número de semanas reais no mês
-	anoInt, _ := strconv.Atoi(ano)
-	mesInt, _ := strconv.Atoi(mes)
-	primeiraData := time.Date(anoInt, time.Month(mesInt), 1, 0, 0, 0, 0, time.UTC)
-	ultimaData := primeiraData.AddDate(0, 1, -1)
-	numSemanas := int(math.Ceil(float64(ultimaData.Day()+int(primeiraData.Weekday())) / 7))
-
-	var resultado []map[string]interface{}
-
-	for _, corretora := range corretoras {
-		// Buscar operações agrupadas por dia apenas para esta corretora no período
-		var operacoesPorDia []struct {
-			Data      string  `json:"data"`
-			SomaTotal float64 `json:"somaTotal"`
-			SomaQuant float64 `json:"somaQuant"`
-		}
-
-		if err := DB.Debug().Table("operacoes o").
-			Select(`
-				DATE(o.data) as data,
-				COALESCE(SUM(o.valor_total), 0) as soma_total,
-				COALESCE(SUM(o.quantidade), 0) as soma_quant`).
-			Joins("INNER JOIN tickers t ON t.id = o.ticker_id").
-			Where("t.corretora_id = ? AND YEAR(o.data) = ? AND MONTH(o.data) = ?",
-				corretora.ID, ano, mes).
-			Group("DATE(o.data)").
-			Order("data").
-			Scan(&operacoesPorDia).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao buscar operações: " + err.Error()})
-			return
-		}
-
-		// Calcular totais mensais
-		var totalMensal, quantMensal float64
-		semanas := make(map[int]map[string]interface{})
-
-		for _, dia := range operacoesPorDia {
-			// Parse da data
-			data, _ := time.Parse("2006-01-02", dia.Data)
-			semana := calcularSemanaDoMes(data)
-
-			totalMensal += dia.SomaTotal
-			quantMensal += dia.SomaQuant
-
-			// Inicializar semana se não existir
-			if _, exists := semanas[semana]; !exists {
-				semanas[semana] = map[string]interface{}{
-					"semana":      semana,
-					"totalSemana": 0.0,
-					"quantSemana": 0.0,
-					"dias":        []map[string]interface{}{},
-				}
-			}
-
-			// Adicionar dia à semana
-			semanaData := semanas[semana]
-			semanaData["totalSemana"] = semanaData["totalSemana"].(float64) + dia.SomaTotal
-			semanaData["quantSemana"] = semanaData["quantSemana"].(float64) + dia.SomaQuant
-
-			dias := semanaData["dias"].([]map[string]interface{})
-			dias = append(dias, map[string]interface{}{
-				"data":       data.Format("02/01"),
-				"fechamento": dia.SomaTotal,
-				"quantidade": dia.SomaQuant,
-			})
-			semanaData["dias"] = dias
-			semanas[semana] = semanaData
-		}
-
-		// Converter mapa de semanas para array ordenado
-		var semanasArray []map[string]interface{}
-		for semanaNum := 1; semanaNum <= numSemanas; semanaNum++ {
-			if semana, exists := semanas[semanaNum]; exists {
-				semanasArray = append(semanasArray, semana)
-			} else {
-				semanasArray = append(semanasArray, map[string]interface{}{
-					"semana":      semanaNum,
-					"totalSemana": 0.0,
-					"quantSemana": 0.0,
-					"dias":        []map[string]interface{}{},
-				})
-			}
-		}
-
-		// Ordenar semanas
-		sort.Slice(semanasArray, func(i, j int) bool {
-			return semanasArray[i]["semana"].(int) < semanasArray[j]["semana"].(int)
-		})
-
-		// Incluir TODOS os dados da corretora
-		resultado = append(resultado, map[string]interface{}{
-			"corretoraId":      corretora.ID,
-			"corretoraNome":    corretora.Nome,
-			"corretoraData":    corretora.Data,
-			"corretoraInfo":    corretora.Info,
-			"corretoraMoeda":   corretora.Moeda,
-			"corretoraCor":     corretora.Cor,
-			"corretoraCreated": corretora.CreatedAt,
-			"corretoraUpdated": corretora.UpdatedAt,
-			"totalMensal":      totalMensal,
-			"quantidadeMensal": quantMensal,
-			"totalOperacoes":   len(operacoesPorDia),
-			"semanas":          semanasArray,
-		})
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"dadosPorCorretora": resultado,
-		"periodo":           fmt.Sprintf("%s/%s", mes, ano),
-	})
-}
-
-// Função auxiliar para calcular a semana do mês (simplificada)
-func calcularSemanaDoMes(data time.Time) int {
-	dia := data.Day()
-	return (dia-1)/7 + 1
-}
-
-/* // Função auxiliar para calcular a semana do mês
-func calcularSemanaDoMes(data time.Time) int {
-	// Calcula a semana do mês baseado no dia
-	dia := data.Day()
-	semana := (dia-1)/7 + 1
-
-	// Garante que a semana seja entre 1 e 6 (máximo teórico)
-	if semana < 1 {
-		semana = 1
-	}
-	if semana > 6 {
-		semana = 6
-	}
-
-	return semana
-} */
-
-// Função auxiliar para agrupar dados por semana
-func agruparPorSemana(operacoes []struct {
-	Data      time.Time `json:"data"`
-	SomaTotal float64   `json:"somaTotal"`
-	SomaQuant float64   `json:"somaQuant"`
-}, ano, mes string) []map[string]interface{} {
-
-	// Calcular o número de semanas no mês
-	anoInt, _ := strconv.Atoi(ano)
-	mesInt, _ := strconv.Atoi(mes)
-
-	primeiraData := time.Date(anoInt, time.Month(mesInt), 1, 0, 0, 0, 0, time.UTC)
-	ultimaData := primeiraData.AddDate(0, 1, -1)
-
-	numSemanas := int(math.Ceil(float64(ultimaData.Day()+int(primeiraData.Weekday())) / 7))
-
-	// Criar estrutura para as semanas
-	semanas := make([]map[string]interface{}, numSemanas)
-
-	for i := 0; i < numSemanas; i++ {
-		semanas[i] = map[string]interface{}{
-			"semana":           i + 1,
-			"operacoes":        []interface{}{},
-			"totalSemana":      0.0,
-			"quantidadeSemana": 0.0,
-		}
-	}
-
-	// Distribuir as operações pelas semanas
-	for _, op := range operacoes {
-		// Calcular a semana do mês (1-4 ou 1-5)
-		semana := (op.Data.Day()-1)/7 + 1
-		if semana > numSemanas {
-			semana = numSemanas
-		}
-
-		// Adicionar à semana correspondente
-		semanaIndex := semana - 1
-		semanas[semanaIndex]["operacoes"] = append(semanas[semanaIndex]["operacoes"].([]interface{}), op)
-
-		// Somar totais da semana
-		semanas[semanaIndex]["totalSemana"] = semanas[semanaIndex]["totalSemana"].(float64) + op.SomaTotal
-		semanas[semanaIndex]["quantidadeSemana"] = semanas[semanaIndex]["quantidadeSemana"].(float64) + op.SomaQuant
-	}
-
-	return semanas
-}
-
 func DeleteOperacao(c *gin.Context) {
 	id := c.Param("id")
 	var operacao models.Operacoes
@@ -338,4 +136,195 @@ func DeleteOperacao(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Operação deletada com sucesso"})
+}
+
+func GetOperacoesMesAtual(c *gin.Context) {
+	// Obter data atual
+	agora := time.Now()
+	inicioMes := time.Date(agora.Year(), agora.Month(), 1, 0, 0, 0, 0, time.UTC)
+	fimMes := inicioMes.AddDate(0, 1, -1)
+
+	// Primeiro, buscar TODAS as corretoras
+	var todasCorretoras []struct {
+		ID   uint   `json:"id"`
+		Nome string `json:"nome"`
+		Cor  string `json:"cor"`
+	}
+
+	err := DB.Table("corretoras").
+		Select("id, nome, cor").
+		Order("id ASC").
+		Scan(&todasCorretoras).Error
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Erro ao buscar corretoras: " + err.Error(),
+		})
+		return
+	}
+
+	// Buscar operações do mês
+	var operacoes []struct {
+		Data          time.Time `json:"data"`
+		TipoOperacao  string    `json:"tipoOperacao"`
+		ValorTotal    float64   `json:"valorTotal"`
+		CorretoraID   uint      `json:"corretora_id"`
+		CorretoraNome string    `json:"corretora_nome"`
+		CorretoraCor  string    `json:"corretora_cor"`
+	}
+
+	err = DB.Table("operacoes o").
+		Select(`
+            o.data, 
+            o.tipo_operacao, 
+            o.valor_total,
+            c.id as corretora_id,
+            c.nome as corretora_nome
+        `).
+		Joins("JOIN tickers t ON t.id = o.ticker_id").
+		Joins("JOIN corretoras c ON c.id = t.corretora_id").
+		Where("o.data BETWEEN ? AND ?", inicioMes, fimMes).
+		Order("c.nome, o.data ASC").
+		Scan(&operacoes).Error
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Erro ao buscar operações: " + err.Error(),
+		})
+		return
+	}
+
+	// Criar mapa de operações por corretora
+	operacoesPorCorretora := make(map[uint][]struct {
+		Data         time.Time
+		TipoOperacao string
+		ValorTotal   float64
+	})
+
+	for _, op := range operacoes {
+		operacoesPorCorretora[op.CorretoraID] = append(operacoesPorCorretora[op.CorretoraID], struct {
+			Data         time.Time
+			TipoOperacao string
+			ValorTotal   float64
+		}{
+			Data:         op.Data,
+			TipoOperacao: op.TipoOperacao,
+			ValorTotal:   op.ValorTotal,
+		})
+	}
+
+	// Processar TODAS as corretoras (mesmo as sem operações)
+	var resultado []gin.H
+
+	for _, corretora := range todasCorretoras {
+		corretoraData := gin.H{
+			"corretora_id":   corretora.ID,
+			"corretora_nome": corretora.Nome,
+			"corretora_cor":  corretora.Cor,
+			"semanas":        []gin.H{},
+		}
+
+		// Se a corretora tem operações, processá-las
+		if ops, exists := operacoesPorCorretora[corretora.ID]; exists {
+			semanas := make(map[int]gin.H)
+
+			for _, op := range ops {
+				semana := calcularSemanaDoMes(op.Data)
+
+				if _, exists := semanas[semana]; !exists {
+					semanas[semana] = gin.H{
+						"semana":              semana,
+						"total_compra_semana": 0.0,
+						"total_venda_semana":  0.0,
+						"fechamento_semana":   0.0, // NOVO
+						"evolucao_semana":     0.0, // NOVO
+						"retirada_semana":     0.0, // NOVO
+						"dias":                make(map[string]gin.H),
+					}
+				}
+
+				semanaData := semanas[semana]
+				dias := semanaData["dias"].(map[string]gin.H)
+				dataStr := op.Data.Format("2006-01-02")
+
+				if _, exists := dias[dataStr]; !exists {
+					dias[dataStr] = gin.H{
+						"data":             dataStr,
+						"total_compra_dia": 0.0,
+						"total_venda_dia":  0.0,
+						"fechamento_dia":   0.0, // NOVO
+						"evolucao_dia":     0.0, // NOVO
+						"retirada_dia":     0.0, // NOVO
+					}
+				}
+
+				dia := dias[dataStr]
+				if op.TipoOperacao == "C" {
+					dia["total_compra_dia"] = dia["total_compra_dia"].(float64) + op.ValorTotal
+					semanaData["total_compra_semana"] = semanaData["total_compra_semana"].(float64) + op.ValorTotal
+				} else if op.TipoOperacao == "V" {
+					dia["total_venda_dia"] = dia["total_venda_dia"].(float64) + op.ValorTotal
+					semanaData["total_venda_semana"] = semanaData["total_venda_semana"].(float64) + op.ValorTotal
+					dia["retirada_dia"] = dia["retirada_dia"].(float64) + op.ValorTotal                     // NOVO
+					semanaData["retirada_semana"] = semanaData["retirada_semana"].(float64) + op.ValorTotal // NOVO
+				}
+
+				// Calcular totais do dia
+				dia["fechamento_dia"] = dia["total_compra_dia"].(float64) + dia["total_venda_dia"].(float64) // NOVO
+				dia["evolucao_dia"] = dia["total_venda_dia"].(float64) - dia["total_compra_dia"].(float64)   // NOVO
+
+				dias[dataStr] = dia
+				semanaData["dias"] = dias
+				semanas[semana] = semanaData
+			}
+
+			// Calcular totais finais da semana
+			for semanaNum, semanaData := range semanas {
+				semanaData["fechamento_semana"] = semanaData["total_compra_semana"].(float64) + semanaData["total_venda_semana"].(float64) // NOVO
+				semanaData["evolucao_semana"] = semanaData["total_venda_semana"].(float64) - semanaData["total_compra_semana"].(float64)   // NOVO
+				semanas[semanaNum] = semanaData
+			}
+
+			// Converter semanas para array ordenado
+			var semanasArray []gin.H
+			for semana := 1; semana <= 6; semana++ {
+				if semanaData, exists := semanas[semana]; exists {
+					// Converter dias do map para array ordenado
+					diasMap := semanaData["dias"].(map[string]gin.H)
+					var diasArray []gin.H
+					for _, dia := range diasMap {
+						diasArray = append(diasArray, dia)
+					}
+					// Ordenar dias por data
+					sort.Slice(diasArray, func(i, j int) bool {
+						return diasArray[i]["data"].(string) < diasArray[j]["data"].(string)
+					})
+					semanaData["dias"] = diasArray
+					semanasArray = append(semanasArray, semanaData)
+				}
+			}
+
+			// Ordenar semanas
+			sort.Slice(semanasArray, func(i, j int) bool {
+				return semanasArray[i]["semana"].(int) < semanasArray[j]["semana"].(int)
+			})
+
+			corretoraData["semanas"] = semanasArray
+		}
+
+		resultado = append(resultado, corretoraData)
+	}
+
+	// Formatar resposta
+	resposta := gin.H{
+		"corretoras": resultado,
+	}
+
+	c.JSON(http.StatusOK, resposta)
+}
+
+// FUNÇÃO AUXILIAR - calcularSemanaDoMes
+func calcularSemanaDoMes(data time.Time) int {
+	dia := data.Day()
+	return (dia-1)/7 + 1
 }
