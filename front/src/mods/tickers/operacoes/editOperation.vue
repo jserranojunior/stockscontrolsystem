@@ -150,6 +150,32 @@
               </div>
             </div>
           </div>
+
+
+
+          <div class="w-full mt-2">
+            <div class="form-control mx-2">
+              <label class="label">
+                <span class="label-text font-medium">Resultado</span>
+              </label>
+              <div class="relative">
+                <input type="text" v-model="state.resultado" v-money="moneyMask" class="input input-bordered w-full"
+                  placeholder="0,00" />
+              </div>
+            </div>
+          </div>
+          <div class="w-full mt-2">
+            <div class="form-control mx-2">
+              <label class="label">
+                <span class="label-text font-medium">L/P</span>
+              </label>
+              <div class="relative">
+                <input type="text" v-model="state.lp" v-money="moneyMask" class="input input-bordered w-full"
+                  placeholder="0,00" />
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </template>
@@ -205,6 +231,8 @@ let state = reactive({
   valorTotal: "",
   precoMedioCompra: "",
   carteira: "",
+  resultado: '',
+  lp: "",
 });
 
 async function deletarOperacao() {
@@ -256,6 +284,8 @@ async function updateOperacoes() {
         carteira: 0,
         tickerId: 0,
         ticker: null,
+        resultado: 0,
+        lp: 0,
       };
       state.valorTotal = "";
       state.precoMedioCompra = "";
@@ -277,15 +307,16 @@ onBeforeMount(async () => {
 watch(
   () => store.editarOperacao.ID,
   async () => {
-    console.log("Mudano o ID");
-    if (store.editarOperacao && store.editarOperacao.ID) {
-      console.log("Não deve rodar");
 
-      console.log("Ta entrando aqui");
+    if (store.editarOperacao && store.editarOperacao.ID) {
+
       await getOperacoesID(store.editarOperacao.ID).then((res: any) => {
         store.editarOperacao.data = store.editarOperacao.data.split("T")[0];
         state.valorTotal = String(store.editarOperacao.valorTotal);
         state.precoMedioCompra = String(store.editarOperacao.precoMedioCompra);
+
+        state.lp = String(store.editarOperacao.lp);
+        state.resultado = String(store.editarOperacao.resultado);
 
         state.carteira = String(store.editarOperacao.carteira);
         store.editarOperacao.valorUnidade = calcularUnidade(
@@ -308,6 +339,21 @@ watch(
   () => store.corretoraSelecionada,
   (newValue) => {
     getTickersCorretoraID(newValue);
+  }
+);
+
+watch(
+  () => state.resultado,
+  (newValue) => {
+    store.editarOperacao.resultado = moneyToFloat(newValue);
+
+  }
+);
+
+watch(
+  () => state.lp,
+  (newValue) => {
+    store.editarOperacao.lp = moneyToFloat(newValue);
   }
 );
 

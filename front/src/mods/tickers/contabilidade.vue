@@ -62,8 +62,8 @@
                       <th class="border border-gray-300 p-2">Venda</th>
                       <th class="border border-gray-300 p-2">Carteira</th>
                       <th class="border border-gray-300 p-2">PM</th>
+                      <th class="border border-gray-300 p-2">Resultado</th>
                       <th class="border border-gray-300 p-2">L/P</th>
-                      <th class="border border-gray-300 p-2">Div</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -115,10 +115,10 @@
                         {{ formatarMoeda(op.precoMedioCompra) }}
                       </td>
                       <td class="border border-gray-300 p-2 text-right">
-                        {{ "-" }}
+                        {{ formatarMoeda(op.resultado) }}
                       </td>
                       <td class="border border-gray-300 p-2 text-right">
-                        {{ "-" }}
+                        {{ formatarMoeda(op.lp) }}
                       </td>
                     </tr>
                   </tbody>

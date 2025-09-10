@@ -59,6 +59,8 @@ export const store = reactive({
     valorUnidade: null as any,
     saldoTickers: null as any,
     carteira: null as any,
+    resultado: null as any,
+    lp: null as any,
   },
 
   editarOperacao: {
@@ -73,6 +75,8 @@ export const store = reactive({
     valorUnidade: null as any,
     saldoTickers: null as any,
     carteira: null as any,
+    resultado: null as any,
+    lp: null as any,
   },
 
   ativosParaCalcular: {

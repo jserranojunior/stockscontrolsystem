@@ -134,6 +134,31 @@
 
         </div>
 
+        <div class="flex flex-wrap">
+          <div class="w-full md:w-1/2 lg:w-1/4">
+            <div class="form-control mx-2">
+              <label class="label">
+                <span class="label-text font-medium">Resultado</span>
+              </label>
+              <div class="relative">
+                <input type="text" v-model="state.resultado" v-money="moneyMask"
+                  class="input input-bordered w-full pl-10" placeholder="0,00" />
+              </div>
+            </div>
+          </div>
+          <div class="w-full md:w-1/2 lg:w-1/4">
+            <div class="form-control mx-2">
+              <label class="label">
+                <span class="label-text font-medium">L/P</span>
+              </label>
+              <div class="relative">
+                <input type="text" v-model="state.lp" v-money="moneyMask" class="input input-bordered w-full pl-10"
+                  placeholder="0,00" />
+              </div>
+            </div>
+          </div>
+        </div>
+
 
 
 
@@ -168,6 +193,8 @@ let state = reactive({
   valorTotal: "",
   precoMedioCompra: "",
   carteira: "",
+  resultado: '',
+  lp: "",
 });
 
 function addOperacao() {
@@ -181,7 +208,7 @@ function getOperacoes() {
   store.novaOperacao.precoMedioCompra = moneyToFloat(state.precoMedioCompra);
 
   store.corretoraTickers.find((ticker: any) => {
-    console.log(store.corretoraTickers)
+
     if (ticker.ID === store.novaOperacao.tickerId) {
 
       if (ticker.operacoes && ticker.operacoes[ticker.operacoes.length - 1]) {
@@ -191,10 +218,11 @@ function getOperacoes() {
 
         store.novaOperacao.carteira = calcularCarteira(store.novaOperacao.saldoTickers, ticker.operacoes[ticker.operacoes.length - 1].carteira, store.novaOperacao.tipoOperacao, store.novaOperacao.valorTotal);
       } else {
-        store.novaOperacao.saldoTickers = calcularSaldo(0, 'C', 0);
-        store.novaOperacao.carteira = calcularCarteira(0, 0, 'C', 0);
+        store.novaOperacao.saldoTickers = calcularSaldo(0, 'C', store.novaOperacao.quantidade);
+        store.novaOperacao.carteira = calcularCarteira(0, 0, 'C', store.novaOperacao.valorTotal);
       }
 
+      console.log(store.novaOperacao.carteira)
       state.carteira = String(store.novaOperacao.carteira);
 
 
@@ -226,7 +254,22 @@ watch(
 watch(
   () => state.carteira,
   (newValue) => {
-    store.editarOperacao.carteira = moneyToFloat(newValue);
+    store.novaOperacao.carteira = moneyToFloat(newValue);
+  }
+);
+
+watch(
+  () => state.resultado,
+  (newValue) => {
+    store.novaOperacao.resultado = moneyToFloat(newValue);
+
+  }
+);
+
+watch(
+  () => state.lp,
+  (newValue) => {
+    store.novaOperacao.lp = moneyToFloat(newValue);
   }
 );
 

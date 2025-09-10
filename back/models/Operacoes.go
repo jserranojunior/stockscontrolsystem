@@ -19,5 +19,8 @@ type Operacoes struct {
 	SaldoTickers     float64 `gorm:"default:0" json:"saldoTickers"`
 	Carteira         float64 `gorm:"default:0" json:"carteira"`
 
+	Resultado float64 `gorm:"default:0" json:"resultado"`
+	Lp        float64 `gorm:"default:0" json:"lp"`
+
 	Ticker Tickers `gorm:"foreignKey:TickerID" json:"ticker,omitempty"`
 }

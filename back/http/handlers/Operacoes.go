@@ -43,6 +43,8 @@ func UpdateOperacao(c *gin.Context) {
 	operacao.PrecoMedioCompra = input.PrecoMedioCompra
 	operacao.SaldoTickers = input.SaldoTickers
 	operacao.Carteira = input.Carteira
+	operacao.Lp = input.Lp
+	operacao.Resultado = input.Resultado
 
 	if err := DB.Save(&operacao).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao atualizar operação"})

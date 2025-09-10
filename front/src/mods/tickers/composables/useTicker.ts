@@ -87,6 +87,8 @@ export const useTicker = () => {
     data.valorTotal = Number(data.valorTotal);
     data.valorUnidade = Number(data.valorUnidade);
     data.carteira = Number(data.carteira);
+    data.lp = Number(data.lp);
+    data.resultado = Number(data.resultado);
     data.precoMedioCompra = data.precoMedioCompra
       ? Number(data.precoMedioCompra)
       : null;
@@ -218,6 +220,8 @@ export const useTicker = () => {
           precoMedioCompra: null,
           saldoTickers: 0,
           carteira: null,
+          lp: null,
+          resultado: null,
         };
       } else {
         // Erro
