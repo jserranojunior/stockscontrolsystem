@@ -108,9 +108,11 @@
               <label class="label">
                 <span class="label-text font-medium">Valor Total</span>
               </label>
+
               <div class="relative">
                 <input type="text" v-model="state.valorTotal" v-money="moneyMask" class="input input-bordered w-full"
                   placeholder="0,00" />
+
               </div>
             </div>
           </div>
@@ -208,7 +210,7 @@ import Modal from "../../../components/modals/Modal.vue";
 import { onBeforeMount, reactive, watch } from "vue";
 import { store } from "../composables/storeTicker";
 import { useTicker } from "../composables/useTicker";
-import { moneyMask } from "../../../helpers/mask/moneyMask";
+import { moneyMask, formatarMoeda } from "../../../helpers/mask/moneyMask";
 import moneyToFloat from "../../../helpers/filters/moneyToFloat";
 import { useModal } from "../../../components/modals/use/useModal";
 import ModalConfirmacao from "../../../components/modals/ModalConfirmacao.vue";
@@ -312,13 +314,14 @@ watch(
 
       await getOperacoesID(store.editarOperacao.ID).then((res: any) => {
         store.editarOperacao.data = store.editarOperacao.data.split("T")[0];
-        state.valorTotal = String(store.editarOperacao.valorTotal);
-        state.precoMedioCompra = String(store.editarOperacao.precoMedioCompra);
+        state.valorTotal = formatarMoeda(store.editarOperacao.valorTotal);
 
-        state.lp = String(store.editarOperacao.lp);
-        state.resultado = String(store.editarOperacao.resultado);
+        state.precoMedioCompra = formatarMoeda(store.editarOperacao.precoMedioCompra);
 
-        state.carteira = String(store.editarOperacao.carteira);
+        state.lp = formatarMoeda(store.editarOperacao.lp);
+        state.resultado = formatarMoeda(store.editarOperacao.resultado);
+
+        state.carteira = formatarMoeda(store.editarOperacao.carteira);
         store.editarOperacao.valorUnidade = calcularUnidade(
           store.editarOperacao.valorTotal,
           store.editarOperacao.quantidade
