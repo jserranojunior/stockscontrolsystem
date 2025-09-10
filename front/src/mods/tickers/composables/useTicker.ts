@@ -292,8 +292,8 @@ export const useTicker = () => {
 
       corretora.totalPerformanceDiaria = totalPerformanceDiaria;
       totalPerformanceDiaria.variacaoPercentual = calcularVariacaoPercentual(
-        totalPerformanceDiaria.precoAtual,
-        totalPerformanceDiaria.precoMedio
+        totalPerformanceDiaria.carteira,
+        totalPerformanceDiaria.posicao
       );
     }
     return dados;
@@ -336,7 +336,7 @@ export const useTicker = () => {
     return parseFloat((posicao - (valorInvestido ?? 0)).toFixed(2));
   }
 
-  function calcularVariacaoPercentual(
+  /*   function calcularVariacaoPercentual(
     precoAtual: number,
     precoMedio: number
   ): number {
@@ -344,6 +344,17 @@ export const useTicker = () => {
     const variacao = ((precoAtual - precoMedio) / precoMedio) * 100;
     return parseFloat(variacao.toFixed(2));
   }
+ */
+
+  const calcularVariacaoPercentual = (carteira: any, posicao: any): number => {
+    console.log("Carteira", carteira, "Posição", posicao);
+    if (carteira === 0) return 0;
+
+    const resultado = posicao - carteira;
+    const percentual = (resultado / carteira) * 100;
+
+    return parseFloat(percentual.toFixed(2));
+  };
 
   function calcularPosicaoOperacoesPerformance(dados: any) {
     for (const corretora of dados) {
@@ -354,9 +365,13 @@ export const useTicker = () => {
 
         const performance = calcularPerformance(posicao, op.carteira);
         const variacaoPercentual = calcularVariacaoPercentual(
-          op.precoAtual,
-          op.precoMedio
+          op.carteira,
+          posicao
         );
+
+        if (op.carteira === 1530.2) {
+          console.log("Op", op);
+        }
 
         return {
           ...op,
@@ -492,5 +507,6 @@ export const useTicker = () => {
     calcularUnidade,
     getOperacoesID,
     atualizarOperacao,
+    calcularVariacaoPercentual,
   };
 };

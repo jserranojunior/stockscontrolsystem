@@ -147,16 +147,17 @@
                     </div>
                   </div>
                   <template v-if="ticker.operacoes">
-                    <div class="flex justify-between font-bold">
+                    <div class="flex justify-between font-bold" v-if="ticker.operacoes[ticker.operacoes.length - 1]">
                       <span class="font-semibold">Resultado:</span>
 
                       <!-- Percentual -->
                       <div :class="{
-                        'text-green-700': resultadoPercentual(ticker) > 0,
-                        'text-red-600': resultadoPercentual(ticker) < 0,
-                        'text-gray-600': resultadoPercentual(ticker) === 0,
+                        'text-green-700': calcularVariacaoPercentual(ticker.operacoes[ticker.operacoes.length - 1].carteira, ticker.posicao) > 0,
+                        'text-red-600': calcularVariacaoPercentual(ticker.operacoes[ticker.operacoes.length - 1].carteira, ticker.posicao) < 0,
+                        'text-gray-600': calcularVariacaoPercentual(ticker.operacoes[ticker.operacoes.length - 1].carteira, ticker.posicao) === 0,
                       }">
-                        {{ resultadoPercentual(ticker).toFixed(2) }}%
+                        {{ calcularVariacaoPercentual(ticker.operacoes[ticker.operacoes.length - 1].carteira,
+                          ticker.posicao) }}%
                       </div>
 
                       <!-- Valor -->
@@ -287,7 +288,7 @@ import { useRouter } from "vue-router";
 
 
 const router = useRouter();
-const { getCorretorasComOperacoes } = useTicker();
+const { getCorretorasComOperacoes, calcularVariacaoPercentual } = useTicker();
 
 onBeforeMount(async () => {
   store.tipoContabilidade = "ativo"
@@ -355,7 +356,7 @@ const resultadoValor = (ticker: any): number => {
   return parseFloat(resultado.toFixed(2));
 };
 
-const resultadoPercentual = (ticker: any): number => {
+/* const resultadoPercentual = (ticker: any): number => {
   if (!ticker.operacoes || ticker.operacoes.length === 0) return 0;
 
   const ultimaOp = ticker.operacoes[ticker.operacoes.length - 1];
@@ -369,5 +370,5 @@ const resultadoPercentual = (ticker: any): number => {
   const percentual = (resultado / carteira) * 100;
 
   return parseFloat(percentual.toFixed(2));
-};
+};  */
 </script>
