@@ -9,26 +9,26 @@
     </template>
   </ModalConfirmacao>
 
-
-  <Modal :nome="'editOperacao'" class="z-99">
+  <Dialog :nome="'editOperacao'" class="z-99" :width="state.dialog.width">
     <template #header>
-      <div class="flex justify-between">
+      <div class="flex justify-between mt-2">
         <div>
           <h2 class="text-md font-bold mb-6 text-primary flex items-center gap-2">
             Editar Operação
           </h2>
         </div>
 
-        <div class="btn-sm btn mx text-white bg-gray-600 hover:bg-gray-700 p-2 rounded cursor-pointer"
-          @click="togleShowModalFixed({ nome: 'modalCalculadora', show: true })">
-          <Icon icon="arcticons:opencalc" width="25" height="25"></Icon>
-
+        <div @click="toggleCalculadora()" class="flec btn btn-sm">Calculadora <Icon icon="arcticons:opencalc" width="25"
+            height="25"></Icon>
         </div>
       </div>
     </template>
     <template #body>
-      <div class="space-y-10 mb-2" v-if="store.editarOperacao.ID">
-        <div class="card bg-gra-100 rounded-2xl p-2">
+      <div class="flex justify-between mb-2 " v-if="store.editarOperacao.ID">
+        <div :class="[
+          'card bg-gra-100 rounded-2xl p-2',
+          state.dialog.calculadora ? 'w-1/2' : 'w-full'
+        ]">
           <!-- Data -->
           <div class="w-full mt-2">
             <div class="form-control mx-2">
@@ -179,10 +179,16 @@
           </div>
 
         </div>
+        <div class="w-1/2" v-if="state.dialog.calculadora">
+          <Calculadora></Calculadora>
+        </div>
       </div>
+
+
+
     </template>
     <template #footer>
-      <div class="flex float-right">
+      <div class="flex justify-end">
         <div class="pt-2 float-right mx-2">
           <button class="btn btn-warning w-full md:w-auto gap-2" @click="voltar()">
             Voltar
@@ -202,22 +208,31 @@
         </div>
       </div>
     </template>
-  </Modal>
+  </Dialog>
+
+
+
+
 </template>
 
+
+
 <script setup lang="ts">
-import Modal from "../../../components/modals/Modal.vue";
-import { onBeforeMount, reactive, watch } from "vue";
+import Dialog from "../../../components/modals/Dialog.vue";
+import { onBeforeMount, reactive, ref, watch } from "vue";
 import { store } from "../composables/storeTicker";
 import { useTicker } from "../composables/useTicker";
 import { moneyMask, formatarMoeda } from "../../../helpers/mask/moneyMask";
 import moneyToFloat from "../../../helpers/filters/moneyToFloat";
-import { useModal } from "../../../components/modals/use/useModal";
+
 import ModalConfirmacao from "../../../components/modals/ModalConfirmacao.vue";
 
+import { useModal } from "../../../components/modals/use/useModal";
 const { togleShowModalFixed } = useModal();
 
+
 import { useRouter } from "vue-router";
+import Calculadora from "../../../components/calculadora/Calculadora.vue";
 const router = useRouter();
 const {
   atualizarOperacao,
@@ -235,7 +250,23 @@ let state = reactive({
   carteira: "",
   resultado: '',
   lp: "",
+  dialog: {
+    width: "500",
+    calculadora: false,
+  },
 });
+
+function toggleCalculadora() {
+  if (state.dialog.calculadora) {
+    state.dialog.width = "500";
+    state.dialog.calculadora = false;
+  }
+  else {
+    state.dialog.width = "1000";
+    state.dialog.calculadora = true;
+  }
+
+}
 
 async function deletarOperacao() {
   return await deleteOperacaoID(store.editarOperacao.ID).then(async () => {

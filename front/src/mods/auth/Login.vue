@@ -25,23 +25,12 @@
 
               <form class="form-control">
                 <label class="block">
-                  <input
-                    id="email"
-                    v-model="loginInputs.email"
-                    type="email"
-                    class="input input-sm w-full max-w-xs input-bordered"
-                    placeholder="Email"
-                  />
+                  <input id="email" v-model="loginInputs.email" type="email"
+                    class="input input-sm w-full max-w-xs input-bordered" placeholder="Email" />
                 </label>
                 <label class="block mt-2">
-                  <input
-                    id="password"
-                    v-model="loginInputs.password"
-                    type="password"
-                    class="input input-sm w-full max-w-xs input-bordered"
-                    placeholder="Senha"
-                    autocomplete="on"
-                  />
+                  <input id="password" v-model="loginInputs.password" type="password"
+                    class="input input-sm w-full max-w-xs input-bordered" placeholder="Senha" autocomplete="on" />
                 </label>
               </form>
               <div class="mt-2 border-t"></div>
@@ -52,10 +41,7 @@
                   </label>
                 </div>
                 <div class="w-1/2">
-                  <button
-                    class="w-full py-2 px-4 rounded-md btn btn-sm btn-primary"
-                    @click="Login()"
-                  >
+                  <button class="w-full py-2 px-4 rounded-md btn btn-sm btn-primary" @click="Login()">
                     <span class="px-2">LOGAR</span>
                     <Icon icon="ri:login-circle-line" />
                   </button>
@@ -73,7 +59,7 @@ import { onMounted } from "vue";
 import { useAuth } from "./use/useAuth";
 let { loginInputs, Login, btnLogin, loginWithEnterBTN } = useAuth();
 
-onMounted(() => {
+/* onMounted(() => {
   loginWithEnterBTN();
-});
+}); */
 </script>

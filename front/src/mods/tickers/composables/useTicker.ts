@@ -347,7 +347,6 @@ export const useTicker = () => {
  */
 
   const calcularVariacaoPercentual = (carteira: any, posicao: any): number => {
-    console.log("Carteira", carteira, "Posição", posicao);
     if (carteira === 0) return 0;
 
     const resultado = posicao - carteira;

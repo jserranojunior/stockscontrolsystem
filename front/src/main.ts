@@ -7,6 +7,7 @@ import routes from "./mods/rotas/routes";
 import { useAcl } from "./mods/auth/acl/use/useAcl";
 
 import { VMoney } from "v-money";
+import ElementPlus from "element-plus";
 
 let { generateRoutesEnableWithUserAcls } = useAcl();
 
@@ -14,6 +15,7 @@ async function start() {
   await generateRoutesEnableWithUserAcls().then(() => {
     createApp(App)
       .use(routes)
+      .use(ElementPlus)
       .directive("money", VMoney)
       .component("Icon", Icon)
 

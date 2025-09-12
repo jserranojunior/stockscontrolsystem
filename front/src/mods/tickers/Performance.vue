@@ -175,7 +175,7 @@
                       </th>
 
                       <th class="text-right" title="Quantidade de ativos em carteira">
-                        STOCKS
+                        ATIVOS
                       </th>
                       <th class="text-right" title="Preço Médio (Valor Médio)">
                         PM
@@ -263,77 +263,39 @@
                     </tr>
 
                     <!-- Total Diário -->
-                    <tr class="bg-gray-100 font-semibold"
+                    <tr class="bg-gray-100 font-semibold text-base text-center"
                       v-if="corretora && corretora.totalPerformanceDiaria && corretora.totalPerformanceDiaria.carteira">
-                      <td title="Movimentação diaria">Total Diário</td>
+                      <td title="Movimentação diaria"> Total <!-- {{ corretora.nome.split(" ")[0] }} --></td>
 
 
-                      <td class="text-right">
+                      <td class="text-right text-blue-600">
                         {{ formatarNumero(corretora.totalPerformanceDiaria.carteira) }}
                       </td>
 
-                      <td class="text-right"> {{ corretora.totalPerformanceDiaria.saldo }}
+                      <td class="text-right">
                       </td>
-                      <td>{{ formatarNumero(corretora.totalPerformanceDiaria.precoMedio) }}</td>
+                      <td></td>
                       <th class="text-center mx-auto">
                         <div class="px-2 w-2">|</div>
                       </th>
-                      <td>{{ formatarNumero(corretora.totalPerformanceDiaria.precoAtual) }}</td>
+                      <td></td>
 
-                      <td class="text-right"> {{ formatarNumero(corretora.totalPerformanceDiaria.posicao) }}
+                      <td class="text-right text-green-700"> {{ formatarNumero(corretora.totalPerformanceDiaria.posicao)
+                      }}
                       </td>
 
                       <td class="text-right"> {{ formatarNumero(corretora.totalPerformanceDiaria.performance) }}
 
                       </td>
 
-                      <td class="text-right">
+                      <td class="text-right ">
 
-                        {{ formatarNumero(corretora.totalPerformanceDiaria.variacaoPercentual) }}
+                        {{ formatarNumero(corretora.totalPerformanceDiaria.variacaoPercentual) }}%
                       </td>
                       <td></td>
                     </tr>
 
-                    <!-- Total Corretora -->
-                    <tr class="bg-gray-200 font-bold text-sm">
-                      <td title="Total Dia Anterior - Final do dia">
-                        Total {{ corretora.nome.split(" ")[0] }}
-                      </td>
-                      <td class="text-right text-lg text-green-700"
-                        v-if="corretora.totalPerformanceDiaria && corretora.totalPerformanceDiaria.posicao">
-                        {{ formatarNumero(corretora.totalPerformanceDiaria.posicao) }}
-                      </td>
-                      <td>
-                      </td>
 
-
-
-                      <td>
-                      </td>
-                      <td>
-
-                      </td>
-
-                      <td>
-
-                      </td>
-
-
-                      <td class="text-right">
-                        <!--  {{
-                        formatCurrency(corretora.totalCorretora.valorComprado)
-                      }} -->
-                      </td>
-
-                      <td class="text-right">
-                        <!-- {{ formatCurrency(corretora.totalCorretora.performance) }} -->
-                      </td>
-
-                      <td class="text-right">
-                        <!--  {{ corretora.totalCorretora.variacaoPercentual }}% -->
-                      </td>
-                      <td></td>
-                    </tr>
                   </tbody>
                 </table>
               </div>

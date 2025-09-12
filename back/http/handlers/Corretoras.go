@@ -37,7 +37,9 @@ type CorretoraDTO struct {
 
 func GetCorretoras(c *gin.Context) {
 	var corretoras []models.Corretoras
-	if err := DB.Preload("Tickers").Find(&corretoras).Error; err != nil {
+	if err := DB.Preload("Tickers", func(db *gorm.DB) *gorm.DB {
+		return db.Order("tickers.name ASC")
+	}).Find(&corretoras).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -52,7 +54,9 @@ func GetCorretoraPorID(c *gin.Context) {
 	}
 
 	var corretora models.Corretoras
-	if err := DB.Preload("Tickers").First(&corretora, id).Error; err != nil {
+	if err := DB.Preload("Tickers", func(db *gorm.DB) *gorm.DB {
+		return db.Order("tickers.name ASC")
+	}).First(&corretora, id).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Corretora não encontrada"})
 			return
@@ -175,14 +179,17 @@ func DeletarCorretora(c *gin.Context) {
 
 func GetCorretorasComOperacoes(c *gin.Context) {
 	tipocontabilidade := c.Param("tipocontabilidade")
-	fmt.Println("tipocontabilidade =", tipocontabilidade)
+	fmt.Println("BUSCANDO tipocontabilidade =", tipocontabilidade)
 
 	var corretoras []models.Corretoras
 
 	// carrega tudo com operações ordenadas
-	err := DB.Preload("Tickers.Operacoes", func(db *gorm.DB) *gorm.DB {
+	err := DB.Preload("Tickers", func(db *gorm.DB) *gorm.DB {
+		return db.Order("tickers.name ASC")
+	}).Preload("Tickers.Operacoes", func(db *gorm.DB) *gorm.DB {
 		return db.Order("operacoes.data ASC").Order("operacoes.created_at ASC")
 	}).Find(&corretoras).Error
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -244,7 +251,9 @@ func GetCorretorasComOperacoesPerfomance(c *gin.Context) {
 	var corretoras []models.Corretoras
 
 	// busca corretoras, tickers e operações apenas do dia informado
-	err = DB.Preload("Tickers.Operacoes", "data >= ? AND data < ?", inicio, fim).
+	err = DB.Preload("Tickers", func(db *gorm.DB) *gorm.DB {
+		return db.Order("tickers.name ASC")
+	}).Preload("Tickers.Operacoes", "data >= ? AND data < ?", inicio, fim).
 		Find(&corretoras).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -289,7 +298,9 @@ func GetCorretorasUltimaOperacao(c *gin.Context) {
 	var corretoras []models.Corretoras
 
 	// busca corretoras + tickers + todas operações
-	err := DB.Preload("Tickers.Operacoes").
+	err := DB.Preload("Tickers", func(db *gorm.DB) *gorm.DB {
+		return db.Order("tickers.name ASC")
+	}).Preload("Tickers.Operacoes").
 		Find(&corretoras).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

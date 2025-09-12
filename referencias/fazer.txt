@@ -1,14 +1,8 @@
 
-Colocar L/P 
-Colocar Marge (+/-)
+
+Quando digitar 123,4 ele preencher como 123,40
+
+Fazer o caixa disponível
 
 
 
-
-PM em INVESTIDO no DIARIO é o Preço medio ou o preço da unidade?
-
-
-NO Inseriro tem um valorMedio que tem que ser automatico, valor dividido da ação pelo valor total - não confundir com preço médio
-
-
-Adicionar Nova operação como um MOdal

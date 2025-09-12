@@ -62,7 +62,7 @@
 
 <script lang="ts" setup>
 import { onBeforeMount } from "vue";
-import Calculadora from "../components/calculadora/Calculadora.vue";
+import Calculadora from "../pages/Calculadora.vue";
 
 import { useModal } from "../components/modals/use/useModal";
 const { togleShowModalFixed } = useModal();
