@@ -74,4 +74,8 @@ func RegisterRoutes() {
 
 	router.Put("/ticker/:id", middlewares.CORSMiddleware, handlers.UpdateTicker)
 
+	router.Put("/caixas/:id", handlers.UpdateCaixa)
+
+	router.Get("/caixas", handlers.GetCaixas)
+
 }

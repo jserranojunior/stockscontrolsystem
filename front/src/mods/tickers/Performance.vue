@@ -1,7 +1,7 @@
 <template>
   <div>
 
-
+    <CaixaDisponivel></CaixaDisponivel>
     <Modal :nome="'atualizartick'" v-if="store.ativoSelecionado">
       <template #header>
         <h3 class="text-lg font-bold">Atualizar Valor Atual</h3>
@@ -280,8 +280,9 @@
                       </th>
                       <td></td>
 
-                      <td class="text-right text-green-700"> {{ formatarNumero(corretora.totalPerformanceDiaria.posicao)
-                      }}
+                      <td class="text-right text-green-700"> {{
+                        formatarNumero(corretora.totalPerformanceDiaria.posicao)
+                        }}
                       </td>
 
                       <td class="text-right"> {{ formatarNumero(corretora.totalPerformanceDiaria.performance) }}
@@ -317,6 +318,9 @@ const { getCorretorasComOperacoesPerformance, atualizarTicker } = useTicker();
 import { store } from "./composables/storeTicker"
 import { moneyMask, formatarMoeda } from "../../helpers/mask/moneyMask";
 import moneyToFloat from "../../helpers/filters/moneyToFloat";
+
+import CaixaDisponivel from "../caixa/components/CaixaDisponivel.vue";
+
 onBeforeMount(async () => {
   await getCorretorasComOperacoesPerformance();
 });

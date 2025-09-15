@@ -21,5 +21,6 @@ func MigrateDB() {
 	db.AutoMigrate(&Corretoras{})
 	db.AutoMigrate(&Tickers{})
 	db.AutoMigrate(&Operacoes{})
+	db.AutoMigrate(&Caixa{})
 
 }
