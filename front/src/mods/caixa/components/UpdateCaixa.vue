@@ -40,14 +40,14 @@ const state = reactive({
 
 
 watch(() => store.caixa, (newValue) => {
-  if (store.caixa[0] && store.caixa[0].valor) {
+  if (store.caixa[0] && store.caixa[0].ID) {
     state.valor = formatarMoeda(store.caixa[0].valor);
   }
 
 })
 
 async function salvar() {
-  if (store.caixa[0] && store.caixa[0].valor) {
+  if (store.caixa[0] && store.caixa[0].ID) {
     store.caixa[0].valor = moneyToFloat(state.valor);
 
     await useCaixa().atualizarCaixa(store.caixa[0]).then(() => {
@@ -59,7 +59,7 @@ async function salvar() {
 }
 
 onBeforeMount(async () => {
-  if (store.caixa[0] && store.caixa[0].valor) {
+  if (store.caixa[0] && store.caixa[0].ID) {
     state.valor = formatarMoeda(store.caixa[0].valor);
   }
 });
