@@ -182,7 +182,7 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, reactive, watch } from "vue";
+import { onBeforeMount, onBeforeUnmount, reactive, watch } from "vue";
 import { store } from "../composables/storeTicker";
 import { useTicker } from "../composables/useTicker";
 import { moneyMask } from "../../../helpers/mask/moneyMask";
@@ -232,11 +232,22 @@ function getOperacoes() {
   });
 }
 
+function handleKeydown(e: any) {
+  if (e.key === "Enter") {
+    e.preventDefault() // opcional: evita submit automático de forms
+    addOperacao()
+  }
+}
 
 
 onBeforeMount(async () => {
   await getCorretoras()
+  window.addEventListener("keydown", handleKeydown)
 });
+
+onBeforeUnmount(() => {
+  window.removeEventListener("keydown", handleKeydown)
+})
 
 
 watch(() => store.novaOperacao.tipoOperacao, () => {

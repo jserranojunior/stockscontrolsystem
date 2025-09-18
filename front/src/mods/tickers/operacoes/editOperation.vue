@@ -219,7 +219,7 @@
 
 <script setup lang="ts">
 import Dialog from "../../../components/modals/Dialog.vue";
-import { onBeforeMount, reactive, ref, watch } from "vue";
+import { onBeforeMount, onBeforeUnmount, reactive, ref, watch } from "vue";
 import { store } from "../composables/storeTicker";
 import { useTicker } from "../composables/useTicker";
 import { moneyMask, formatarMoeda } from "../../../helpers/mask/moneyMask";
@@ -285,6 +285,14 @@ function openConfirmar() {
 
 }
 
+function handleKeydown(e: any) {
+  if (e.key === "Enter") {
+    e.preventDefault() // opcional: evita submit automático de forms
+    updateOperacoes()
+  }
+}
+
+
 
 function voltar() {
   if (store.editarOperacao.ID) {
@@ -330,7 +338,13 @@ async function updateOperacoes() {
 
 onBeforeMount(async () => {
   await getCorretoras().then(async () => { });
+  window.addEventListener("keydown", handleKeydown)
+
 });
+
+onBeforeUnmount(() => {
+  window.removeEventListener("keydown", handleKeydown)
+})
 
 /* watch(() => store.editarOperacao.tipoOperacao, () => {
   calcularOperacao();
