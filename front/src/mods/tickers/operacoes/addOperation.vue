@@ -100,7 +100,8 @@
               </label>
               <div class="relative">
 
-                <input type="text" v-model="state.valorTotal" v-money="moneyMask"
+                <input type="text" v-model="state.valorTotal"
+                  @blur="state.valorTotal = formatCurrencyExcel(state.valorTotal)"
                   class="input input-bordered w-full pl-10" placeholder="0,00" />
               </div>
             </div>
@@ -113,7 +114,8 @@
               </label>
               <div class="relative">
 
-                <input type="text" v-model="state.precoMedioCompra" v-money="moneyMask"
+                <input type="text" v-model="state.precoMedioCompra"
+                  @blur="state.precoMedioCompra = formatCurrencyExcel(state.precoMedioCompra)"
                   class="input input-bordered w-full pl-10" placeholder="0,00" />
               </div>
 
@@ -126,7 +128,7 @@
                 <span class="label-text font-medium">Carteira depois da operação</span>
               </label>
               <div class="relative">
-                <input type="text" v-model="state.carteira" v-money="moneyMask"
+                <input type="text" v-model="state.carteira" @blur="state.carteira = formatCurrencyExcel(state.carteira)"
                   class="input input-bordered w-full pl-10" placeholder="0,00" />
               </div>
             </div>
@@ -141,7 +143,8 @@
                 <span class="label-text font-medium">Resultado</span>
               </label>
               <div class="relative">
-                <input type="text" v-model="state.resultado" v-money="moneyMask"
+                <input type="text" v-model="state.resultado"
+                  @blur="state.resultado = formatCurrencyExcel(state.resultado)"
                   class="input input-bordered w-full pl-10" placeholder="0,00" />
               </div>
             </div>
@@ -152,8 +155,8 @@
                 <span class="label-text font-medium">L/P</span>
               </label>
               <div class="relative">
-                <input type="text" v-model="state.lp" v-money="moneyMask" class="input input-bordered w-full pl-10"
-                  placeholder="0,00" />
+                <input type="text" v-model="state.lp" @blur="state.lp = formatCurrencyExcel(state.lp)"
+                  class="input input-bordered w-full pl-10" placeholder="0,00" />
               </div>
             </div>
           </div>
@@ -175,17 +178,16 @@
       </div>
     </div>
 
-
   </div>
 
 
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, onBeforeUnmount, reactive, watch } from "vue";
+import { computed, nextTick, onBeforeMount, onBeforeUnmount, reactive, ref, watch } from "vue";
 import { store } from "../composables/storeTicker";
 import { useTicker } from "../composables/useTicker";
-import { moneyMask } from "../../../helpers/mask/moneyMask";
+import { formatCurrencyExcel } from "../../../helpers/mask/moneyMask";
 import moneyToFloat from "../../../helpers/filters/moneyToFloat";
 const { adicionarOperacao, getCorretoras, getTickersCorretoraID, calcularSaldo, calcularCarteira, calcularUnidade } = useTicker();
 
@@ -195,10 +197,13 @@ let state = reactive({
   carteira: "",
   resultado: '',
   lp: "",
+
 });
 
-function addOperacao() {
 
+
+
+function addOperacao() {
   adicionarOperacao();
 }
 
@@ -235,6 +240,14 @@ function getOperacoes() {
 function handleKeydown(e: any) {
   if (e.key === "Enter") {
     e.preventDefault() // opcional: evita submit automático de forms
+
+    state.valorTotal = formatCurrencyExcel(state.valorTotal)
+    state.precoMedioCompra = formatCurrencyExcel(state.precoMedioCompra)
+    state.carteira = formatCurrencyExcel(state.carteira)
+    state.resultado = formatCurrencyExcel(state.resultado)
+    state.lp = formatCurrencyExcel(state.lp)
+
+    console.log(state.lp)
     addOperacao()
   }
 }

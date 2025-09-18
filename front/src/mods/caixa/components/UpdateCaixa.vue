@@ -8,7 +8,7 @@
     </template>
     <template #body>
       <input type="text" v-model="state.valor" placeholder="Digite o valor" class="input input-bordered w-full"
-        v-money="moneyMask" />
+        @blur="state.valor = formatCurrencyExcel(state.valor)" />
 
     </template>
     <template #footer>
@@ -27,9 +27,9 @@ import { store } from '../composables/storeCaixa';
 import { useCaixa } from '../composables/useCaixa';
 import { useModal } from '../../../components/modals/use/useModal';
 import Modal from "../../../components/modals/Modal.vue";
-import { moneyMask, formatarMoeda } from "../../../helpers/mask/moneyMask";
+import { formatCurrencyExcel, formatarMoeda } from "../../../helpers/mask/moneyMask";
 import moneyToFloat from "../../../helpers/filters/moneyToFloat";
-import { onBeforeMount, reactive, watch } from 'vue';
+import { onBeforeMount, onBeforeUnmount, reactive, watch } from 'vue';
 
 const { togleShowModalFixed } = useModal();
 
@@ -55,12 +55,29 @@ async function salvar() {
     });
   }
 
-
 }
+
+function handleKeydown(e: any) {
+  if (e.key === "Enter") {
+    e.preventDefault()
+    state.valor = formatCurrencyExcel(state.valor)
+    salvar()
+  }
+}
+
 
 onBeforeMount(async () => {
   if (store.caixa[0] && store.caixa[0].ID) {
     state.valor = formatarMoeda(store.caixa[0].valor);
   }
+  window.addEventListener("keydown", handleKeydown)
+
 });
+
+
+
+onBeforeUnmount(() => {
+  window.removeEventListener("keydown", handleKeydown)
+})
+
 </script>

@@ -6,7 +6,6 @@ import routes from "./mods/rotas/routes";
  */ import { Icon } from "@iconify/vue";
 import { useAcl } from "./mods/auth/acl/use/useAcl";
 
-import { VMoney } from "v-money";
 import ElementPlus from "element-plus";
 
 let { generateRoutesEnableWithUserAcls } = useAcl();
@@ -16,7 +15,6 @@ async function start() {
     createApp(App)
       .use(routes)
       .use(ElementPlus)
-      .directive("money", VMoney)
       .component("Icon", Icon)
 
       .mount("#app");

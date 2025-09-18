@@ -58,10 +58,10 @@
           <span class="label-text font-medium">Preço Atual</span>
         </label>
         <div class="relative">
-          <input v-model="state.precoAtual" type="text" class="input input-bordered w-full" v-money="moneyMask" />
+          <input v-model="state.precoAtual" type="text" class="input input-bordered w-full"
+            @blur="state.precoAtual = formatCurrencyExcel(state.precoAtual)" />
         </div>
       </div>
-
 
       <div class="form-control mt-4">
 
@@ -75,11 +75,11 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, watch } from "vue";
+import { onBeforeMount, onBeforeUnmount, reactive, watch } from "vue";
 import { store } from "./composables/storeTicker";
 import { useTicker } from './composables/useTicker'
 const { adicionarTicker } = useTicker()
-import { moneyMask, parseMoeda } from "../../helpers/mask/moneyMask";
+import { formatCurrencyExcel, parseMoeda } from "../../helpers/mask/moneyMask";
 
 async function addTicker() {
   await adicionarTicker().then(() => {
@@ -98,4 +98,26 @@ watch(
 
   }
 );
+
+
+
+
+function handleKeydown(e: any) {
+  if (e.key === "Enter") {
+    e.preventDefault()
+    state.precoAtual = formatCurrencyExcel(state.precoAtual)
+    addTicker()
+  }
+}
+
+
+onBeforeMount(async () => {
+  window.addEventListener("keydown", handleKeydown)
+});
+
+
+
+onBeforeUnmount(() => {
+  window.removeEventListener("keydown", handleKeydown)
+})
 </script>

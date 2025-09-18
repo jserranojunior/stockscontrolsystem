@@ -9,7 +9,8 @@
       </template>
       <template #body>
         <input type="text" placeholder="0,00" class="input input-bordered w-full"
-          v-model="store.ativoSelecionado.valorSemFormatar" v-money="moneyMask" />
+          v-model="store.ativoSelecionado.valorSemFormatar"
+          @blur="store.ativoSelecionado.valorSemFormatar = formatCurrencyExcel(store.ativoSelecionado.valorSemFormatar)" />
 
       </template>
       <template #footer>
@@ -282,7 +283,7 @@
 
                       <td class="text-right text-green-700"> {{
                         formatarNumero(corretora.totalPerformanceDiaria.posicao)
-                        }}
+                      }}
                       </td>
 
                       <td class="text-right"> {{ formatarNumero(corretora.totalPerformanceDiaria.performance) }}
@@ -309,21 +310,36 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, ref, watch } from "vue";
+import { onBeforeMount, onBeforeUnmount, ref, watch } from "vue";
 import Modal from "../../components/modals/Modal.vue";
 import { useModal } from "../../components/modals/use/useModal";
 const { togleShowModalFixed } = useModal();
 import { useTicker } from "./composables/useTicker";
 const { getCorretorasComOperacoesPerformance, atualizarTicker } = useTicker();
 import { store } from "./composables/storeTicker"
-import { moneyMask, formatarMoeda } from "../../helpers/mask/moneyMask";
+import { formatCurrencyExcel, formatarMoeda } from "../../helpers/mask/moneyMask";
 import moneyToFloat from "../../helpers/filters/moneyToFloat";
 
 import CaixaDisponivel from "../caixa/components/CaixaDisponivel.vue";
 
 onBeforeMount(async () => {
   await getCorretorasComOperacoesPerformance();
+  window.addEventListener("keydown", handleKeydown)
+
 });
+
+function handleKeydown(e: any) {
+  if (e.key === "Enter") {
+    e.preventDefault()
+    store.ativoSelecionado.valorSemFormatar = formatCurrencyExcel(store.ativoSelecionado.valorSemFormatar)
+    atualizarValorTick()
+  }
+}
+
+
+onBeforeUnmount(() => {
+  window.removeEventListener("keydown", handleKeydown)
+})
 
 async function abrirModalEditarTick(ativoSelecionado: any) {
   store.ativoSelecionado = ativoSelecionado;
@@ -408,13 +424,6 @@ const formatarNumero = (valor: number | null) => {
 };
 
 
-function formatCurrency(value: any) {
-  // Implemente sua formatação de moeda aqui
-  return value.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
-}
 
 
 
