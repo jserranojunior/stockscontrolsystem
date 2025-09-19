@@ -46,6 +46,18 @@ export function httpTickers() {
       });
   }
 
+  async function updateCorretora(data: any) {
+    console.log(data, "data");
+    const urlApi = "/corretoras";
+    return await ApiConnect.putWithoutToken(urlApi, data)
+      .then((res: any) => {
+        return res;
+      })
+      .catch((res: any) => {
+        return res;
+      });
+  }
+
   async function getTickersCorretoraID(corretoraID: number) {
     const urlApi = "/tickers/" + corretoraID;
     return await ApiConnect.getWithoutToken(urlApi)
@@ -228,5 +240,6 @@ export function httpTickers() {
     addOperacao,
     getOperacoesSemanaMes,
     getOperacoesID,
+    updateCorretora,
   };
 }

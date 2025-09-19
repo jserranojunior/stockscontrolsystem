@@ -148,9 +148,10 @@ func GetOperacoesMesAtual(c *gin.Context) {
 
 	// Primeiro, buscar TODAS as corretoras
 	var todasCorretoras []struct {
-		ID   uint   `json:"id"`
-		Nome string `json:"nome"`
-		Cor  string `json:"cor"`
+		ID         uint    `json:"id"`
+		Nome       string  `json:"nome"`
+		Cor        string  `json:"cor"`
+		Disponivel float64 `json:"disponivel"`
 	}
 
 	err := DB.Table("corretoras").

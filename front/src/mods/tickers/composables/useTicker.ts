@@ -117,6 +117,19 @@ export const useTicker = () => {
   }
 
   // No seu componente Vue/React
+  async function atualizarCorretora(data: any) {
+    return await httpTickers()
+      .updateCorretora(data)
+      .then((res: any) => {
+        return res;
+      })
+      .catch((res: any) => {
+        console.error(res);
+        return res;
+      });
+  }
+
+  // No seu componente Vue/React
   async function atualizarTicker(data: any) {
     return await httpTickers()
       .updateTicker(data)
@@ -368,10 +381,6 @@ export const useTicker = () => {
           posicao
         );
 
-        if (op.carteira === 1530.2) {
-          console.log("Op", op);
-        }
-
         return {
           ...op,
           posicao,
@@ -507,5 +516,6 @@ export const useTicker = () => {
     getOperacoesID,
     atualizarOperacao,
     calcularVariacaoPercentual,
+    atualizarCorretora,
   };
 };

@@ -1,6 +1,5 @@
 <template>
 
-  <CaixaDisponivel></CaixaDisponivel>
 
   <div class="flex flex-warp justify-center mt-4">
     <div class="btn btn-primary mx-1" @click="store.tipoContabilidade = 'ativo'">Ativos</div>
@@ -287,7 +286,6 @@ import { useTicker } from "./composables/useTicker";
 import { dateFormatPtbr } from "alvitre-obelisk";
 
 import { useRouter } from "vue-router";
-import CaixaDisponivel from "../caixa/components/CaixaDisponivel.vue";
 
 const router = useRouter();
 const { getCorretorasComOperacoes, calcularVariacaoPercentual } = useTicker();

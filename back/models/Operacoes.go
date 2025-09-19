@@ -24,3 +24,18 @@ type Operacoes struct {
 
 	Ticker Tickers `gorm:"foreignKey:TickerID" json:"ticker,omitempty"`
 }
+
+type OperacaoDTO struct {
+	ID                        uint      `json:"id"`
+	Tick                      string    `json:"tick"`
+	TipoOperacao              string    `json:"tipoOperacao"`
+	Data                      time.Time `json:"data"`
+	Quantidade                float64   `json:"quantidade"`
+	ValorTotal                float64   `json:"valorTotal"`
+	ValorUnidade              float64   `json:"valorUnidade"`
+	PrecoMedio                float64   `json:"precoMedio"`
+	Saldo                     float64   `json:"saldo"`
+	Carteira                  float64   `json:"carteira"`
+	PrecoAtual                float64   `json:"precoAtual"`
+	DataAtualizacaoPrecoAtual time.Time `json:"dataAtualizacaoPrecoAtual"`
+}

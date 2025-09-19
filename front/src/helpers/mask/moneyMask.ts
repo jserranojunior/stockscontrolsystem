@@ -42,24 +42,20 @@ function formatCurrencyExcel(value: string): string {
   let cents = "";
 
   if (clean.includes(",")) {
-    // se o usuário digitou vírgula
+    // se tem vírgula
     const parts = clean.split(",");
-    integerPart = parts[0];
-    cents = (parts[1] || "").padEnd(2, "0").slice(0, 2);
+    integerPart = parts[0].replace(/^0+/, "") || "0"; // remove zeros à esquerda
+    cents = (parts[1] || "").padEnd(2, "0").slice(0, 2); // completa centavos
   } else {
-    // sem vírgula, últimos 2 dígitos = centavos
-    while (clean.length < 3) clean = "0" + clean;
-    integerPart = clean.slice(0, -2);
-    cents = clean.slice(-2);
+    // sem vírgula
+    integerPart = clean.replace(/^0+/, "") || "0";
+    cents = "00";
   }
 
-  // remove zeros à esquerda da parte inteira
-  integerPart = integerPart.replace(/^0+/, "");
-  if (!integerPart) integerPart = "0";
-
-  // adiciona separadores de milhar
+  // adiciona separador de milhar
   integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
   return `${integerPart},${cents}`;
 }
+
 export { moneyMask, formatarMoeda, parseMoeda, formatCurrencyExcel };

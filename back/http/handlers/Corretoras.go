@@ -12,27 +12,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type OperacaoDTO struct {
-	ID                        uint      `json:"id"`
-	Tick                      string    `json:"tick"`
-	TipoOperacao              string    `json:"tipoOperacao"`
-	Data                      time.Time `json:"data"`
-	Quantidade                float64   `json:"quantidade"`
-	ValorTotal                float64   `json:"valorTotal"`
-	ValorUnidade              float64   `json:"valorUnidade"`
-	PrecoMedio                float64   `json:"precoMedio"`
-	Saldo                     float64   `json:"saldo"`
-	Carteira                  float64   `json:"carteira"`
-	PrecoAtual                float64   `json:"precoAtual"`
-	DataAtualizacaoPrecoAtual time.Time `json:"dataAtualizacaoPrecoAtual"`
-}
-
-type CorretoraDTO struct {
-	Nome      string        `json:"nome"`
-	Cor       string        `json:"cor"`
-	Operacoes []OperacaoDTO `json:"operacoes"`
-}
-
 // Use a variável global DB (definida em outro lugar)
 
 func GetCorretoras(c *gin.Context) {
@@ -69,11 +48,12 @@ func GetCorretoraPorID(c *gin.Context) {
 
 func CriarCorretora(c *gin.Context) {
 	var input struct {
-		Nome  string `json:"nome" binding:"required"`
-		Data  string `json:"data" binding:"required"`
-		Info  string `json:"info"`
-		Moeda string `json:"moeda" binding:"required"`
-		Cor   string `json:"cor"`
+		Nome       string  `json:"nome" binding:"required"`
+		Data       string  `json:"data" binding:"required"`
+		Info       string  `json:"info"`
+		Moeda      string  `json:"moeda" binding:"required"`
+		Cor        string  `json:"cor"`
+		Disponivel float64 `json:"disponivel"`
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -104,18 +84,15 @@ func CriarCorretora(c *gin.Context) {
 }
 
 func AtualizarCorretora(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil || id <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
-		return
-	}
 
 	var input struct {
-		Nome  string `json:"nome"`
-		Data  string `json:"data"`
-		Info  string `json:"info"`
-		Moeda string `json:"moeda"`
-		Cor   string `json:"cor"`
+		ID         uint     `json:"id" binding:"required"`
+		Nome       string   `json:"nome"`
+		Data       string   `json:"data"`
+		Info       string   `json:"info"`
+		Moeda      string   `json:"moeda"`
+		Cor        string   `json:"cor"`
+		Disponivel *float64 `json:"disponivel"`
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -123,8 +100,10 @@ func AtualizarCorretora(c *gin.Context) {
 		return
 	}
 
+	fmt.Printf("Input recebido: %+v\n", input)
+
 	var corretora models.Corretoras
-	if err := DB.First(&corretora, id).Error; err != nil {
+	if err := DB.First(&corretora, input.ID).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Corretora não encontrada"})
 			return
@@ -135,6 +114,10 @@ func AtualizarCorretora(c *gin.Context) {
 
 	if input.Nome != "" {
 		corretora.Nome = input.Nome
+	}
+	if input.Disponivel != nil {
+		fmt.Printf("Atualizando Disponivel: %f -> %f\n", corretora.Disponivel, *input.Disponivel)
+		corretora.Disponivel = *input.Disponivel
 	}
 	if input.Data != "" {
 		dataParsed, err := time.Parse("2006-01-02", input.Data)
@@ -158,6 +141,8 @@ func AtualizarCorretora(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	fmt.Printf("Corretora salva: %+v\n", corretora)
 
 	c.JSON(http.StatusOK, corretora)
 }
@@ -261,16 +246,18 @@ func GetCorretorasComOperacoesPerfomance(c *gin.Context) {
 	}
 
 	// monta DTO de resposta
-	var resposta []CorretoraDTO
+	var resposta []models.CorretoraDTO
 	for _, cor := range corretoras {
-		corDTO := CorretoraDTO{
-			Nome: cor.Nome,
-			Cor:  cor.Cor,
+		corDTO := models.CorretoraDTO{
+			ID:         cor.ID,
+			Nome:       cor.Nome,
+			Cor:        cor.Cor,
+			Disponivel: cor.Disponivel,
 		}
 
 		for _, ticker := range cor.Tickers {
 			for _, op := range ticker.Operacoes {
-				opDTO := OperacaoDTO{
+				opDTO := models.OperacaoDTO{
 
 					Tick:                      ticker.Tick,
 					TipoOperacao:              op.TipoOperacao,
@@ -308,11 +295,13 @@ func GetCorretorasUltimaOperacao(c *gin.Context) {
 	}
 
 	// monta DTO de resposta
-	var resposta []CorretoraDTO
+	var resposta []models.CorretoraDTO
 	for _, cor := range corretoras {
-		corDTO := CorretoraDTO{
-			Nome: cor.Nome,
-			Cor:  cor.Cor,
+		corDTO := models.CorretoraDTO{
+			ID:         cor.ID,
+			Nome:       cor.Nome,
+			Cor:        cor.Cor,
+			Disponivel: cor.Disponivel,
 		}
 
 		for _, ticker := range cor.Tickers {
@@ -333,7 +322,7 @@ func GetCorretorasUltimaOperacao(c *gin.Context) {
 				continue
 			}
 
-			opDTO := OperacaoDTO{
+			opDTO := models.OperacaoDTO{
 				ID:                        ticker.ID,
 				Tick:                      ticker.Tick,
 				TipoOperacao:              ultimaOp.TipoOperacao,
