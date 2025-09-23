@@ -50,7 +50,8 @@ func GetTickersPorCorretoraID(c *gin.Context) {
 	var tickersDB []models.Tickers
 	if err := DB.Preload("Operacoes", func(db *gorm.DB) *gorm.DB {
 		return db.Order("operacoes.data ASC").Order("operacoes.created_at ASC")
-	}).Where("corretora_id = ?", corretoraID).Find(&tickersDB).Error; err != nil {
+	}).Joins("LEFT JOIN operacoes ON operacoes.ticker_id = tickers.id").
+		Where("tickers.corretora_id = ?", corretoraID).Find(&tickersDB).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

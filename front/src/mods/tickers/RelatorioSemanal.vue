@@ -1,83 +1,53 @@
 <template>
-
   <div>
     <div class="p-6 flex justify-center items-center">
       <h1 class="text-3xl font-bold mb-6 text-center w-full">
         Relatório Semanal de Investimentos
       </h1>
     </div>
-
-
-    <!--   <pre><code class="language-json">   {{ store.operacoesSemanaMes }} </code></pre>
- -->
-
-    <div class="flex flex-wrap justify-center  p-2"
+    <div class="flex flex-wrap justify-center p-2 "
       v-if="store.operacoesSemanaMes && store.operacoesSemanaMes.corretoras">
       <div v-for="corretora in store.operacoesSemanaMes.corretoras" :key="corretora.corretora_id"
-        class="w-1/4 mx-1 card shadow-xl rounded-2xl overflow-hidden">
-        <!-- Cabeçalho -->
+        class="w-1/2 my-4  px-4 card shadow-xl rounded-2xl overflow-hidden">
+
         <div class="card-title p-1 text-base-100 text-center justify-center"
           :class="getBgClass(corretora.corretora_cor)">
           {{ corretora.corretora_nome }}
         </div>
 
-        <!-- Total Mensal -->
-        <div class="p-4 text-right text-2xl font-bold">
-          <!--           {{ corretora.totalMensal.toFixed(2) }}
- -->
-        </div>
-
-        <!-- Tabela -->
         <div class="overflow-x-auto px-4 pb-4">
           <table class="table table-sm w-full text-xs bg-base-100">
             <thead class="text-black">
               <tr>
                 <th>Data</th>
-                <th>Fechamento</th>
-                <th>Evolução</th>
-                <th>Retirada</th>
+                <th class="text-right">Posição</th>
+                <th class="text-right">Investido</th>
+                <th class="text-right">Variação</th>
+
               </tr>
             </thead>
 
-            <tbody v-for="semana in corretora.semanas" :key="semana.semana">
-              <!-- Cabeçalho da semana -->
+            <tbody v-for="semana in ordenarSemanas(corretora.semanas)" :key="semana.semana">
               <tr>
-                <td colspan="4" class="px-2 py-1 bg-gray-200  text-left">
-                  <span class="font-semibold">Semana {{ semana.semana }}</span>
+                <td colspan="4" class="px-2 py-1 bg-gray-200 text-left">
+                  <span class="font-semibold">
+                    Semana {{ semana.semana === 0 ? 'Mês Anterior' : semana.semana }}
+                  </span>
                 </td>
               </tr>
 
-              <!-- Dias -->
               <tr v-for="dia in semana.dias" :key="dia.data">
-                <td>{{ dateFormatPtbr(dia.data) }}</td>
-                <td class="text-right">{{ dia.fechamento_dia.toFixed(2) }} </td>
+                <td>{{ formatarData(dia.totais.data) }}</td>
+                <td class="text-right">{{ formatarMoeda(dia.totais.posicao_dia) }}</td>
+                <td class="text-right">{{ formatarMoeda(dia.totais.investido_dia) }}</td>
+                <td class="text-right">{{ formatarMoeda(dia.totais.variacao_dia) }}</td>
 
-                <td class="bg-gray-100 text-right">{{ dia.evolucao_dia.toFixed(2) }}</td>
-                <td class="text-right">{{ dia.retirada_dia.toFixed(2) }}</td>
-              </tr>
-
-              <!-- Totais -->
-              <tr>
-                <td class="px-2 py-1 font-semibold">Total</td>
-                <td class="text-right font-bold">
-                  <div>{{ semana.fechamento_semana.toFixed(2) }}</div>
-                </td>
-                <td class="px-2 py-1 text-right font-semibold text-blue-800 bg-gray-100">
-                  <div>{{ semana.evolucao_semana.toFixed(2) }}</div>
-                </td>
-                <td class="px-2 py-1 text-right font-semibold text-red-800">
-                  {{ semana.retirada_semana.toFixed(2) }}
-                </td>
               </tr>
             </tbody>
           </table>
-
         </div>
       </div>
     </div>
-    <!-- 
-    <pre>
-{{ store.operacoesSemanaMes.dadosPorCorretora }}</pre> -->
   </div>
 </template>
 
@@ -85,24 +55,34 @@
 import { onBeforeMount } from 'vue'
 import { store } from './composables/storeTicker'
 import { useTicker } from './composables/useTicker'
-import { dateFormatPtbr } from 'alvitre-obelisk'
+import { formatarMoeda } from '../../helpers/mask/moneyMask'
+
 const { getOperacoesSemanaMes } = useTicker()
 
 onBeforeMount(() => {
-  // Carregar dados iniciais
   getOperacoesSemanaMes()
 })
 
-// dentro do <script setup>
 const getBgClass = (cor: string) => {
-  return (
-    {
-      blue: "bg-blue-400",
-      green: "bg-green-600",
-      yellow: "bg-yellow-500",
-    }[cor] || "bg-gray-600"
-  ); // fallback
-};
+  return ({
+    blue: "bg-blue-400",
+    green: "bg-green-600",
+    yellow: "bg-yellow-500",
+  }[cor] || "bg-gray-600")
+}
 
+const formatarData = (dataString: string) => {
+  // Corrige o problema do fuso horário
+  // Adiciona 'T12:00:00' para forçar o horário do meio-dia e evitar problemas de timezone
+  const data = new Date(dataString + 'T12:00:00')
 
+  // Formata apenas o dia (2 dígitos)
+  return data.getDate().toString().padStart(2, '0')
+}
+
+// Ordena semanas garantindo que a semana 0 fique primeiro
+const ordenarSemanas = (semanas: any[]) => {
+  if (!semanas) return []
+  return [...semanas].sort((a, b) => a.semana - b.semana)
+}
 </script>
