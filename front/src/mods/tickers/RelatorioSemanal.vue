@@ -5,6 +5,9 @@
         Relatório Semanal de Investimentos
       </h1>
     </div>
+
+
+
     <div class="flex flex-wrap justify-center p-2 "
       v-if="store.operacoesSemanaMes && store.operacoesSemanaMes.corretoras">
       <div v-for="corretora in store.operacoesSemanaMes.corretoras" :key="corretora.corretora_id"
@@ -22,6 +25,7 @@
                 <th>Data</th>
                 <th class="text-right">Posição</th>
                 <th class="text-right">Investido</th>
+                <th class="text-right">Resultado</th>
                 <th class="text-right">Variação</th>
 
               </tr>
@@ -29,7 +33,7 @@
 
             <tbody v-for="semana in ordenarSemanas(corretora.semanas)" :key="semana.semana">
               <tr>
-                <td colspan="4" class="px-2 py-1 bg-gray-200 text-left">
+                <td colspan="5" class="px-2 py-1 bg-gray-200 text-left">
                   <span class="font-semibold">
                     Semana {{ semana.semana === 0 ? 'Mês Anterior' : semana.semana }}
                   </span>
@@ -38,10 +42,14 @@
 
               <tr v-for="dia in semana.dias" :key="dia.data">
                 <td>{{ formatarData(dia.totais.data) }}</td>
-                <td class="text-right">{{ formatarMoeda(dia.totais.posicao_dia) }}</td>
-                <td class="text-right">{{ formatarMoeda(dia.totais.investido_dia) }}</td>
-                <td class="text-right">{{ formatarMoeda(dia.totais.variacao_dia) }}</td>
-
+                <td class="text-right" :class="{ 'text-red-500': dia.totais.posicao_dia < 0 }">{{
+                  formatarMoeda(dia.totais.posicao_dia) }}</td>
+                <td class="text-right" :class="{ 'text-red-500': dia.totais.investido_dia < 0 }">{{
+                  formatarMoeda(dia.totais.investido_dia) }}</td>
+                <td class="text-right" :class="{ 'text-red-500': dia.totais.resultado_dia < 0 }">{{
+                  formatarMoeda(dia.totais.resultado_dia) }}</td>
+                <td class="text-right" :class="{ 'text-red-500': dia.totais.variacao_dia < 0 }">{{
+                  formatarMoeda(dia.totais.variacao_dia) }}</td>
               </tr>
             </tbody>
           </table>

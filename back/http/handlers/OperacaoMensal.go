@@ -33,11 +33,13 @@ type OperacaoAux struct {
 	Posicao       float64
 }
 
+// EstadoCorretora foi alterada para incluir PosicaoDiaAnterior
 type EstadoCorretora struct {
-	TotalQuantidade map[uint]float64
-	CustoMedio      map[uint]float64
-	UltimoPreco     map[uint]float64
-	PosicaoAnterior float64
+	TotalQuantidade    map[uint]float64
+	CustoMedio         map[uint]float64
+	UltimoPreco        map[uint]float64
+	PosicaoAnterior    float64
+	PosicaoDiaAnterior float64 // Variavel para rastrear a posicao_dia do dia anterior
 }
 
 // Estrutura de totais diários
@@ -49,6 +51,7 @@ type TotaisDia struct {
 	QuantidadeDia float64 `json:"quantidade_dia"`
 	ValorAtual    float64 `json:"valorAtual"`
 	InvestidoDia  float64 `json:"investido_dia"`
+	ResultadoDia  float64 `json:"resultado_dia"`
 }
 
 // Estrutura de saída do dia, com totais e lista de operações
@@ -57,6 +60,19 @@ type DiaResultado struct {
 	Operacoes []OperacaoAux `json:"operacoes"`
 }
 
+// ----------------------------------------------------------------------
+// Funções que devem estar em outros arquivos
+// ----------------------------------------------------------------------
+// Estas funções não estão incluídas aqui para evitar a "redeclaração".
+// Elas devem permanecer nos seus arquivos de origem.
+//
+// ObterPeriodoMesAtual() Periodo
+// ObterUltimoDiaMesAnterior() time.Time
+// GerarSemanasMesAtual() []Semana
+// isFimDeSemana(t time.Time) bool
+// FiltrarDiasMesAtual(dias []string) []string
+// OrdenarSemanas(semanas map[int]gin.H) []gin.H
+//
 // ----------------------------------------------------------------------
 // Função principal
 // ----------------------------------------------------------------------
@@ -104,10 +120,11 @@ func processarCorretoras(
 
 	for _, corretora := range corretoras {
 		estado := &EstadoCorretora{
-			TotalQuantidade: make(map[uint]float64),
-			CustoMedio:      make(map[uint]float64),
-			UltimoPreco:     make(map[uint]float64),
-			PosicaoAnterior: 0.0,
+			TotalQuantidade:    make(map[uint]float64),
+			CustoMedio:         make(map[uint]float64),
+			UltimoPreco:        make(map[uint]float64),
+			PosicaoAnterior:    0.0,
+			PosicaoDiaAnterior: 0.0, // Inicializa a nova variável
 		}
 
 		semanas := processarSemanaZero(corretora, estado, operacoesAnterior)
@@ -148,6 +165,7 @@ func processarSemanaZero(
 	posicaoTotalCarteira, _, quantidadeDia := calcularTotaisDia(estado)
 
 	estado.PosicaoAnterior = posicaoTotalCarteira
+	estado.PosicaoDiaAnterior = 0.0 // O dia de início não tem variação de operações
 
 	// O valor do campo investido_dia é 0 para o dia do mês anterior
 	investidoDia := 0.0
@@ -210,7 +228,9 @@ func processarDiasSemana(
 
 	for _, dataStr := range dias {
 		dia, _ := time.Parse("2006-01-02", dataStr)
-		posicaoAnterior := estado.PosicaoAnterior
+
+		// A variação é baseada na posição do dia anterior
+		posicaoDiaAnterior := estado.PosicaoDiaAnterior
 
 		operacoesDia := operacoesPorData[dataStr]
 
@@ -238,7 +258,16 @@ func processarDiasSemana(
 		}
 
 		posicaoTotalCarteira, _, quantidadeDia := calcularTotaisDia(estado)
-		variacaoDia := posicaoTotalCarteira - posicaoAnterior
+
+		// NOVO CÁLCULO DE VARIAÇÃO_DIA
+		var variacaoDia float64
+		// Se a posição do dia for 0, a variação também será 0
+		if posicaoDia == 0 {
+			variacaoDia = 0.0
+		} else {
+			// Caso contrário, faz o cálculo normal
+			variacaoDia = posicaoDia - math.Abs(posicaoDiaAnterior)
+		}
 
 		diasArray = append(diasArray, criarDiaResultado(
 			dia,
@@ -251,7 +280,9 @@ func processarDiasSemana(
 			investidoDia,
 		))
 
+		// Atualiza o estado para o próximo dia
 		estado.PosicaoAnterior = posicaoTotalCarteira
+		estado.PosicaoDiaAnterior = posicaoDia
 	}
 
 	return diasArray
@@ -310,6 +341,10 @@ func criarDiaResultado(
 	investidoDia float64,
 ) DiaResultado {
 
+	// O resultado do dia é a soma direta da posição e do valor investido.
+	// Isso gera o valor esperado para o cenário que você apresentou.
+	resultadoDia := posicaoDia + investidoDia
+
 	return DiaResultado{
 		Totais: TotaisDia{
 			Data:          data.Format("2006-01-02"),
@@ -319,6 +354,7 @@ func criarDiaResultado(
 			Disponivel:    roundFloat(disponivel),
 			QuantidadeDia: roundFloat(quantidadeDia),
 			ValorAtual:    roundFloat(posicaoTotalCarteira),
+			ResultadoDia:  roundFloat(resultadoDia),
 		},
 		Operacoes: operacoes,
 	}
