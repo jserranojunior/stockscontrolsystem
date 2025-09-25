@@ -35,6 +35,11 @@ function parseMoeda(valor: string): number {
 function formatCurrencyExcel(value: string): string {
   if (!value) return "";
 
+  // Se não existe vírgula mas existe ponto, então trata ponto como vírgula
+  if (!value.includes(",") && value.includes(".")) {
+    value = value.replace(".", ",");
+  }
+
   // remove tudo que não seja dígito ou vírgula
   let clean = value.replace(/[^\d,]/g, "");
 
