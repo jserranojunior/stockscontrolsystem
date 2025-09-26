@@ -19,7 +19,7 @@
         </div>
 
         <div class="overflow-x-auto px-4 pb-4">
-          <table class="table table-sm w-full text-xs bg-base-100">
+          <table class="table  w-full bg-base-100">
             <thead class="text-black">
               <tr>
                 <th>Data</th>
@@ -31,7 +31,8 @@
               </tr>
             </thead>
 
-            <tbody v-for="semana in ordenarSemanas(corretora.semanas)" :key="semana.semana">
+            <tbody v-for="semana in ordenarSemanas(corretora.semanas)" :key="semana.semana"
+              class="text-lg font-semibold">
               <tr>
                 <td colspan="5" class="px-2 py-1 bg-gray-200 text-left">
                   <span class="font-semibold">
@@ -40,7 +41,7 @@
                 </td>
               </tr>
 
-              <tr v-for="dia in semana.dias" :key="dia.data">
+              <tr v-for="dia in semana.dias" :key="dia.data" class="text-lg font-semibold">
                 <td>{{ formatarData(dia.totais.data) }}</td>
                 <td class="text-right" :class="{ 'text-red-500': dia.totais.posicao_dia < 0 }">{{
                   formatarMoeda(dia.totais.posicao_dia) }}</td>

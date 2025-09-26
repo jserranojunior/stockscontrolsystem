@@ -142,7 +142,19 @@ export const useTicker = () => {
       });
   }
 
-  async function adicionarTicker(): Promise<void> {
+  function limpararFormularioTicker() {
+    store.corretoraSelecionada = null;
+    store.novoTicker = {
+      corretora: 0,
+      tick: "",
+      name: "",
+      datacompra: new Date().toISOString().split("T")[0],
+      datavenda: null as any,
+      precoAtual: "" as any,
+    };
+  }
+
+  async function adicionarTicker(): Promise<any> {
     // Validação básica antes de enviar
     if (
       !store.novoTicker.corretora ||
@@ -152,62 +164,37 @@ export const useTicker = () => {
       !store.novoTicker.datacompra
     ) {
       showMessage("Preencha todos os campos obrigatórios");
-      return;
+      return false;
     }
 
-    /*     if (store.novoTicker.datacompra) {
-      store.novoTicker.datacompra = converterCampoData(
-        store.novoTicker.datacompra
-      );
-    } */
-
     try {
-      console.log("Adicionando Ticker - ...", store.novoTicker);
-
       const result = await httpTickers().addTicker(store.novoTicker);
 
       if (result.success) {
         // Sucesso
         showMessage(result.message || "Operação adicionada com sucesso!");
 
-        // Limpar formulário
-        store.corretoraSelecionada = null;
-        store.novoTicker = {
-          corretora: 0,
-          tick: "",
-          name: "",
-          datacompra: new Date().toISOString().split("T")[0],
-          datavenda: null as any,
-          precoAtual: "" as any,
-        };
+        limpararFormularioTicker();
+        return true;
       } else {
-        // Erro
-
-        store.corretoraSelecionada = null;
-        store.novoTicker = {
-          corretora: 0,
-          tick: "",
-          name: "",
-          datacompra: new Date().toISOString().split("T")[0],
-          datavenda: null as any,
-          precoAtual: "" as any,
-        };
-
+        limpararFormularioTicker();
         showMessage(result.error || "Erro ao adicionar operação");
+        return false;
       }
     } catch (error) {
       if (error) {
         console.log(error);
+        return false;
       }
     }
   }
 
   // No seu componente Vue/React
-  async function adicionarOperacao(): Promise<void> {
+  async function adicionarOperacao(): Promise<any> {
     // Validação básica antes de enviar
     if (!store.novaOperacao.tickerId) {
       showMessage("Preencha todos os campos obrigatórios");
-      return;
+      return false;
     }
 
     store.novaOperacao.data = converterCampoData(store.novaOperacao.data);
@@ -236,13 +223,16 @@ export const useTicker = () => {
           lp: null,
           resultado: null,
         };
+        return true;
       } else {
         // Erro
         showMessage(result.error || "Erro ao adicionar operação");
+        return false;
       }
     } catch (error) {
       if (error) {
         console.log(error);
+        return false;
       }
     }
   }
@@ -255,10 +245,11 @@ export const useTicker = () => {
       });
   }
 
-  async function getTickersCorretoraID(corretoraID: number) {
+  async function getTickersCorretora(corretoraID: number) {
     await httpTickers()
       .getTickersCorretoraID(corretoraID)
       .then((res) => {
+        console.log(res.data);
         store.corretoraTickers = res.data;
       });
   }
@@ -508,7 +499,7 @@ export const useTicker = () => {
     getCorretoras,
     getCorretorasComOperacoes,
     getCorretorasComOperacoesPerformance,
-    getTickersCorretoraID,
+    getTickersCorretora,
     getOperacoesSemanaMes,
     calcularSaldo,
     calcularCarteira,

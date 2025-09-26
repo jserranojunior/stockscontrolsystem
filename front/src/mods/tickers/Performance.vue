@@ -64,13 +64,13 @@
 
               </tr>
             </thead>
-            <tbody v-if="store.ativos">
+            <tbody v-if="store.ativos" class="text-lg">
 
               <tr class="bg-gray-100 font-semibold"
                 v-for="corretora in (Array.isArray(store.ativos) ? store.ativos.filter(c => c.totalPerformanceDiaria) : [])"
                 :key="corretora.ID">
 
-                <td title="Movimentação diaria">{{ corretora.nome }}</td>
+                <td title="Movimentação diaria" class="text-sm">{{ corretora.nome }}</td>
 
 
 
@@ -78,7 +78,7 @@
                   {{ formatarNumero(corretora.totalPerformanceDiaria.carteira) }}
                 </td>
 
-                <td class="text-right"> {{ corretora.totalPerformanceDiaria.saldo }}
+                <td class="text-right"> {{ formatarNumero(corretora.totalPerformanceDiaria.saldo) }}
                 </td>
                 <td class="text-right">{{ formatarNumero(corretora.totalPerformanceDiaria.precoMedio) }}</td>
                 <th class="text-center mx-auto">
@@ -185,7 +185,7 @@
                       </th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody class="text-lg font-semibold">
                     <!-- Saldo em conta corrente -->
 
                     <!-- Categorias de ativos -->
@@ -202,7 +202,7 @@
                       @click="abrirModalEditarTick(operacoes)" class="hover:bg-gray-300 transition cursor-pointer">
 
 
-                      <td class="text-center font-bold">{{ operacoes.tick }}</td>
+                      <td class="text-center ">{{ operacoes.tick }}</td>
 
                       <td class="text-right font-medium">
                         {{ formatarNumero(operacoes.carteira) }}
@@ -264,7 +264,7 @@
 
                       <td class="text-right text-green-700"> {{
                         formatarNumero(corretora.totalPerformanceDiaria.posicao)
-                        }}
+                      }}
                       </td>
 
                       <td class="text-right"> {{ formatarNumero(corretora.totalPerformanceDiaria.performance) }}
@@ -277,7 +277,7 @@
                       </td>
                       <td></td>
                     </tr>
-                    <tr class=" font-semibold text-base text-center">
+                    <tr class=" font-semibold text-lg text-center">
                       <td colspan="5"></td>
                       <td colspan="1" class="text-left">Disponível</td>
                       <td colspan="1" class="text-right text-blue-600 cursor-pointer"

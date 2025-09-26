@@ -1,25 +1,43 @@
 <template>
+  <AddOperation />
+  <addNewTick />
 
+  <div class="flex justify-between px-12">
+    <div class="w-1/2 card  shadow-lg rounded-lg px-10 py-2  mx-auto">
+      <div class="card-title text-center mx-auto ">Tipo de Tick</div>
+      <div class="card-body my-0 py-4 flex flex-warp justify-center ">
+        <div class="btn btn-accent mx-1" @click="store.tipoContabilidade = 'ativo'">ATIVOS</div>
 
-  <div class="flex flex-warp justify-center mt-4">
-    <div class="btn btn-primary mx-1" @click="store.tipoContabilidade = 'ativo'">Ativos</div>
-
-    <div class="btn btn-warning mx-1" @click="store.tipoContabilidade = 'encerrado'">Encerrados</div>
-  </div>
-
-  <div class=" w-full text-center mt-10 " v-if="store.ativos">
-    <div class="menu menu-vertical lg:menu-horizontal rounded-box mx-auto bg-white"
-      v-for="(corretora, index) in store.ativos" :key="index">
-      <div v-for="(ticker, index) in corretora.tickers" :key="index">
-        <ul v-if="ticker.operacoes && ticker.operacoes.length > 0">
-          <li>
-            <a :href="`#${ticker.tick}`">
-              <div class="btn btn-sm mr-1"> {{ ticker.tick }}</div>
-            </a>
-          </li>
-        </ul>
+        <div class="btn btn-error text-white  mx-1" @click="store.tipoContabilidade = 'encerrado'">ENCERRADOS
+        </div>
       </div>
+    </div>
 
+    <div class="w-1/2 card  shadow-lg rounded-lg px-10 py-2  mx-auto">
+
+
+      <div class="card-body w-full text-center   p-2 m-0" v-if="store.ativos">
+        <div class="menu menu-vertical lg:menu-horizontal rounded-box mx-auto"
+          v-for="(corretora, index) in store.ativos" :key="index">
+          <div v-for="(ticker, index) in corretora.tickers" :key="index">
+            <ul v-if="ticker.operacoes && ticker.operacoes.length > 0">
+              <li>
+                <a :href="`#${ticker.tick}`">
+                  <div class="btn btn-sm mr-1"> {{ ticker.tick }}</div>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="w-1/2  card  shadow-lg rounded-lg px-10 py-2  mx-auto">
+      <div class="card-title text-center mx-auto">Adicionar</div>
+      <div class="card-body flex flex-warp justify-center ">
+        <button class="btn btn-success mx-1" @click="openModalAddNewTick()">+ NOVO ATIVO</button>
+        <button class="btn btn-primary mx-1" @click="openModalAddNovaOperacao()">+ NOVA OPERAÇÃO</button>
+      </div>
     </div>
   </div>
 
@@ -284,8 +302,12 @@ import { onBeforeMount, watch } from "vue";
 import { store } from "./composables/storeTicker";
 import { useTicker } from "./composables/useTicker";
 import { dateFormatPtbr } from "alvitre-obelisk";
-
+import addNewTick from "./addNewTick.vue";
 import { useRouter } from "vue-router";
+
+import { useModal } from "../../components/modals/use/useModal";
+import AddOperation from "./operacoes/addOperation.vue";
+const { togleShowModalFixed } = useModal();
 
 const router = useRouter();
 const { getCorretorasComOperacoes, calcularVariacaoPercentual } = useTicker();
@@ -298,6 +320,23 @@ onBeforeMount(async () => {
 watch(() => store.tipoContabilidade, async () => {
   await getCorretorasComOperacoes();
 })
+
+
+
+function openModalAddNovaOperacao() {
+
+  togleShowModalFixed({
+    nome: "addNovaOperacao",
+    show: true,
+  });
+};
+
+function openModalAddNewTick() {
+  togleShowModalFixed({
+    nome: "addnewTick",
+    show: true,
+  });
+};
 
 const calcularMetaValor = (carteira: number): number => {
   return carteira * 1.25;

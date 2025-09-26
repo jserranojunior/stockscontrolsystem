@@ -50,8 +50,7 @@
 
         <router-link class="btn-sm mx-1 btn btn-outline btn-secondary" :to="'/contabilidade'"
           v-if="nameRoutesEnable.includes('contabilidade')">Contabilidade</router-link>
-        <router-link class="btn-sm mx-1 btn  btn-secondary" :to="'/operacoes'"
-          v-if="nameRoutesEnable.includes('operacoes')">Nova Operação</router-link>
+
         <div class="btn-sm mx-1 btn btn-primary" @click="Logout()" v-if="nameRoutesEnable.includes('contabilidade')">
           Sair
         </div>

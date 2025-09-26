@@ -240,7 +240,7 @@ const router = useRouter();
 const {
   atualizarOperacao,
   getCorretoras,
-  getTickersCorretoraID,
+  getTickersCorretora,
   calcularUnidade,
   getOperacoesID,
   getCorretorasComOperacoes,
@@ -394,7 +394,9 @@ watch(
 watch(
   () => store.corretoraSelecionada,
   (newValue) => {
-    getTickersCorretoraID(newValue);
+    if (newValue) {
+      getTickersCorretora(newValue);
+    }
   }
 );
 
@@ -402,7 +404,6 @@ watch(
   () => state.resultado,
   (newValue) => {
     store.editarOperacao.resultado = moneyToFloat(newValue);
-
   }
 );
 
