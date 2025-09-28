@@ -115,6 +115,26 @@ func AddTicker(c *gin.Context) {
 		return
 	}
 
+	// --- 1. Verificação de Duplicidade ---
+	var existingTicker models.Tickers
+	// Tenta encontrar um Ticker com o mesmo 'Tick' (código do ativo, ex: PETR4)
+	result := DB.Where("tick = ?", input.Tick).First(&existingTicker)
+
+	if result.Error == nil {
+		// Se não houver erro, significa que o Ticker foi encontrado.
+		// O ticker já existe, retorna um erro de conflito (HTTP 409 Conflict) ou Bad Request (HTTP 400).
+		c.JSON(http.StatusConflict, gin.H{"error": "Já existe um ativo cadastrado com o mesmo código (Tick)."})
+		return
+	}
+
+	// Se o erro for diferente de gorm.ErrRecordNotFound, ocorreu um problema no banco de dados.
+	if result.Error != gorm.ErrRecordNotFound {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao consultar o banco de dados para verificar o ticker existente."})
+		return
+	}
+	// Se o erro for gorm.ErrRecordNotFound, podemos continuar o cadastro.
+	// ----------------------------------------
+
 	// Converte DataCompra
 	dataCompra, err := time.Parse("2006-01-02", input.DataCompra)
 	if err != nil {
@@ -122,7 +142,7 @@ func AddTicker(c *gin.Context) {
 		return
 	}
 
-	// Converte Name para sql.NullString
+	// Cria a struct do novo Ticker
 	ticker := models.Tickers{
 		CorretoraID:               input.CorretoraID,
 		Tick:                      input.Tick,
@@ -132,12 +152,15 @@ func AddTicker(c *gin.Context) {
 		DataAtualizacaoPrecoAtual: time.Now(),
 	}
 
+	// Salva o novo Ticker
 	if err := DB.Create(&ticker).Error; err != nil {
+		// Se o erro for uma falha de unicidade no DB (caso o 'Tick' tenha um índice UNIQUE),
+		// você pode tentar capturar isso aqui, mas a verificação anterior já previne a maioria dos casos.
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao salvar ticker"})
 		return
 	}
 
-	c.JSON(http.StatusOK, ticker)
+	c.JSON(http.StatusCreated, ticker) // Status 201 Created é mais apropriado para criação
 }
 
 type UpdateTickerInput struct {
