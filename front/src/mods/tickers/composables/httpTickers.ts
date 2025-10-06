@@ -1,6 +1,61 @@
 import ClassUseApiConnect from "../../../helpers/http/useApiConnect";
 const ApiConnect = new ClassUseApiConnect();
 
+interface ApiResponse {
+  success: boolean;
+  data?: any;
+  error?: string;
+  message?: string;
+  status?: number;
+}
+
+async function addValorTicker(data: any): Promise<ApiResponse> {
+  const urlApi = "/valorticker";
+
+  try {
+    const response = await ApiConnect.postWithoutToken(
+      urlApi,
+      data as unknown as Record<string, unknown>
+    );
+
+    if (
+      response &&
+      typeof response === "object" &&
+      "status" in response &&
+      response.status >= 200 &&
+      response.status < 300
+    ) {
+      return {
+        success: true,
+        data: response.data,
+        message: "Valor atualizado com sucesso",
+      };
+    } else if (
+      response &&
+      typeof response === "object" &&
+      "status" in response
+    ) {
+      return {
+        success: false,
+        error: response.data?.error || "Erro ao adicionar ticker",
+        status: response.status,
+      };
+    } else {
+      return {
+        success: false,
+        error: "Resposta inválida do servidor",
+      };
+    }
+  } catch (error: any) {
+    console.log(error.request.response);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message || "Erro de conexão",
+      status: error.response?.status,
+    };
+  }
+}
+
 async function getOperacoesSemanaMes() {
   const urlApi = "/operacoessemanames";
   return await ApiConnect.getWithoutToken(urlApi)
@@ -241,5 +296,6 @@ export function httpTickers() {
     getOperacoesSemanaMes,
     getOperacoesID,
     updateCorretora,
+    addValorTicker,
   };
 }

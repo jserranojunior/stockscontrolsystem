@@ -189,6 +189,39 @@ export const useTicker = () => {
     }
   }
 
+  async function adicionarValorTicker(): Promise<any> {
+    // Validação básica antes de enviar
+    if (
+      !store.novoValorTicker.data ||
+      !store.novoValorTicker.valorAtual ||
+      !store.novoValorTicker.tickerId
+    ) {
+      showMessage("Preencha todos os campos obrigatórios");
+      return false;
+    }
+
+    try {
+      const result = await httpTickers().addValorTicker(store.novoValorTicker);
+
+      if (result.success) {
+        // Sucesso
+        showMessage(result.message || "Operação adicionada com sucesso!");
+
+        limpararFormularioTicker();
+        return true;
+      } else {
+        limpararFormularioTicker();
+        showMessage(result.error || "Erro ao adicionar operação");
+        return false;
+      }
+    } catch (error) {
+      if (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  }
+
   // No seu componente Vue/React
   async function adicionarOperacao(): Promise<any> {
     // Validação básica antes de enviar
@@ -308,7 +341,6 @@ export const useTicker = () => {
       if (corretora.operacoes && corretora.operacoes[0]) {
         for (let op of corretora.operacoes) {
           if (!op.saldo) {
-            console.log("Corretora", corretora.nome);
             op.precoMedio = 0;
           }
         }
@@ -322,6 +354,7 @@ export const useTicker = () => {
       .getCorretorasComOperacoesPerformance()
       .then((res) => {
         let checkDados = zerarPrecoMedioSemSaldo(res.data);
+        console.log(checkDados, "checkDados");
         store.ativos = calcularPosicaoOperacoesPerformance(checkDados);
         store.ativos = calcularTotalInvestidoPerformance(store.ativos);
       });
@@ -508,5 +541,6 @@ export const useTicker = () => {
     atualizarOperacao,
     calcularVariacaoPercentual,
     atualizarCorretora,
+    adicionarValorTicker,
   };
 };

@@ -74,4 +74,6 @@ func RegisterRoutes() {
 
 	router.Put("/ticker/:id", middlewares.CORSMiddleware, handlers.UpdateTicker)
 
+	router.Post("/valorticker", middlewares.CORSMiddleware, handlers.NovoValorTicker)
+
 }

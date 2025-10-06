@@ -18,6 +18,8 @@ func GetCorretoras(c *gin.Context) {
 	var corretoras []models.Corretoras
 	if err := DB.Preload("Tickers", func(db *gorm.DB) *gorm.DB {
 		return db.Order("tickers.name ASC")
+	}).Preload("Tickers.ValoresTickers", func(db *gorm.DB) *gorm.DB {
+		return db.Order("valores_tickers.data DESC").Limit(1)
 	}).Find(&corretoras).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -35,6 +37,8 @@ func GetCorretoraPorID(c *gin.Context) {
 	var corretora models.Corretoras
 	if err := DB.Preload("Tickers", func(db *gorm.DB) *gorm.DB {
 		return db.Order("tickers.name ASC")
+	}).Preload("Tickers.ValoresTickers", func(db *gorm.DB) *gorm.DB {
+		return db.Order("valores_tickers.data DESC").Limit(1)
 	}).First(&corretora, id).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Corretora não encontrada"})
@@ -171,6 +175,8 @@ func GetCorretorasComOperacoes(c *gin.Context) {
 	// carrega tudo com operações ordenadas
 	err := DB.Preload("Tickers", func(db *gorm.DB) *gorm.DB {
 		return db.Order("tickers.name ASC")
+	}).Preload("Tickers.ValoresTickers", func(db *gorm.DB) *gorm.DB {
+		return db.Order("valores_tickers.data DESC")
 	}).Preload("Tickers.Operacoes", func(db *gorm.DB) *gorm.DB {
 		return db.Order("operacoes.data ASC").Order("operacoes.created_at ASC")
 	}).Find(&corretoras).Error
@@ -210,8 +216,9 @@ func GetCorretorasComOperacoes(c *gin.Context) {
 			corretorasFiltradas = append(corretorasFiltradas, corretora)
 		}
 	}
+	fmt.Println("corretorasFiltradas =", corretorasFiltradas)
 
-	c.JSON(http.StatusOK, corretorasFiltradas)
+	c.JSON(http.StatusOK, corretoras)
 }
 
 func GetCorretorasComOperacoesPerfomance(c *gin.Context) {
@@ -238,6 +245,8 @@ func GetCorretorasComOperacoesPerfomance(c *gin.Context) {
 	// busca corretoras, tickers e operações apenas do dia informado
 	err = DB.Preload("Tickers", func(db *gorm.DB) *gorm.DB {
 		return db.Order("tickers.name ASC")
+	}).Preload("Tickers.ValoresTickers", func(db *gorm.DB) *gorm.DB {
+		return db.Order("valores_tickers.data DESC").Limit(1)
 	}).Preload("Tickers.Operacoes", "data >= ? AND data < ?", inicio, fim).
 		Find(&corretoras).Error
 	if err != nil {
@@ -257,6 +266,12 @@ func GetCorretorasComOperacoesPerfomance(c *gin.Context) {
 
 		for _, ticker := range cor.Tickers {
 			for _, op := range ticker.Operacoes {
+
+				var precoAtual float64 = 0.0
+				if len(ticker.ValoresTickers) > 0 {
+					precoAtual = ticker.ValoresTickers[0].ValorAtual
+				}
+
 				opDTO := models.OperacaoDTO{
 
 					Tick:                      ticker.Tick,
@@ -268,7 +283,7 @@ func GetCorretorasComOperacoesPerfomance(c *gin.Context) {
 					PrecoMedio:                op.PrecoMedioCompra,
 					Saldo:                     op.SaldoTickers,
 					Carteira:                  op.Carteira,
-					PrecoAtual:                ticker.PrecoAtual,
+					PrecoAtual:                precoAtual,
 					DataAtualizacaoPrecoAtual: ticker.DataAtualizacaoPrecoAtual,
 				}
 				corDTO.Operacoes = append(corDTO.Operacoes, opDTO)
@@ -287,8 +302,9 @@ func GetCorretorasUltimaOperacao(c *gin.Context) {
 	// busca corretoras + tickers + todas operações
 	err := DB.Preload("Tickers", func(db *gorm.DB) *gorm.DB {
 		return db.Order("tickers.name ASC")
-	}).Preload("Tickers.Operacoes").
-		Find(&corretoras).Error
+	}).Preload("Tickers.ValoresTickers", func(db *gorm.DB) *gorm.DB {
+		return db.Order("valores_tickers.data DESC")
+	}).Preload("Tickers.Operacoes").Find(&corretoras).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -322,6 +338,11 @@ func GetCorretorasUltimaOperacao(c *gin.Context) {
 				continue
 			}
 
+			var precoAtual float64 = 0.0
+			if len(ticker.ValoresTickers) > 0 {
+				precoAtual = ticker.ValoresTickers[0].ValorAtual
+			}
+
 			opDTO := models.OperacaoDTO{
 				ID:                        ticker.ID,
 				Tick:                      ticker.Tick,
@@ -333,7 +354,7 @@ func GetCorretorasUltimaOperacao(c *gin.Context) {
 				PrecoMedio:                ultimaOp.PrecoMedioCompra,
 				Saldo:                     ultimaOp.SaldoTickers,
 				Carteira:                  ultimaOp.Carteira,
-				PrecoAtual:                ticker.PrecoAtual,
+				PrecoAtual:                precoAtual,
 				DataAtualizacaoPrecoAtual: ticker.DataAtualizacaoPrecoAtual,
 			}
 
@@ -345,5 +366,6 @@ func GetCorretorasUltimaOperacao(c *gin.Context) {
 	}
 
 	// retorna JSON
+	fmt.Println("resposta =", resposta)
 	c.JSON(http.StatusOK, resposta)
 }

@@ -14,8 +14,8 @@ type Tickers struct {
 	Name                      sql.NullString `json:"name"`
 	DataCompra                time.Time      `gorm:"not null" json:"datacompra"`
 	DataVenda                 sql.NullTime   `json:"datavenda"`
-	PrecoAtual                float64        `gorm:"default:0" json:"precoAtual"`
 	DataAtualizacaoPrecoAtual time.Time      `json:"dataAtualizacaoPrecoAtual"`
 
-	Operacoes []Operacoes `gorm:"foreignKey:TickerID" json:"operacoes,omitempty"`
+	Operacoes      []Operacoes      `gorm:"foreignKey:TickerID" json:"operacoes,omitempty"`
+	ValoresTickers []ValoresTickers `gorm:"foreignKey:TickerID;references:ID" json:"valoresTickers,omitempty"`
 }

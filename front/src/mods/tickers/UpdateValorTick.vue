@@ -5,6 +5,7 @@
       <p class="py-4">{{ store.ativoSelecionado.tick }}</p>
     </template>
     <template #body>
+
       <input type="text" placeholder="0,00" class="input input-bordered w-full"
         v-model="store.ativoSelecionado.valorSemFormatar"
         @blur="store.ativoSelecionado.valorSemFormatar = formatCurrencyExcel(store.ativoSelecionado.valorSemFormatar)" />
@@ -29,16 +30,14 @@ const { togleShowModalFixed } = useModal();
 import { formatCurrencyExcel, formatarMoeda } from "../../helpers/mask/moneyMask";
 
 import { useTicker } from "./composables/useTicker";
-const { atualizarTicker, getCorretorasComOperacoesPerformance } = useTicker();
+const { adicionarValorTicker, getCorretorasComOperacoesPerformance } = useTicker();
 
 import moneyToFloat from "../../helpers/filters/moneyToFloat";
 import Modal from "../../components/modals/Modal.vue";
 
 
 onBeforeMount(async () => {
-
   window.addEventListener("keydown", handleKeydown)
-
 });
 
 
@@ -58,15 +57,21 @@ onBeforeUnmount(() => {
 
 async function atualizarValorTick() {
 
-
-
   if (store.ativoSelecionado) {
     store.ativoSelecionado.dataAtualizacaoPrecoAtual = dataHoraAtual()
     store.ativoSelecionado.precoAtual = moneyToFloat(store.ativoSelecionado.valorSemFormatar)
   }
-  await atualizarTicker(store.ativoSelecionado).then(async () => {
-    store.ativoSelecionado.precoAtual = String(store.ativoSelecionado.precoAtual)
 
+  store.novoValorTicker.tickerId = store.ativoSelecionado.id
+  store.novoValorTicker.data = dataHoraAtual()
+  store.novoValorTicker.valorAtual = store.ativoSelecionado.precoAtual
+
+
+
+
+  await adicionarValorTicker().then(async () => {
+    store.ativoSelecionado.precoAtual = String(store.ativoSelecionado.precoAtual)
+    console.log(store.novoValorTicker, "store.novoValorTicker")
     await getCorretorasComOperacoesPerformance().then(() => {
       togleShowModalFixed({ nome: "atualizartick", show: false });
 

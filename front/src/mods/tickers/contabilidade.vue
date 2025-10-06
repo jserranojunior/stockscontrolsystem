@@ -161,8 +161,8 @@
 
                   <div class="flex justify-between">
                     <div class="font-semibold">P. Atual:</div>
-                    <div v-if="ticker.precoAtual">
-                      {{ formatarMoeda(ticker.precoAtual) }}
+                    <div v-if="ticker && ticker.valoresTickers">
+                      {{ ticker.valoresTickers[0].valorAtual }}
                     </div>
                   </div>
                   <template v-if="ticker.operacoes">
@@ -215,25 +215,27 @@
                     <div class="tooltip" data-tip="Diferença entre o preço atual e a meta">
                       <div class="font-semibold">Dif.:</div>
                     </div>
-                    <div v-if="ticker.operacoes && ticker.operacoes.length" :class="{
-                      'text-green-700': calcularDiferencaMeta(
-                        ticker.operacoes[ticker.operacoes.length - 1].precoMedioCompra,
-                        ticker.precoAtual,
-                        ticker.operacoes[ticker.operacoes.length - 1].saldoTickers
-                      ) > 0,
-                      'text-red-500': calcularDiferencaMeta(
-                        ticker.operacoes[ticker.operacoes.length - 1].precoMedioCompra,
-                        ticker.precoAtual,
-                        ticker.operacoes[ticker.operacoes.length - 1].saldoTickers
-                      ) < 0
-                    }">
+                    <div
+                      v-if="ticker.operacoes && ticker.operacoes[0] && ticker.valoresTickers && ticker.valoresTickers[0]"
+                      :class="{
+                        'text-green-700': calcularDiferencaMeta(
+                          ticker.operacoes[ticker.operacoes.length - 1].precoMedioCompra,
+                          ticker.valoresTickers[0].valorAtual,
+                          ticker.operacoes[ticker.operacoes.length - 1].saldoTickers
+                        ) > 0,
+                        'text-red-500': calcularDiferencaMeta(
+                          ticker.operacoes[ticker.operacoes.length - 1].precoMedioCompra,
+                          ticker.valoresTickers[0].valorAtual,
+                          ticker.operacoes[ticker.operacoes.length - 1].saldoTickers
+                        ) < 0
+                      }">
                       {{
                         formatarMoeda(
                           calcularDiferencaMeta(
                             ticker.operacoes[ticker.operacoes.length -
                               1]
                               .precoMedioCompra,
-                            ticker.precoAtual,
+                            ticker.valoresTickers[0].valorAtual,
                             ticker.operacoes[ticker.operacoes.length - 1].saldoTickers
                           )
                         )
@@ -388,7 +390,14 @@ const resultadoValor = (ticker: any): number => {
 
   const saldo = ultimaOp.saldoTickers ?? 0;
   const carteira = ultimaOp.carteira ?? 0;
-  const precoAtual = ticker.precoAtual ?? 0;
+
+  let precoAtual = 0;
+
+  if (ticker && ticker.valoresTickers && ticker.valoresTickers[0]) {
+    precoAtual = ticker.valoresTickers[0].valorAtual;
+  } else {
+    precoAtual = 0;
+  }
 
   const resultado = saldo * precoAtual - carteira;
 

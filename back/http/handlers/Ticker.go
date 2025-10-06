@@ -12,18 +12,18 @@ import (
 )
 
 type TickerResponse struct {
-	ID                        uint               `json:"ID"`
-	CreatedAt                 time.Time          `json:"CreatedAt"`
-	UpdatedAt                 time.Time          `json:"UpdatedAt"`
-	DeletedAt                 gorm.DeletedAt     `json:"DeletedAt"` // ← Alterado para gorm.DeletedAt
-	CorretoraID               uint               `json:"corretora"`
-	Tick                      string             `json:"tick"`
-	Name                      sql.NullString     `json:"name"`
-	DataCompra                time.Time          `json:"datacompra"`
-	DataVenda                 sql.NullTime       `json:"datavenda"`
-	PrecoAtual                float64            `json:"precoAtual"`
-	Operacoes                 []OperacaoResponse `json:"operacoes,omitempty"`
-	DataAtualizacaoPrecoAtual time.Time          `json:"dataAtualizacaoPrecoAtual"`
+	ID                        uint                    `json:"ID"`
+	CreatedAt                 time.Time               `json:"CreatedAt"`
+	UpdatedAt                 time.Time               `json:"UpdatedAt"`
+	DeletedAt                 gorm.DeletedAt          `json:"DeletedAt"` // ← Alterado para gorm.DeletedAt
+	CorretoraID               uint                    `json:"corretora"`
+	Tick                      string                  `json:"tick"`
+	Name                      sql.NullString          `json:"name"`
+	DataCompra                time.Time               `json:"datacompra"`
+	DataVenda                 sql.NullTime            `json:"datavenda"`
+	Operacoes                 []OperacaoResponse      `json:"operacoes,omitempty"`
+	ValoresTickers            []models.ValoresTickers `json:"valoresTickers,omitempty"`
+	DataAtualizacaoPrecoAtual time.Time               `json:"dataAtualizacaoPrecoAtual"`
 }
 
 type OperacaoResponse struct {
@@ -50,6 +50,8 @@ func GetTickersPorCorretoraID(c *gin.Context) {
 	var tickersDB []models.Tickers
 	if err := DB.Preload("Operacoes", func(db *gorm.DB) *gorm.DB {
 		return db.Order("operacoes.data ASC").Order("operacoes.created_at ASC")
+	}).Preload("ValoresTickers", func(db *gorm.DB) *gorm.DB {
+		return db.Order("valores_tickers.data DESC").Limit(1)
 	}).Where("corretora_id = ?", corretoraID).Order("name ASC").
 		Find(&tickersDB).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -90,8 +92,8 @@ func GetTickersPorCorretoraID(c *gin.Context) {
 			Name:                      tickerDB.Name,
 			DataCompra:                tickerDB.DataCompra,
 			DataVenda:                 tickerDB.DataVenda,
-			PrecoAtual:                tickerDB.PrecoAtual,
 			Operacoes:                 operacoes,
+			ValoresTickers:            tickerDB.ValoresTickers,
 			DataAtualizacaoPrecoAtual: tickerDB.DataAtualizacaoPrecoAtual,
 		})
 	}
@@ -100,12 +102,11 @@ func GetTickersPorCorretoraID(c *gin.Context) {
 }
 
 type AddTickerInput struct {
-	CorretoraID               uint    `json:"corretora" binding:"required"`
-	Tick                      string  `json:"tick" binding:"required"`
-	Name                      string  `json:"name"`
-	DataCompra                string  `json:"datacompra" binding:"required"`
-	PrecoAtual                float64 `json:"precoAtual"`
-	DataAtualizacaoPrecoAtual string  `json:"dataAtualizacaoPrecoAtual"`
+	CorretoraID               uint   `json:"corretora" binding:"required"`
+	Tick                      string `json:"tick" binding:"required"`
+	Name                      string `json:"name"`
+	DataCompra                string `json:"datacompra" binding:"required"`
+	DataAtualizacaoPrecoAtual string `json:"dataAtualizacaoPrecoAtual"`
 }
 
 func AddTicker(c *gin.Context) {
@@ -148,7 +149,6 @@ func AddTicker(c *gin.Context) {
 		Tick:                      input.Tick,
 		Name:                      sql.NullString{String: input.Name, Valid: input.Name != ""},
 		DataCompra:                dataCompra,
-		PrecoAtual:                input.PrecoAtual,
 		DataAtualizacaoPrecoAtual: time.Now(),
 	}
 
@@ -164,11 +164,10 @@ func AddTicker(c *gin.Context) {
 }
 
 type UpdateTickerInput struct {
-	Tick       *string  `json:"tick,omitempty"`
-	Name       *string  `json:"name,omitempty"`
-	DataCompra *string  `json:"datacompra,omitempty"`
-	DataVenda  *string  `json:"datavenda,omitempty"`
-	PrecoAtual *float64 `json:"precoAtual,omitempty"`
+	Tick       *string `json:"tick,omitempty"`
+	Name       *string `json:"name,omitempty"`
+	DataCompra *string `json:"datacompra,omitempty"`
+	DataVenda  *string `json:"datavenda,omitempty"`
 }
 
 func UpdateTicker(c *gin.Context) {
@@ -209,9 +208,6 @@ func UpdateTicker(c *gin.Context) {
 		if dv, err := time.Parse("2006-01-02", *input.DataVenda); err == nil {
 			ticker.DataVenda = sql.NullTime{Time: dv, Valid: true}
 		}
-	}
-	if input.PrecoAtual != nil {
-		ticker.PrecoAtual = *input.PrecoAtual
 	}
 
 	// sempre atualiza a data de atualização
