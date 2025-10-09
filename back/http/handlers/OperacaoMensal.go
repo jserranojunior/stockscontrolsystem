@@ -114,7 +114,7 @@ func processarCorretoras(
 	operacoes map[uint][]OperacaoAux,
 	operacoesAnterior map[uint][]OperacaoAux,
 ) []gin.H {
-
+	variacaoMes := 0.0
 	var resultado []gin.H
 	semanasMes := GerarSemanasMesAtual()
 
@@ -131,11 +131,14 @@ func processarCorretoras(
 		semanas = processarSemanasMesAtual(corretora, estado, operacoes, semanas, semanasMes)
 		semanasOrdenadas := OrdenarSemanas(semanas)
 
+		variacaoMes = somarVariacaoMes(semanasOrdenadas)
+
 		resultado = append(resultado, gin.H{
 			"corretora_id":   corretora.ID,
 			"corretora_nome": corretora.Nome,
 			"corretora_cor":  corretora.Cor,
 			"semanas":        semanasOrdenadas,
+			"variacao_mes":   variacaoMes,
 		})
 	}
 

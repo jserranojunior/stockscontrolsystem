@@ -52,7 +52,17 @@
                 <td class="text-right" :class="{ 'text-red-500': dia.totais.variacao_dia < 0 }">{{
                   formatarMoeda(dia.totais.variacao_dia) }}</td>
               </tr>
+
             </tbody>
+            <tfoot>
+              <tr class="text-lg text-black font-semibold">
+                <td colspan="4" class="px-2 py-1 text-left">
+                  <span class="font-semibold">Total</span>
+                </td>
+                <td class="text-right" :class="{ 'text-red-500': corretora.variacao_mes < 0 }">{{
+                  formatarMoeda(corretora.variacao_mes) }}</td>
+              </tr>
+            </tfoot>
           </table>
         </div>
       </div>

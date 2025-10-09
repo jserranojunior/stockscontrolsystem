@@ -126,6 +126,21 @@ func FiltrarDiasMesAtual(dias []string) []string {
 	return diasFiltrados
 }
 
+// Nova função utilitária para somar a variação
+func somarVariacaoMes(semanas []gin.H) float64 {
+	var variacaoMes float64
+	for _, semana := range semanas {
+		// O valor de "dias" é um []DiaResultado. Use o cast correto.
+		if dias, ok := semana["dias"].([]DiaResultado); ok {
+			for _, dia := range dias {
+				// Acesse o campo VariacaoDia dentro do Totais
+				variacaoMes += dia.Totais.VariacaoDia
+			}
+		}
+	}
+	return roundFloat(variacaoMes) // É bom arredondar o resultado final
+}
+
 // Ordena semanas por número
 func OrdenarSemanas(semanasMap map[int]gin.H) []gin.H {
 	var semanasArray []gin.H
