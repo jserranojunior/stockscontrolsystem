@@ -13,12 +13,14 @@
   "dependencies": {
     "@iconify/vue": "^5.0.0",
     "alvitre-obelisk": "^1.2.5",
+    "apexcharts": "^5.3.5",
     "axios": "^1.6.8",
     "element-plus": "^2.11.2",
     "maska": "^3.1.1",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0",
-    "vue-the-mask": "^0.11.1"
+    "vue-the-mask": "^0.11.1",
+    "vue3-apexcharts": "^1.8.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.10",

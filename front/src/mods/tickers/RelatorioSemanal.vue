@@ -1,4 +1,5 @@
 <template>
+  <ChartsMes></ChartsMes>
   <div>
     <div class="p-6 flex justify-center items-center">
       <h1 class="text-3xl font-bold mb-6 text-center w-full">
@@ -75,6 +76,7 @@ import { onBeforeMount } from 'vue'
 import { store } from './composables/storeTicker'
 import { useTicker } from './composables/useTicker'
 import { formatarMoeda } from '../../helpers/mask/moneyMask'
+import ChartsMes from './components/ChartsMes.vue'
 
 const { getOperacoesSemanaMes } = useTicker()
 

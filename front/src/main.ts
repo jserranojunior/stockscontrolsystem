@@ -5,6 +5,7 @@ import routes from "./mods/rotas/routes";
 /* import Maska from "maska";
  */ import { Icon } from "@iconify/vue";
 import { useAcl } from "./mods/auth/acl/use/useAcl";
+import VueApexCharts from "vue3-apexcharts";
 
 import ElementPlus from "element-plus";
 
@@ -15,6 +16,7 @@ async function start() {
     createApp(App)
       .use(routes)
       .use(ElementPlus)
+      .use(VueApexCharts)
       .component("Icon", Icon)
 
       .mount("#app");

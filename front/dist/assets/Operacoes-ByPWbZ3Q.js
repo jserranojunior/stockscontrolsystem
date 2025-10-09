@@ -1,0 +1,1 @@
+import{_ as e}from"./addOperation.vue_vue_type_script_setup_true_lang-B710NmjC.js";import{g as o,c as r,b as t,o as a}from"./index-DmfBF_Hm.js";import"./useTicker-DymqrdUF.js";import"./moneyToFloat-R4QARd_C.js";const f=o({__name:"Operacoes",setup(c){return(n,s)=>(a(),r("div",null,[t(e)]))}});export{f as default};
