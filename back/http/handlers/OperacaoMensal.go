@@ -49,7 +49,7 @@ type TotaisDia struct {
 	VariacaoDia   float64 `json:"variacao_dia"`
 	Disponivel    float64 `json:"disponivel"`
 	QuantidadeDia float64 `json:"quantidade_dia"`
-	ValorAtual    float64 `json:"valorAtual"`
+	ValorAtualDia float64 `json:"valorAtual_dia"`
 	InvestidoDia  float64 `json:"investido_dia"`
 	ResultadoDia  float64 `json:"resultado_dia"`
 }
@@ -353,7 +353,7 @@ func criarDiaResultado(
 			VariacaoDia:   roundFloat(variacaoDia),
 			Disponivel:    roundFloat(disponivel),
 			QuantidadeDia: roundFloat(quantidadeDia),
-			ValorAtual:    roundFloat(posicaoTotalCarteira),
+			ValorAtualDia: roundFloat(posicaoTotalCarteira),
 			ResultadoDia:  roundFloat(resultadoDia),
 		},
 		Operacoes: operacoes,
@@ -386,25 +386,42 @@ func fetchDados(inicio, fim time.Time) ([]Corretora, []OperacaoAux, error) {
 	}
 
 	var operacoes []OperacaoAux
+
 	err = DB.Table("operacoes o").
 		Select(`
-			o.data,
-			o.tipo_operacao,
-			o.quantidade,
-			o.valor_total,
-			o.ticker_id,
-			o.carteira,
-			c.id as corretora_id,
-			c.nome as corretora_nome,
-			c.cor as corretora_cor,
-			t.preco_atual,
-			(o.quantidade * t.preco_atual) AS posicao
-		`).
+      o.data,
+      o.tipo_operacao,
+      o.quantidade,
+      o.valor_total,
+      o.ticker_id,
+      o.carteira,
+      c.id as corretora_id,
+      c.nome as corretora_nome,
+      c.cor as corretora_cor,
+      (
+        SELECT v.valorAtual
+        FROM valores_tickers v
+        WHERE v.ticker_id = o.ticker_id 
+          AND v.data <= o.data
+        ORDER BY v.data DESC 
+        LIMIT 1
+      ) AS PrecoAtual,
+      (o.quantidade * (
+        SELECT v.valorAtual
+        FROM valores_tickers v
+        WHERE v.ticker_id = o.ticker_id 
+          AND v.data <= o.data
+        ORDER BY v.data DESC 
+        LIMIT 1
+      )) AS Posicao
+    `).
+		// O JOIN com valores_tickers (v) não é mais necessário aqui
 		Joins("JOIN tickers t ON t.id = o.ticker_id").
 		Joins("JOIN corretoras c ON c.id = t.corretora_id").
 		Where("o.data BETWEEN ? AND ?", inicio, fim).
 		Order("c.nome, o.data ASC").
 		Scan(&operacoes).Error
+
 	if err != nil {
 		return nil, nil, fmt.Errorf("Erro ao buscar operações: %v", err)
 	}
