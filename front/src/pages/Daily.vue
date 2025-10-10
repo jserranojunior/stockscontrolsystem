@@ -14,12 +14,12 @@
     <div id="relatorio-diario">
       <RelatorioSemanal />
     </div>
-    <div id="resumo">
+    <!--  <div id="resumo">
       <Resumo />
     </div>
     <div id="resumo-dolar">
       <ResumoDolar />
-    </div>
+    </div> -->
     <div id="resultado-mensal">
       <ResultadoMensal />
     </div>

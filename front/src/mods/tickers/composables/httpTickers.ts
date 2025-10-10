@@ -67,6 +67,17 @@ async function getOperacoesSemanaMes() {
     });
 }
 
+async function getOperacoesMesAMes() {
+  const urlApi = "/operacoesagrupadas";
+  return await ApiConnect.getWithoutToken(urlApi)
+    .then((res: any) => {
+      return res;
+    })
+    .catch((res: any) => {
+      return res;
+    });
+}
+
 export function httpTickers() {
   async function getCorretoras() {
     const urlApi = "/corretoras";
@@ -297,5 +308,6 @@ export function httpTickers() {
     getOperacoesID,
     updateCorretora,
     addValorTicker,
+    getOperacoesMesAMes,
   };
 }

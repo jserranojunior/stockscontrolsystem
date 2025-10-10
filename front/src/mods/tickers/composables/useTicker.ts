@@ -55,8 +55,15 @@ export const useTicker = () => {
     await httpTickers()
       .getOperacoesSemanaMes()
       .then((res) => {
-        console.log(res.data);
         store.operacoesSemanaMes = res.data;
+      });
+  }
+
+  async function getOperacoesMesAMes() {
+    await httpTickers()
+      .getOperacoesMesAMes()
+      .then((res) => {
+        store.operacoesMesAMes = res.data;
       });
   }
 
@@ -542,5 +549,6 @@ export const useTicker = () => {
     calcularVariacaoPercentual,
     atualizarCorretora,
     adicionarValorTicker,
+    getOperacoesMesAMes,
   };
 };

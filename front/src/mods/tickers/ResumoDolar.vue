@@ -1,19 +1,15 @@
 <template>
-  <div
-    class="w-full max-w-6xl mx-auto card shadow-xl p-0 m-0 rounded-2xl my-12"
-  >
+
+
+  <div class="w-full max-w-6xl mx-auto card shadow-xl p-0 m-0 rounded-2xl my-12">
     <div class="card-body p-0 m-0 rounded-2xl">
       <!-- Título -->
-      <h2
-        class="card-title p-3 m-0 text-center justify-center text-lg bg-base-200 rounded-t-2xl"
-      >
+      <h2 class="card-title p-3 m-0 text-center justify-center text-lg bg-base-200 rounded-t-2xl">
         Julho&nbsp;2025 - USD
       </h2>
 
       <!-- Faixa superior com quatro números -->
-      <div
-        class="grid grid-cols-4 text-center text-xs md:text-sm font-medium border-x border-b border-black"
-      >
+      <div class="grid grid-cols-4 text-center text-xs md:text-sm font-medium border-x border-b border-black">
         <div class="py-1">{{ headerValues.total }}</div>
         <div class="py-1 bg-green-100">{{ headerValues.posAtual }}</div>
         <div class="py-1 bg-yellow-300">{{ headerValues.resultMes }}</div>
@@ -35,27 +31,16 @@
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="row in rows"
-              :key="row.name"
-              :class="row.rowClass"
-              class="hover:bg-gray-50"
-            >
+            <tr v-for="row in rows" :key="row.name" :class="row.rowClass" class="hover:bg-gray-50">
               <td class="font-semibold">{{ row.name }}</td>
               <td class="text-right">{{ row.cashPrev }}</td>
               <td class="text-right">{{ row.cash2520 }}</td>
               <td class="text-right">{{ row.firstJuly }}</td>
               <td class="text-right">{{ row.posAtual }}</td>
-              <td
-                class="text-right font-medium"
-                :class="getValueClass(row.result)"
-              >
+              <td class="text-right font-medium" :class="getValueClass(row.result)">
                 {{ row.result }}
               </td>
-              <td
-                class="text-right font-medium"
-                :class="getValueClass(row.perf, true)"
-              >
+              <td class="text-right font-medium" :class="getValueClass(row.perf, true)">
                 {{ row.perf }}
               </td>
             </tr>
@@ -86,6 +71,9 @@
 </template>
 
 <script>
+import { onBeforeMount } from 'vue';
+import { store } from './composables/storeTicker';
+
 export default {
   data() {
     return {
@@ -131,6 +119,8 @@ export default {
     },
   },
 };
+
+
 </script>
 
 <style scoped>
@@ -139,6 +129,7 @@ export default {
 .table td {
   padding: 0.35rem 0.5rem;
 }
+
 .table tr:not(:last-child) {
   border-bottom: 1px solid #e5e7eb;
 }

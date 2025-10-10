@@ -76,4 +76,6 @@ func RegisterRoutes() {
 
 	router.Post("/valorticker", middlewares.CORSMiddleware, handlers.NovoValorTicker)
 
+	router.Get("/operacoesagrupadas", middlewares.CORSMiddleware, handlers.GetOperacoesAgrupadas)
+
 }

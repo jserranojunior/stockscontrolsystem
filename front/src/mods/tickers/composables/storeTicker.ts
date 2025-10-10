@@ -184,4 +184,6 @@ export const store = reactive({
     datavenda: null as any,
     precoAtual: 0 as number,
   },
+
+  operacoesMesAMes: {} as any,
 });
