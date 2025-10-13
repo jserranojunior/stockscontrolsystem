@@ -45,6 +45,11 @@
         </router-link>
         <router-link class="btn-sm mx-1 btn btn-outline btn-secondary" :to="'/corretoras'"
           v-if="nameRoutesEnable.includes('corretoras')">Corretoras</router-link>
+
+        <router-link class="btn-sm mx-1 btn  btn-warning" :to="'/aportes'"
+          v-if="nameRoutesEnable.includes('aportes')">Aportes</router-link>
+
+
         <router-link class="btn-sm mx-1 btn btn-outline btn-secondary" :to="'/diario'"
           v-if="nameRoutesEnable.includes('diario')">Diário</router-link>
 

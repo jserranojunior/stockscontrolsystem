@@ -78,4 +78,7 @@ func RegisterRoutes() {
 
 	router.Get("/operacoesagrupadas", middlewares.CORSMiddleware, handlers.GetOperacoesAgrupadas)
 
+	router.Post("/aportes", middlewares.CORSMiddleware, handlers.NovoAporte)
+	router.Get("/aportes", middlewares.CORSMiddleware, handlers.GetAportes)
+
 }

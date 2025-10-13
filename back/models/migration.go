@@ -23,5 +23,6 @@ func MigrateDB() {
 	db.AutoMigrate(&Operacoes{})
 
 	db.AutoMigrate(&ValoresTickers{})
+	db.AutoMigrate(&Aportes{})
 
 }
