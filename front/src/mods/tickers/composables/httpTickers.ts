@@ -79,6 +79,19 @@ async function getOperacoesMesAMes() {
 }
 
 export function httpTickers() {
+
+    async function getAllTickers() {
+    const urlApi = "/getalltickers"
+    return await ApiConnect.getWithoutToken(urlApi)
+      .then((res: any) => {
+        return res;
+      })
+      .catch((res: any) => {
+        return res;
+      });
+  }
+
+
   async function getCorretoras() {
     const urlApi = "/corretoras";
     return await ApiConnect.getWithoutToken(urlApi)
@@ -295,6 +308,7 @@ export function httpTickers() {
   }
 
   return {
+    getAllTickers,
     deleteOperacao,
     updateTicker,
     addTicker,

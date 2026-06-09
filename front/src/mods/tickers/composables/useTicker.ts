@@ -1,4 +1,4 @@
-import { computed } from "vue";
+import { computed, toRefs } from "vue";
 import { store } from "./storeTicker";
 import { httpTickers } from "./httpTickers";
 export const useTicker = () => {
@@ -525,9 +525,26 @@ export const useTicker = () => {
         resultadoNegociacao: resultado,
       };
     });
+
+
+
+
+
+
   });
 
+    async function getAllTickers() {
+    await httpTickers()
+      .getAllTickers()
+      .then((res) => {
+        console.log(res.data);
+        store.allTickers = res.data;
+      });
+  }
+
   return {
+    ...toRefs(store),
+    getAllTickers,
     deleteOperacaoID,
     atualizarTicker,
     adicionarTicker,

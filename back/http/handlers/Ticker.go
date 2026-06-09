@@ -221,3 +221,63 @@ func UpdateTicker(c *gin.Context) {
 
 	c.JSON(http.StatusOK, ticker)
 }
+
+
+func GetAllTickers(c *gin.Context) {
+    // Buscar todos os tickers com suas operações e o preço mais recente
+    var tickersDB []models.Tickers
+    
+    // O Preload garante que as relações sejam trazidas
+    err := DB.Preload("Operacoes", func(db *gorm.DB) *gorm.DB {
+        return db.Order("operacoes.data ASC").Order("operacoes.created_at ASC")
+    }).Preload("ValoresTickers", func(db *gorm.DB) *gorm.DB {
+        return db.Order("valores_tickers.data DESC").Limit(1)
+    }).Order("name ASC").Find(&tickersDB).Error
+
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao buscar tickers: " + err.Error()})
+        return
+    }
+
+    if len(tickersDB) == 0 {
+        c.JSON(http.StatusNotFound, gin.H{"error": "Nenhum ticker cadastrado no sistema"})
+        return
+    }
+
+    // Converter para a struct de response (para manter o padrão que você já usa)
+    var tickers []TickerResponse
+    for _, tickerDB := range tickersDB {
+        var operacoes []OperacaoResponse
+        for _, op := range tickerDB.Operacoes {
+            operacoes = append(operacoes, OperacaoResponse{
+                ID:               op.ID,
+                TickerID:         op.TickerID,
+                TipoOperacao:     op.TipoOperacao,
+                Data:             op.Data,
+                Quantidade:       op.Quantidade,
+                ValorTotal:       op.ValorTotal,
+                ValorUnidade:     op.ValorUnidade,
+                PrecoMedioCompra: op.PrecoMedioCompra,
+                SaldoTickers:     op.SaldoTickers,
+                Carteira:         op.Carteira,
+            })
+        }
+
+        tickers = append(tickers, TickerResponse{
+            ID:                        tickerDB.ID,
+            CreatedAt:                 tickerDB.CreatedAt,
+            UpdatedAt:                 tickerDB.UpdatedAt,
+            DeletedAt:                 tickerDB.DeletedAt,
+            CorretoraID:               tickerDB.CorretoraID,
+            Tick:                      tickerDB.Tick,
+            Name:                      tickerDB.Name,
+            DataCompra:                tickerDB.DataCompra,
+            DataVenda:                 tickerDB.DataVenda,
+            Operacoes:                 operacoes,
+            ValoresTickers:            tickerDB.ValoresTickers,
+            DataAtualizacaoPrecoAtual: tickerDB.DataAtualizacaoPrecoAtual,
+        })
+    }
+
+    c.JSON(http.StatusOK, tickers)
+}

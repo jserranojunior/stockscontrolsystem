@@ -60,6 +60,8 @@ func RegisterRoutes() {
 
 	router.Get("/tickers/:corretoraID", middlewares.CORSMiddleware, handlers.GetTickersPorCorretoraID)
 
+	router.Get("/getalltickers", middlewares.CORSMiddleware, handlers.GetAllTickers)
+
 	router.Post("/operacoes", middlewares.CORSMiddleware, handlers.CreateOperacao)
 
 	router.Get("/operacoessemanames", middlewares.CORSMiddleware, handlers.GetOperacoesMesAtual)
@@ -81,4 +83,10 @@ func RegisterRoutes() {
 	router.Post("/aportes", middlewares.CORSMiddleware, handlers.NovoAporte)
 	router.Get("/aportes", middlewares.CORSMiddleware, handlers.GetAportes)
 
+	router.Get("/ia/status", middlewares.CORSMiddleware, handlers.IAstatus)	
+
+	router.Get("/analiseativo/:ticker", middlewares.CORSMiddleware, handlers.AnaliseAtivoHandler)
+	
+	router.Get("/noticias/:ticker", middlewares.CORSMiddleware, handlers.ExibirNoticias)
+	router.Get("/testarkeywords/:ticker", middlewares.CORSMiddleware, handlers.TestarKeywordsHandler)
 }

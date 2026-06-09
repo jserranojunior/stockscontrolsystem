@@ -2,7 +2,7 @@ import { reactive } from "vue";
 
 export const store = reactive({
   corretoras: [] as any,
-
+allTickers: [] as any,
   operacoes: [
     {
       data: "2024-03-25",

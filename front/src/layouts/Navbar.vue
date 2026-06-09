@@ -46,8 +46,11 @@
         <router-link class="btn-sm mx-1 btn btn-outline btn-secondary" :to="'/corretoras'"
           v-if="nameRoutesEnable.includes('corretoras')">Corretoras</router-link>
 
-        <router-link class="btn-sm mx-1 btn  btn-warning" :to="'/aportes'"
+        <router-link class="btn-sm mx-1 btn btn-outline btn-secondary" :to="'/aportes'"
           v-if="nameRoutesEnable.includes('aportes')">Aportes</router-link>
+
+          <router-link class="btn-sm mx-1 btn  btn-warning" :to="'/analiseativos'"
+          v-if="nameRoutesEnable.includes('analiseativos')">Análise</router-link>
 
 
         <router-link class="btn-sm mx-1 btn btn-outline btn-secondary" :to="'/diario'"
