@@ -65,8 +65,7 @@ func IAstatus(c *gin.Context) {
 
 func ChamarIAKeywords(ticker string) (string, error) {
 	apiKey := os.Getenv("GROQ_API_KEY")
-	
-	// O segredo está no prompt: limitamos o vocabulário para o que a NewsAPI entende
+
 	prompt := fmt.Sprintf(`Como especialista em mercado financeiro e SEO, gere uma query otimizada para a NewsAPI para o ticker "%s".
 	Regras:
 	1. Use apenas operadores lógicos básicos como OR.
@@ -79,30 +78,62 @@ func ChamarIAKeywords(ticker string) (string, error) {
 		"messages": []map[string]interface{}{
 			{"role": "user", "content": prompt},
 		},
-		"temperature": 0.3, // Temperatura baixa para ser preciso
+		"temperature": 0.3,
 	}
 	jsonPayload, _ := json.Marshal(payload)
 
-	req, _ := http.NewRequest("POST", "https://api.groq.com/openai/v1/chat/completions", bytes.NewBuffer(jsonPayload))
+	req, err := http.NewRequest("POST", "https://api.groq.com/openai/v1/chat/completions", bytes.NewBuffer(jsonPayload))
+	if err != nil {
+		return ticker, err
+	}
 	req.Header.Set("Authorization", "Bearer "+apiKey)
 	req.Header.Set("Content-Type", "application/json")
 
-	client := &http.Client{Timeout: 5 * time.Second}
+	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		return ticker, err // Fallback simples
+		return ticker, err
 	}
 	defer resp.Body.Close()
 
-	bodyBytes, _ := io.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return ticker, err
+	}
+
 	var response map[string]interface{}
-	json.Unmarshal(bodyBytes, &response)
+	if err := json.Unmarshal(bodyBytes, &response); err != nil {
+		return ticker, err
+	}
 
-	choices := response["choices"].([]interface{})
-	content := choices[0].(map[string]interface{})["message"].(map[string]interface{})["content"].(string)
+	// Verificação de erro da API do Groq
+	if errMsg, ok := response["error"]; ok {
+		return ticker, fmt.Errorf("erro na API Groq: %v", errMsg)
+	}
 
-	// Remove eventuais aspas extras que a IA possa retornar
-	return fmt.Sprintf("%v", content), nil
+	// Verificação segura do slice "choices"
+	choices, ok := response["choices"].([]interface{})
+	if !ok || len(choices) == 0 {
+		return ticker, fmt.Errorf("formato de resposta inesperado do Groq")
+	}
+
+	// Verificação segura da estrutura da mensagem
+	firstChoice, ok := choices[0].(map[string]interface{})
+	if !ok {
+		return ticker, fmt.Errorf("erro ao ler a primeira escolha")
+	}
+
+	message, ok := firstChoice["message"].(map[string]interface{})
+	if !ok {
+		return ticker, fmt.Errorf("erro ao ler o campo message")
+	}
+
+	content, ok := message["content"].(string)
+	if !ok {
+		return ticker, fmt.Errorf("erro ao extrair conteúdo da mensagem")
+	}
+
+	return content, nil
 }
 
 func TestarKeywordsHandler(c *gin.Context) {
